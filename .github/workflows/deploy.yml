@@ -1,0 +1,51 @@
+name: CI-CD
+
+on:
+  push:
+    branches: [ develop, main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Build rapide côté CI pour valider le code (sans publier d'images)
+      - uses: actions/setup-java@v4
+        with: { distribution: 'temurin', java-version: '21' }
+      - name: Backend build (sanity check)
+        run: mvn -B -f backend/pom.xml -DskipTests package
+
+      - name: Front build (sanity check)
+        run: |
+          docker build -t front-check ./frontend
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            set -e
+            cd ${{ secrets.APP_DIR }}
+            # fetch + reset sur la branche cible (develop -> QUAL, main -> PROD)
+            BRANCH="${{ github.ref_name }}"
+            if [ "$BRANCH" = "main" ]; then TARGET_BRANCH="main"; else TARGET_BRANCH="develop"; fi
+
+            # si repo déjà cloné :
+            git fetch origin
+            git checkout $TARGET_BRANCH || git checkout -b $TARGET_BRANCH
+            git reset --hard origin/$TARGET_BRANCH
+
+            # rebuild & restart (utilise ton docker-compose.yml existant)
+            docker compose down
+            docker compose up -d --build
+
+            # nettoyage léger
+            docker image prune -f || true
