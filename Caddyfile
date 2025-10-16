@@ -1,15 +1,41 @@
 :88 {
   encode gzip
 
+  # Headers de sécurité
+  header {
+    X-Content-Type-Options nosniff
+    X-Frame-Options DENY
+    X-XSS-Protection "1; mode=block"
+    Referrer-Policy strict-origin-when-cross-origin
+  }
+
+  # CORS pour API
+  @api {
+    path /api/*
+  }
+  header @api Access-Control-Allow-Origin "*"
+  header @api Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+  header @api Access-Control-Allow-Headers "Content-Type, Authorization"
+
   # Keycloak sous /auth
-  reverse_proxy /auth/* keycloak:8080 {
-    header_up X-Forwarded-Proto "https"
+  reverse_proxy /auth/* keycloak:8081 {
+    header_up X-Forwarded-Proto "http"
+    header_up X-Forwarded-For {remote_host}
+    header_up X-Real-IP {remote_host}
   }
 
   # API
-  reverse_proxy /api/* backend:8080
+  reverse_proxy /api/* backend:8080 {
+    header_up X-Forwarded-Proto "http"
+    header_up X-Forwarded-For {remote_host}
+    header_up X-Real-IP {remote_host}
+  }
 
   # Front (le reste)
-  reverse_proxy frontend:80
+  reverse_proxy frontend:80 {
+    header_up X-Forwarded-Proto "http"
+    header_up X-Forwarded-For {remote_host}
+    header_up X-Real-IP {remote_host}
+  }
 }
 

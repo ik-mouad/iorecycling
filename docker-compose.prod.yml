@@ -3,33 +3,35 @@ services:
   postgres:
     image: postgres:16
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-app}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app123}
-      POSTGRES_DB: ${POSTGRES_DB:-app}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - pg:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-app}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
     restart: unless-stopped
+    networks:
+      - iorecycling-network
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.0
     command: ["start-dev","--http-port=8081"]
     environment:
-      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_ADMIN_USERNAME:-admin}
-      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD:-admin}
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_ADMIN_USERNAME}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD}
       KC_HTTP_ENABLED: "true"
       KC_PROXY: "edge"
       KC_HTTP_RELATIVE_PATH: "/auth"
       KC_HOSTNAME_STRICT: "false"
       KC_HOSTNAME_STRICT_HTTPS: "false"
       KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-app}
-      KC_DB_USERNAME: ${POSTGRES_USER:-app}
-      KC_DB_PASSWORD: ${POSTGRES_PASSWORD:-app123}
+      KC_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      KC_DB_USERNAME: ${POSTGRES_USER}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
     depends_on:
       postgres:
         condition: service_healthy
@@ -39,40 +41,42 @@ services:
       timeout: 10s
       retries: 5
     restart: unless-stopped
+    networks:
+      - iorecycling-network
 
   minio:
     image: minio/minio
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio123}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     volumes:
       - minio:/data
-    ports:
-      - "9001:9001"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
       timeout: 20s
       retries: 3
     restart: unless-stopped
+    networks:
+      - iorecycling-network
 
   backend:
-    build: ./backend
+    image: ${REGISTRY:-ghcr.io}/${IMAGE_NAME:-iorecycling}/backend:${VERSION:-latest}
     container_name: backend
-    ports:
-      - "8080:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-app}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-app}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-app123}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       KEYCLOAK_AUTH_SERVER_URL: http://keycloak:8081/auth
-      KEYCLOAK_REALM: ${KEYCLOAK_REALM:-master}
-      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-iorecycling-backend}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID}
       MINIO_ENDPOINT: http://minio:9000
-      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minio}
-      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minio123}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      # Configuration JVM pour production
+      JAVA_OPTS: "-Xmx512m -Xms256m -XX:+UseG1GC -XX:+UseContainerSupport"
     depends_on:
       postgres:
         condition: service_healthy
@@ -84,14 +88,22 @@ services:
       timeout: 10s
       retries: 5
     restart: unless-stopped
+    networks:
+      - iorecycling-network
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
 
   frontend:
-    build: ./frontend
+    image: ${REGISTRY:-ghcr.io}/${IMAGE_NAME:-iorecycling}/frontend:${VERSION:-latest}
     environment:
-      REACT_APP_API_URL: ${REACT_APP_API_URL:-http://localhost:88/api}
-      REACT_APP_KEYCLOAK_URL: ${REACT_APP_KEYCLOAK_URL:-http://localhost:88/auth}
-      REACT_APP_KEYCLOAK_REALM: ${KEYCLOAK_REALM:-master}
-      REACT_APP_KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-iorecycling-frontend}
+      REACT_APP_API_URL: ${REACT_APP_API_URL}
+      REACT_APP_KEYCLOAK_URL: ${REACT_APP_KEYCLOAK_URL}
+      REACT_APP_KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+      REACT_APP_KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID}
     depends_on: 
       - backend
     healthcheck:
@@ -100,6 +112,14 @@ services:
       timeout: 10s
       retries: 3
     restart: unless-stopped
+    networks:
+      - iorecycling-network
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
 
   caddy:
     image: caddy:2
@@ -120,9 +140,23 @@ services:
       timeout: 10s
       retries: 3
     restart: unless-stopped
+    networks:
+      - iorecycling-network
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
 
 volumes:
   pg:
+    driver: local
   minio:
+    driver: local
   caddy_data:
+    driver: local
 
+networks:
+  iorecycling-network:
+    driver: bridge
