@@ -17,24 +17,20 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.0
-    command: ["start-dev","--http-port=8081"]
+    command: ["start-dev","--http-port=8080"]
     environment:
-      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_ADMIN_USERNAME:-admin}
-      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD:-admin}
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       KC_HTTP_ENABLED: "true"
       KC_PROXY: "edge"
       KC_HTTP_RELATIVE_PATH: "/auth"
       KC_HOSTNAME_STRICT: "false"
       KC_HOSTNAME_STRICT_HTTPS: "false"
-      KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-app}
-      KC_DB_USERNAME: ${POSTGRES_USER:-app}
-      KC_DB_PASSWORD: ${POSTGRES_PASSWORD:-app123}
     depends_on:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8081/auth/health/ready || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/auth/health/ready || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -67,7 +63,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-app}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-app}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-app123}
-      KEYCLOAK_AUTH_SERVER_URL: http://keycloak:8081/auth
+      KEYCLOAK_AUTH_SERVER_URL: http://keycloak:8080/auth
       KEYCLOAK_REALM: ${KEYCLOAK_REALM:-master}
       KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-iorecycling-backend}
       MINIO_ENDPOINT: http://minio:9000
@@ -103,7 +99,8 @@ services:
 
   caddy:
     image: caddy:2
-    ports: ["88:88"]
+    ports:
+      - "88:88"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
