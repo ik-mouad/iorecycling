@@ -1,0 +1,15 @@
+:88 {
+  encode gzip
+
+  # Keycloak sous /auth
+  reverse_proxy /auth/* keycloak:8080 {
+    header_up X-Forwarded-Proto "https"
+  }
+
+  # API
+  reverse_proxy /api/* backend:8080
+
+  # Front (le reste)
+  reverse_proxy frontend:80
+}
+
