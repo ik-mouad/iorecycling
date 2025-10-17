@@ -93,7 +93,7 @@ public class ReportService {
     
     private void addTableHeader(PdfPTable table, String text) {
         PdfPCell cell = new PdfPCell(new Phrase(text, HEADER_FONT));
-        cell.setBackgroundColor(Color.LIGHT_GRAY);
+        cell.setBackgroundColor(new Color(211, 211, 211)); // LIGHT_GRAY
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         cell.setPadding(8);
         table.addCell(cell);

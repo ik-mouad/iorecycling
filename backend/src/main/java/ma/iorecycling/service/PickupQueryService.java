@@ -128,6 +128,7 @@ public class PickupQueryService {
      */
     private Double calculateTonnage(Pickup pickup) {
         return switch (pickup.getType()) {
+            case ALL -> 0.0; // ALL n'est pas utilisé pour les calculs individuels
             case RECYCLABLE -> {
                 // Si on a des items détaillés, utiliser leur somme
                 if (!pickup.getItems().isEmpty()) {
