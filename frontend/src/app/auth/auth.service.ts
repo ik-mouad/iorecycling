@@ -18,11 +18,21 @@ export class AuthService {
     this.oauthService.configure(authConfig);
     this.oauthService.loadDiscoveryDocumentAndTryLogin().then(() => {
       this.isAuthenticatedSubject.next(this.oauthService.hasValidAccessToken());
+    }).catch((error) => {
+      console.error('Erreur de configuration OAuth:', error);
+      // En cas d'erreur, on considère que l'utilisateur n'est pas connecté
+      this.isAuthenticatedSubject.next(false);
     });
   }
 
   login(): void {
-    this.oauthService.initCodeFlow();
+    try {
+      this.oauthService.initCodeFlow();
+    } catch (error) {
+      console.error('Erreur lors de la connexion:', error);
+      // Afficher un message d'erreur à l'utilisateur
+      alert('Erreur de connexion. Vérifiez que Keycloak est accessible.');
+    }
   }
 
   logout(): void {
