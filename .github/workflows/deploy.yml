@@ -1,0 +1,174 @@
+# ===========================================
+# IORecycling - Workflow de déploiement
+# ===========================================
+#
+# Ce workflow déploie automatiquement l'application sur le serveur VPS
+# lors des push sur les branches develop et main.
+#
+# SECRETS REQUIS À CONFIGURER DANS GITHUB :
+# ===========================================
+# SSH_HOST      : Adresse IP/domaine du serveur VPS (ex: 146.59.234.174)
+# SSH_USER      : Nom d'utilisateur SSH (ex: ubuntu)
+# SSH_KEY       : Clé privée SSH pour l'authentification
+# SSH_PORT      : Port SSH (optionnel, défaut: 22)
+# APP_DIR       : Répertoire de déploiement sur le serveur (ex: /opt/iorecycling)
+#
+# CONFIGURATION :
+# - Développement : push sur 'develop' → déploiement sur branche develop
+# - Production    : push sur 'main'    → déploiement sur branche main
+#
+# ===========================================
+
+name: Deploy IORecycling
+
+on:
+  push:
+    branches: [ develop, main ]
+
+jobs:
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'eclipse-temurin'
+
+    - name: Cache Maven dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+
+    - name: Build backend with Maven
+      run: mvn -B -f backend/pom.xml -DskipTests package
+
+    - name: Build frontend Docker image (sanity check)
+      run: docker build ./frontend -t iorecycling-frontend:test
+
+    - name: Clean up test image
+      run: docker rmi iorecycling-frontend:test || true
+
+    # Étape E2E (facultative - décommentez si nécessaire)
+    # - name: Install Node.js
+    #   uses: actions/setup-node@v4
+    #   with:
+    #     node-version: '18'
+    #     cache: 'npm'
+    #
+    # - name: Install dependencies
+    #   run: npm ci
+    #
+    # - name: Install Playwright browsers
+    #   run: npx playwright install --with-deps
+    #
+    # - name: Run E2E tests
+    #   run: npx playwright test
+    #   env:
+    #     CI: true
+
+  deploy:
+    name: Deploy to VPS
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Deploy via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_KEY }}
+        port: ${{ secrets.SSH_PORT || 22 }}
+        script: |
+          set -e
+          
+          # Logs avec timestamp
+          echo "$(date '+%Y-%m-%d %H:%M:%S') - Début du déploiement IORecycling"
+          
+          # Aller dans le répertoire de l'application
+          cd ${{ secrets.APP_DIR }}
+          
+          # Vérifier si le repo existe
+          if [ ! -d ".git" ]; then
+            echo "ERREUR: Repository Git non trouvé dans ${{ secrets.APP_DIR }}"
+            echo "Veuillez cloner le repository d'abord:"
+            echo "git clone https://github.com/${{ github.repository }}.git ."
+            exit 1
+          fi
+          
+          # Déterminer la branche cible
+          BRANCH="${{ github.ref_name }}"
+          if [ "$BRANCH" = "main" ]; then
+            TARGET_BRANCH="main"
+            ENV_TYPE="PRODUCTION"
+          else
+            TARGET_BRANCH="develop"
+            ENV_TYPE="QUALIFICATION"
+          fi
+          
+          echo "Déploiement sur environnement: $ENV_TYPE (branche: $TARGET_BRANCH)"
+          
+          # Mise à jour du code source
+          echo "Mise à jour du code source..."
+          git fetch origin
+          git checkout $TARGET_BRANCH || git checkout -b $TARGET_BRANCH
+          git reset --hard origin/$TARGET_BRANCH
+          
+          # Vérifier la présence du fichier .env
+          if [ ! -f ".env" ]; then
+            echo "ATTENTION: Fichier .env manquant!"
+            echo "Copiez env.example vers .env et configurez les variables"
+            if [ -f "env.example" ]; then
+              echo "Copie automatique de env.example vers .env..."
+              cp env.example .env
+            else
+              echo "ERREUR: Fichier env.example non trouvé"
+              exit 1
+            fi
+          fi
+          
+          # Arrêter les services existants
+          echo "Arrêt des services existants..."
+          docker compose down || true
+          
+          # Nettoyage des images inutilisées
+          echo "Nettoyage des images Docker..."
+          docker image prune -f || true
+          
+          # Rebuild & restart
+          echo "Construction et démarrage des services..."
+          docker compose up -d --build
+          
+          # Attendre que les services soient prêts
+          echo "Attente du démarrage des services..."
+          sleep 30
+          
+          # Vérification de la santé des services
+          echo "Vérification de la santé des services..."
+          if docker compose ps | grep -q "unhealthy"; then
+            echo "ATTENTION: Certains services ne sont pas en bonne santé"
+            docker compose ps
+            echo "Vérifiez les logs avec: docker compose logs"
+          else
+            echo "Tous les services sont en bonne santé"
+          fi
+          
+          echo "$(date '+%Y-%m-%d %H:%M:%S') - Déploiement terminé"
+          echo "Services déployés:"
+          docker compose ps
+          
+          # Afficher les URLs d'accès
+          echo ""
+          echo "🌐 URLs d'accès:"
+          echo "Frontend: http://${{ secrets.SSH_HOST }}:88/"
+          echo "API Health: http://${{ secrets.SSH_HOST }}:88/api/health"
+          echo "Keycloak: http://${{ secrets.SSH_HOST }}:88/auth/"
+          echo "MinIO Console: http://${{ secrets.SSH_HOST }}:9001/"
