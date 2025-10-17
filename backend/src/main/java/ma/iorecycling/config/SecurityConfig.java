@@ -47,17 +47,22 @@ public class SecurityConfig {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(jwt -> {
             // Extraire les rôles depuis realm_access.roles
-            Map<String, Object> realmAccess = jwt.getClaimAsMap("realm_access");
-            if (realmAccess == null) {
+            Object realmAccessClaim = jwt.getClaims().get("realm_access");
+            if (!(realmAccessClaim instanceof Map)) {
                 return List.of();
             }
-            
+
             @SuppressWarnings("unchecked")
-            List<String> roles = (List<String>) realmAccess.get("roles");
-            if (roles == null) {
+            Map<String, Object> realmAccess = (Map<String, Object>) realmAccessClaim;
+
+            Object rolesClaim = realmAccess.get("roles");
+            if (!(rolesClaim instanceof List)) {
                 return List.of();
             }
-            
+
+            @SuppressWarnings("unchecked")
+            List<String> roles = (List<String>) rolesClaim;
+
             return roles.stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                 .collect(Collectors.toList());
