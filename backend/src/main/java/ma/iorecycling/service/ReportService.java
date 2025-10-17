@@ -1,7 +1,6 @@
 package ma.iorecycling.service;
 
 import com.lowagie.text.*;
-import com.lowagie.text.pdf.BaseColor;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
@@ -94,7 +93,7 @@ public class ReportService {
     
     private void addTableHeader(PdfPTable table, String text) {
         PdfPCell cell = new PdfPCell(new Phrase(text, HEADER_FONT));
-        cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+        cell.setBackgroundColor(Color.LIGHT_GRAY);
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         cell.setPadding(8);
         table.addCell(cell);
