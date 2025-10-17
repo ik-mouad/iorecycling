@@ -72,7 +72,7 @@ import { AuthService } from '../../auth/auth.service';
 export class LoginComponent {
   showError = false;
 
-  constructor(private authService: AuthService) {
+  constructor(public authService: AuthService) {
     console.log('LoginComponent initialisé');
   }
 
