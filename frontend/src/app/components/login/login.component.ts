@@ -62,14 +62,26 @@ import { AuthService } from '../../auth/auth.service';
 })
 export class LoginComponent {
   showError = false;
+  isInitialized = false;
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) {
+    // Vérifier si le service est initialisé
+    setTimeout(() => {
+      this.isInitialized = true;
+    }, 500);
+  }
 
   login(): void {
     this.showError = false;
+    if (!this.isInitialized) {
+      this.showError = true;
+      return;
+    }
+    
     try {
       this.authService.login();
     } catch (error) {
+      console.error('Erreur de connexion:', error);
       this.showError = true;
     }
   }

@@ -11,7 +11,10 @@ export class AuthService {
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
   constructor(private oauthService: OAuthService) {
-    this.configure();
+    // Délayer la configuration pour éviter les erreurs d'injection
+    setTimeout(() => {
+      this.configure();
+    }, 100);
   }
 
   private configure(): void {
