@@ -56,6 +56,24 @@ jobs:
     - name: Clean up test image
       run: docker rmi iorecycling-frontend:test || true
 
+    # Étape E2E (facultative - décommentez si nécessaire)
+    # - name: Install Node.js
+    #   uses: actions/setup-node@v4
+    #   with:
+    #     node-version: '18'
+    #     cache: 'npm'
+    #
+    # - name: Install dependencies
+    #   run: npm ci
+    #
+    # - name: Install Playwright browsers
+    #   run: npx playwright install --with-deps
+    #
+    # - name: Run E2E tests
+    #   run: npx playwright test
+    #   env:
+    #     CI: true
+
   deploy:
     name: Deploy to VPS
     needs: build
