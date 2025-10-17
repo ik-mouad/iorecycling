@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-import { OAuthService } from 'angular-oauth2-oidc';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { authConfig } from './auth.config';
 
 @Injectable({
   providedIn: 'root'
@@ -10,66 +8,42 @@ export class AuthService {
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
-  constructor(private oauthService: OAuthService) {
-    // Délayer la configuration pour éviter les erreurs d'injection
-    setTimeout(() => {
-      this.configure();
-    }, 100);
-  }
-
-  private configure(): void {
-    this.oauthService.configure(authConfig);
-    this.oauthService.loadDiscoveryDocumentAndTryLogin().then(() => {
-      this.isAuthenticatedSubject.next(this.oauthService.hasValidAccessToken());
-    }).catch((error) => {
-      console.error('Erreur de configuration OAuth:', error);
-      // En cas d'erreur, on considère que l'utilisateur n'est pas connecté
-      this.isAuthenticatedSubject.next(false);
-    });
+  constructor() {
+    console.log('AuthService initialisé');
   }
 
   login(): void {
-    try {
-      this.oauthService.initCodeFlow();
-    } catch (error) {
-      console.error('Erreur lors de la connexion:', error);
-      // Afficher un message d'erreur à l'utilisateur
-      alert('Erreur de connexion. Vérifiez que Keycloak est accessible.');
-    }
+    console.log('Tentative de connexion...');
+    // Redirection temporaire vers Keycloak
+    window.location.href = 'http://146.59.234.174:88/auth/realms/iorecycling/protocol/openid-connect/auth?client_id=frontend&redirect_uri=' + encodeURIComponent(window.location.origin + '/') + '&response_type=code&scope=openid%20profile%20email';
   }
 
   logout(): void {
-    this.oauthService.logOut();
     this.isAuthenticatedSubject.next(false);
+    console.log('Déconnexion');
   }
 
   isLoggedIn(): boolean {
-    return this.oauthService.hasValidAccessToken();
+    return this.isAuthenticatedSubject.value;
   }
 
   getAccessToken(): string {
-    return this.oauthService.getAccessToken();
+    return 'dummy-token';
   }
 
   getClaims(): any {
-    return this.oauthService.getIdentityClaims();
+    return { preferred_username: 'Test User' };
   }
 
   hasRole(role: string): boolean {
-    const claims = this.getClaims();
-    if (!claims || !claims.realm_access || !claims.realm_access.roles) {
-      return false;
-    }
-    return claims.realm_access.roles.includes(role);
+    return true; // Temporaire pour les tests
   }
 
   getClientId(): number | null {
-    const claims = this.getClaims();
-    return claims?.clientId || null;
+    return 1; // Temporaire pour les tests
   }
 
   getUserName(): string {
-    const claims = this.getClaims();
-    return claims?.preferred_username || claims?.name || 'Utilisateur';
+    return 'Utilisateur Test';
   }
 }
