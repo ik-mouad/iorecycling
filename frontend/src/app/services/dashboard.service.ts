@@ -27,6 +27,20 @@ export interface ValuablesDetail {
   total: number; // en MAD
 }
 
+export interface ValorSummaryRowDTO {
+  material: string;
+  qtyKg: number;
+  pricePerKg: number;
+  totalMad: number;
+}
+
+export interface ValorSummary {
+  month: string; // YYYY-MM
+  rows: ValorSummaryRowDTO[];
+  grandTotalMad: number;
+  currency: string;
+}
+
 export interface ValuablesReport {
   month: string;
   year: number;
@@ -62,32 +76,20 @@ export class DashboardService {
   /**
    * Récupère le rapport des valorisables pour le mois en cours
    */
-  getValuablesReport(month?: string): Observable<ValuablesReport> {
+  getValuablesReport(month?: string): Observable<ValorSummary> {
     const currentDate = new Date();
     const targetMonth = month || `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}`;
 
     const params = new HttpParams().set('month', targetMonth);
 
-    return this.http.get<ValuablesReport>(`${this.baseUrl}/valorisables/summary`, { params }).pipe(
-      map(apiResponse => ({
-        month: apiResponse.month,
-        year: parseInt(apiResponse.month.split('-')[0]),
-        details: apiResponse.rows.map(row => ({
-          id: 0, // L'API ne retourne pas d'ID
-          material: row.material,
-          quantity: row.qtyKg,
-          pricePerKg: row.pricePerKg,
-          total: row.totalMad
-        })),
-        totalAmount: apiResponse.grandTotalMad
-      })),
+    return this.http.get<ValorSummary>(`${this.baseUrl}/valorisables/summary`, { params }).pipe(
       catchError(error => {
         console.error('Erreur lors de la récupération du rapport valorisables:', error);
         return of({
           month: targetMonth,
-          year: parseInt(targetMonth.split('-')[0]),
-          details: [],
-          totalAmount: 0
+          rows: [],
+          grandTotalMad: 0,
+          currency: "MAD"
         });
       })
     );

@@ -1,0 +1,238 @@
+<app-authenticated-layout>
+  <div class="dashboard-container">
+    <!-- Hero Header -->
+    <div class="hero-section">
+      <mat-card class="hero-card">
+        <div class="hero-content">
+          <div class="hero-icon">
+            <mat-icon>local_shipping</mat-icon>
+          </div>
+          <div class="hero-text">
+            <h1 class="hero-title">
+              <span class="counter" data-testid="kpi-pickups">{{ pickupsCount }}</span>
+              enlèvements effectués
+            </h1>
+            <p class="hero-subtitle">Depuis le début du partenariat</p>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+
+    <!-- KPIs Grid -->
+    <div class="kpis-grid">
+      <!-- Recyclables KPI -->
+      <mat-card class="kpi-card kpi-recyclables">
+        <div class="kpi-content">
+          <div class="kpi-header">
+            <mat-icon class="kpi-icon">autorenew</mat-icon>
+            <span class="kpi-label">Recyclables</span>
+          </div>
+          <div class="kpi-value" data-testid="kpi-valorisables">
+            {{ formatNumber(valorisablesTonnage) }} t
+          </div>
+          <div class="kpi-subtitle">Tonnes valorisables</div>
+        </div>
+      </mat-card>
+
+      <!-- Banals KPI -->
+      <mat-card class="kpi-card kpi-banals">
+        <div class="kpi-content">
+          <div class="kpi-header">
+            <mat-icon class="kpi-icon">inventory</mat-icon>
+            <span class="kpi-label">Banals</span>
+          </div>
+          <div class="kpi-value" data-testid="kpi-banals">
+            {{ formatNumber(banalsTonnage) }} t
+          </div>
+          <div class="kpi-subtitle">Tonnes banales</div>
+        </div>
+      </mat-card>
+
+      <!-- Dangereux KPI -->
+      <mat-card class="kpi-card kpi-dangereux">
+        <div class="kpi-content">
+          <div class="kpi-header">
+            <mat-icon class="kpi-icon">warning</mat-icon>
+            <span class="kpi-label">Dangereux</span>
+          </div>
+          <div class="kpi-value" data-testid="kpi-dangereux">
+            {{ formatNumber(dangereuxTonnage) }} t
+          </div>
+          <div class="kpi-subtitle">Tonnes à détruire</div>
+        </div>
+      </mat-card>
+    </div>
+
+    <!-- Revenue Card -->
+    <mat-card class="revenue-card">
+      <div class="revenue-header">
+        <h3>Produits valorisables (MAD)</h3>
+        <div class="revenue-value" data-testid="kpi-revenue">
+          {{ formatCurrency(totalRevenue) }}
+        </div>
+      </div>
+      <div class="revenue-chart">
+        <canvas id="revenueChart"></canvas>
+      </div>
+    </mat-card>
+
+    <!-- Filters -->
+    <div class="filters-section">
+      <mat-button-toggle-group [(ngModel)]="selectedFilter" (change)="onFilterChange($event.value)">
+        <mat-button-toggle value="all" data-testid="filter-all">Tous</mat-button-toggle>
+        <mat-button-toggle value="recyclables" data-testid="filter-recyclables">Recyclables</mat-button-toggle>
+        <mat-button-toggle value="banals" data-testid="filter-banals">Banals</mat-button-toggle>
+        <mat-button-toggle value="dangereux" data-testid="filter-dangereux">À détruire</mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+
+    <!-- Valorization Details (visible only for recyclables filter) -->
+    <div *ngIf="showValorizationDetails && valorizationReport" class="valorization-section">
+      <mat-card class="valorization-card">
+        <div class="valorization-header">
+          <h3>Détails valorisables (mois en cours)</h3>
+          <button mat-raised-button color="primary" (click)="downloadReport()" 
+                  [disabled]="isLoadingReport" data-testid="btn-download-pdf">
+            <mat-icon>download</mat-icon>
+            Télécharger rapport PDF
+          </button>
+        </div>
+        
+        <div class="valorization-table" *ngIf="valorizationReport.rows.length > 0">
+          <table mat-table [dataSource]="valorizationReport.rows" class="mat-elevation-z2">
+            <ng-container matColumnDef="material">
+              <th mat-header-cell *matHeaderCellDef>Matériau</th>
+              <td mat-cell *matCellDef="let row">{{ row.material }}</td>
+            </ng-container>
+            
+            <ng-container matColumnDef="quantity">
+              <th mat-header-cell *matHeaderCellDef>Quantité (t)</th>
+              <td mat-cell *matCellDef="let row">{{ formatNumber(row.qtyKg / 1000) }}</td>
+            </ng-container>
+            
+            <ng-container matColumnDef="price">
+              <th mat-header-cell *matHeaderCellDef>Prix/kg</th>
+              <td mat-cell *matCellDef="let row">{{ formatCurrency(row.pricePerKg) }}</td>
+            </ng-container>
+            
+            <ng-container matColumnDef="total">
+              <th mat-header-cell *matHeaderCellDef>Total</th>
+              <td mat-cell *matCellDef="let row">{{ formatCurrency(row.totalMad) }}</td>
+            </ng-container>
+            
+            <tr mat-header-row *matHeaderRowDef="['material', 'quantity', 'price', 'total']"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['material', 'quantity', 'price', 'total']"></tr>
+          </table>
+          
+          <div class="valorization-total">
+            <strong>Total: {{ formatCurrency(valorizationReport.grandTotalMad) }}</strong>
+          </div>
+        </div>
+        
+        <div *ngIf="valorizationReport.rows.length === 0" class="no-data">
+          <mat-icon>inbox</mat-icon>
+          <p>Aucune donnée de valorisation disponible pour ce mois</p>
+        </div>
+      </mat-card>
+    </div>
+
+    <!-- Pickups Table -->
+    <mat-card class="table-card">
+      <div class="table-header">
+        <h3>Historique des enlèvements</h3>
+        <div class="table-actions">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Rechercher</mat-label>
+            <input matInput [(ngModel)]="searchTerm" (input)="onSearchChange()" 
+                   placeholder="Site, type...">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+          <button mat-stroked-button>
+            <mat-icon>download</mat-icon>
+            Export CSV
+          </button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table mat-table [dataSource]="filteredDataSource" class="records-table">
+          <!-- Date Column -->
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+            <td mat-cell *matCellDef="let row">{{ row.date }}</td>
+          </ng-container>
+
+          <!-- Heure Column -->
+          <ng-container matColumnDef="heure">
+            <th mat-header-cell *matHeaderCellDef>Heure</th>
+            <td mat-cell *matCellDef="let row">{{ row.heure }}</td>
+          </ng-container>
+
+          <!-- Type Column -->
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef>Type</th>
+            <td mat-cell *matCellDef="let row">
+              <span class="type-chip" [ngClass]="getTypeClass(row.type)">
+                {{ getTypeLabel(row.type) }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Tonnage Column -->
+          <ng-container matColumnDef="tonnage">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Tonnage</th>
+            <td mat-cell *matCellDef="let row">{{ formatNumber(row.tonnage) }} t</td>
+          </ng-container>
+
+          <!-- Site Column -->
+          <ng-container matColumnDef="site">
+            <th mat-header-cell *matHeaderCellDef>Site</th>
+            <td mat-cell *matCellDef="let row">{{ row.site }}</td>
+          </ng-container>
+
+          <!-- Documents Column -->
+          <ng-container matColumnDef="documents">
+            <th mat-header-cell *matHeaderCellDef>Documents</th>
+            <td mat-cell *matCellDef="let row">
+              <div class="documents-container">
+                <button *ngFor="let doc of row.docs" 
+                        mat-icon-button 
+                        [matTooltip]="doc.type"
+                        (click)="downloadDocument(doc.url, doc.name)"
+                        class="document-btn">
+                  <mat-icon>{{ getDocumentIcon(doc.type) }}</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <!-- Loading State -->
+        <div *ngIf="isLoadingTable" class="loading-container">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Chargement des données...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!isLoadingTable && filteredDataSource.data.length === 0" class="empty-state">
+          <mat-icon>inbox</mat-icon>
+          <h3>Aucun enlèvement trouvé</h3>
+          <p>Vérifiez vos filtres ou contactez le support</p>
+          <button mat-raised-button color="primary">
+            <mat-icon>refresh</mat-icon>
+            Actualiser
+          </button>
+        </div>
+
+        <!-- Paginator -->
+        <mat-paginator [pageSizeOptions]="[10, 25, 50]" 
+                       showFirstLastButtons 
+                       aria-label="Sélectionner la page des enlèvements">
+        </mat-paginator>
+      </div>
+    </mat-card>
+  </div>
+</app-authenticated-layout>
