@@ -6,12 +6,19 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatSkeletonModule } from '@angular/material/skeleton';
+import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
+import { MatSortModule, MatSort } from '@angular/material/sort';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
 import { AuthenticatedLayoutComponent } from '../authenticated-layout/authenticated-layout.component';
 import { IconService } from '../../services/icon.service';
 import { ChartService } from '../../services/chart.service';
+import { DashboardService, PickupRecord, ValuablesReport } from '../../services/dashboard.service';
 
 interface KpiData {
   type: 'recyclables' | 'banals' | 'dangereux';
@@ -30,13 +37,7 @@ interface RevenueData {
   sparklineLabels: string[];
 }
 
-interface CollectionRecord {
-  id: number;
-  date: string;
-  type: 'recyclables' | 'banals' | 'dangereux';
-  weight: number;
-  status: 'completed' | 'pending' | 'cancelled';
-}
+// Interface supprimée car remplacée par PickupRecord du service
 
 @Component({
   selector: 'app-client-dashboard',
@@ -51,6 +52,12 @@ interface CollectionRecord {
     MatProgressSpinnerModule,
     MatTableModule,
     MatSkeletonModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatTooltipModule,
+    MatSnackBarModule,
     FormsModule,
     AuthenticatedLayoutComponent
   ],
@@ -73,7 +80,7 @@ interface CollectionRecord {
               </div>
             </div>
           </mat-card>
-        </div>
+      </div>
 
         <!-- KPIs et Revenu -->
         <div class="metrics-section">
@@ -121,7 +128,7 @@ interface CollectionRecord {
                   <mat-chip class="trend-chip negative">-{{ kpiData.dangereux.trend }}%</mat-chip>
                 </div>
               </div>
-            </mat-card>
+        </mat-card>
 
             <!-- Skeleton pour KPIs -->
             <ng-template #kpiSkeleton>
@@ -142,7 +149,7 @@ interface CollectionRecord {
               <mat-card-title>Produits valorisables</mat-card-title>
               <mat-card-subtitle>Revenus générés</mat-card-subtitle>
             </mat-card-header>
-            <mat-card-content>
+          <mat-card-content>
               <div class="revenue-content">
                 <div class="revenue-amount">
                   {{ formatCurrency(revenueData.total) }}
@@ -151,8 +158,8 @@ interface CollectionRecord {
                   <canvas #revenueChart width="200" height="60"></canvas>
                 </div>
               </div>
-            </mat-card-content>
-          </mat-card>
+          </mat-card-content>
+        </mat-card>
 
           <!-- Skeleton pour Revenu -->
           <ng-template #revenueSkeleton>
@@ -167,39 +174,50 @@ interface CollectionRecord {
                   </mat-skeleton-loader>
                 </div>
               </mat-card-header>
-              <mat-card-content>
+          <mat-card-content>
                 <mat-skeleton-loader [attr.aria-label]="'Chargement montant revenus'" 
                   [ngStyle]="{'width': '150px', 'height': '40px'}">
                 </mat-skeleton-loader>
-              </mat-card-content>
-            </mat-card>
+          </mat-card-content>
+        </mat-card>
           </ng-template>
         </div>
 
-        <!-- Filtres -->
+        <!-- Filtres et Recherche -->
         <div class="filters-section">
-          <mat-button-toggle-group 
-            [(ngModel)]="selectedFilter" 
-            (change)="onFilterChange($event)"
-            class="filter-group"
-            aria-label="Filtrer par type de déchet">
-            <mat-button-toggle value="all" aria-label="Tous les types">
-              <mat-icon>all_inclusive</mat-icon>
-              <span>Tous</span>
-            </mat-button-toggle>
-            <mat-button-toggle value="recyclables" aria-label="Recyclables uniquement">
-              <mat-icon>autorenew</mat-icon>
-              <span>Recyclables</span>
-            </mat-button-toggle>
-            <mat-button-toggle value="banals" aria-label="Banals uniquement">
-              <mat-icon>delete</mat-icon>
-              <span>Banals</span>
-            </mat-button-toggle>
-            <mat-button-toggle value="dangereux" aria-label="Dangereux uniquement">
-              <mat-icon>warning</mat-icon>
-              <span>À détruire</span>
-            </mat-button-toggle>
-          </mat-button-toggle-group>
+          <div class="filters-row">
+            <mat-button-toggle-group 
+              [(ngModel)]="selectedFilter" 
+              (change)="onFilterChange($event)"
+              class="filter-group"
+              aria-label="Filtrer par type de déchet">
+              <mat-button-toggle value="all" aria-label="Tous les types">
+                <mat-icon>all_inclusive</mat-icon>
+                <span>Tous</span>
+              </mat-button-toggle>
+              <mat-button-toggle value="recyclables" aria-label="Recyclables uniquement">
+                <mat-icon>autorenew</mat-icon>
+                <span>Recyclables</span>
+              </mat-button-toggle>
+              <mat-button-toggle value="banals" aria-label="Banals uniquement">
+                <mat-icon>delete</mat-icon>
+                <span>Banals</span>
+              </mat-button-toggle>
+              <mat-button-toggle value="dangereux" aria-label="Dangereux uniquement">
+                <mat-icon>warning</mat-icon>
+                <span>À détruire</span>
+              </mat-button-toggle>
+            </mat-button-toggle-group>
+            
+            <mat-form-field class="search-field" appearance="outline">
+              <mat-label>Rechercher...</mat-label>
+              <input matInput 
+                     [(ngModel)]="searchTerm" 
+                     (input)="applyFilter()"
+                     placeholder="Date, site, type...">
+              <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+          </div>
         </div>
 
         <!-- Table des enlèvements -->
@@ -207,46 +225,95 @@ interface CollectionRecord {
           <mat-card class="table-card">
             <mat-card-header>
               <mat-card-title>Historique des enlèvements</mat-card-title>
-              <mat-card-subtitle>{{ filteredRecords.length }} enregistrement(s)</mat-card-subtitle>
+              <mat-card-subtitle>{{ dataSource.data.length }} enregistrement(s)</mat-card-subtitle>
             </mat-card-header>
-            <mat-card-content>
+          <mat-card-content>
+              <!-- État de chargement -->
               <div class="table-container" *ngIf="!isLoading; else tableSkeleton">
-                <table mat-table [dataSource]="filteredRecords" class="records-table">
-                  <ng-container matColumnDef="date">
-                    <th mat-header-cell *matHeaderCellDef>Date</th>
-                    <td mat-cell *matCellDef="let record">{{ formatDate(record.date) }}</td>
-                  </ng-container>
+                <!-- État d'erreur -->
+                <div *ngIf="hasError" class="error-banner">
+                  <mat-icon>error_outline</mat-icon>
+                  <span>Erreur lors du chargement des données</span>
+                  <button mat-button color="primary" (click)="loadPickups()">Réessayer</button>
+                </div>
 
-                  <ng-container matColumnDef="type">
-                    <th mat-header-cell *matHeaderCellDef>Type</th>
-                    <td mat-cell *matCellDef="let record">
-                      <mat-chip [class]="'type-chip ' + record.type">
-                        <mat-icon>{{ getTypeIcon(record.type) }}</mat-icon>
-                        {{ getTypeLabel(record.type) }}
-                      </mat-chip>
-                    </td>
-                  </ng-container>
+                <!-- État vide -->
+                <div *ngIf="!hasError && dataSource.data.length === 0" class="empty-state">
+                  <mat-icon class="empty-icon">inbox</mat-icon>
+                  <h3>Aucun enlèvement trouvé</h3>
+                  <p>Aucun enlèvement ne correspond à vos critères de recherche.</p>
+                  <button mat-raised-button color="primary" (click)="clearFilters()">
+                    <mat-icon>clear_all</mat-icon>
+                    <span>Voir tous les enlèvements</span>
+                  </button>
+                </div>
 
-                  <ng-container matColumnDef="weight">
-                    <th mat-header-cell *matHeaderCellDef>Poids</th>
-                    <td mat-cell *matCellDef="let record">{{ formatWeight(record.weight) }}</td>
-                  </ng-container>
+                <!-- Tableau -->
+                <div *ngIf="!hasError && dataSource.data.length > 0" class="table-wrapper">
+                  <table mat-table [dataSource]="dataSource" matSort class="records-table">
+                    <ng-container matColumnDef="dateHeure">
+                      <th mat-header-cell *matHeaderCellDef mat-sort-header>Date & Heure</th>
+                      <td mat-cell *matCellDef="let record">
+                        <div class="date-time-cell">
+                          <div class="date">{{ formatDate(record.date) }}</div>
+                          <div class="time">{{ record.heure }}</div>
+                        </div>
+                      </td>
+                    </ng-container>
 
-                  <ng-container matColumnDef="status">
-                    <th mat-header-cell *matHeaderCellDef>Statut</th>
-                    <td mat-cell *matCellDef="let record">
-                      <mat-chip [class]="'status-chip ' + record.status">
-                        {{ getStatusLabel(record.status) }}
-                      </mat-chip>
-                    </td>
-                  </ng-container>
+                    <ng-container matColumnDef="type">
+                      <th mat-header-cell *matHeaderCellDef>Type</th>
+                      <td mat-cell *matCellDef="let record">
+                        <mat-chip [style.background-color]="getWasteTypeColor(record.type)" 
+                                  [style.color]="'white'"
+                                  class="type-chip">
+                          <mat-icon>{{ getTypeIcon(record.type) }}</mat-icon>
+                          {{ getTypeLabel(record.type) }}
+                        </mat-chip>
+                      </td>
+                    </ng-container>
 
-                  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                  <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
-                      class="table-row" 
-                      [attr.aria-label]="'Enlèvement du ' + formatDate(row.date) + ', ' + getTypeLabel(row.type) + ', ' + formatWeight(row.weight)">
-                  </tr>
-                </table>
+                    <ng-container matColumnDef="tonnage">
+                      <th mat-header-cell *matHeaderCellDef mat-sort-header>Tonnage</th>
+                      <td mat-cell *matCellDef="let record">
+                        <span class="tonnage-value">{{ formatWeight(record.tonnage) }}</span>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="site">
+                      <th mat-header-cell *matHeaderCellDef>Site</th>
+                      <td mat-cell *matCellDef="let record">
+                        <span class="site-name">{{ record.site }}</span>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="documents">
+                      <th mat-header-cell *matHeaderCellDef>Documents</th>
+                      <td mat-cell *matCellDef="let record">
+                        <div class="documents-cell">
+                          <button *ngFor="let doc of record.docs" 
+                                  mat-icon-button 
+                                  [matTooltip]="getDocumentLabel(doc.type)"
+                                  (click)="downloadDocument(doc.url, doc.name)"
+                                  class="doc-button">
+                            <mat-icon>{{ getDocumentIcon(doc.type) }}</mat-icon>
+                          </button>
+                        </div>
+                      </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+                        class="table-row" 
+                        [attr.aria-label]="'Enlèvement du ' + formatDate(row.date) + ' à ' + row.heure + ', ' + getTypeLabel(row.type) + ', ' + formatWeight(row.tonnage)">
+                    </tr>
+                  </table>
+
+                  <mat-paginator [pageSizeOptions]="[10, 25, 50]" 
+                                 showFirstLastButtons
+                                 aria-label="Sélectionner la page des enlèvements">
+                  </mat-paginator>
+                </div>
               </div>
 
               <!-- Skeleton pour Table -->
@@ -255,6 +322,70 @@ interface CollectionRecord {
                   <mat-skeleton-loader *ngFor="let i of [1,2,3,4,5]" 
                     [attr.aria-label]="'Chargement ligne ' + i"
                     [ngStyle]="{'width': '100%', 'height': '48px', 'margin-bottom': '8px'}">
+                  </mat-skeleton-loader>
+                </div>
+              </ng-template>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+        <!-- Sous-liste Valorisation (si filtre = Recyclables) -->
+        <div class="valuables-section" *ngIf="selectedFilter === 'recyclables' && !isLoading">
+          <mat-card class="valuables-card">
+            <mat-card-header>
+              <mat-icon mat-card-avatar>eco</mat-icon>
+              <mat-card-title>Détails valorisables (mois en cours)</mat-card-title>
+              <mat-card-subtitle>Matériaux recyclables collectés</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div *ngIf="!valuablesLoading; else valuablesSkeleton">
+                <div class="valuables-table-container">
+                  <table mat-table [dataSource]="valuablesDataSource" class="valuables-table">
+                    <ng-container matColumnDef="material">
+                      <th mat-header-cell *matHeaderCellDef>Matériau</th>
+                      <td mat-cell *matCellDef="let item">{{ item.material }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="quantity">
+                      <th mat-header-cell *matHeaderCellDef>Quantité</th>
+                      <td mat-cell *matCellDef="let item">{{ formatWeight(item.quantity) }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="pricePerKg">
+                      <th mat-header-cell *matHeaderCellDef>Prix/kg</th>
+                      <td mat-cell *matCellDef="let item">{{ formatCurrency(item.pricePerKg) }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="total">
+                      <th mat-header-cell *matHeaderCellDef>Total</th>
+                      <td mat-cell *matCellDef="let item">
+                        <span class="total-amount">{{ formatCurrency(item.total) }}</span>
+                      </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="valuablesColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: valuablesColumns;"></tr>
+                  </table>
+                </div>
+
+                <div class="valuables-summary">
+                  <div class="total-section">
+                    <span class="total-label">Total général :</span>
+                    <span class="total-value">{{ formatCurrency(valuablesReport?.totalAmount || 0) }}</span>
+                  </div>
+                  <button mat-raised-button color="primary" (click)="downloadReport()">
+                    <mat-icon>download</mat-icon>
+                    <span>Télécharger rapport PDF</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Skeleton pour Valorisation -->
+              <ng-template #valuablesSkeleton>
+                <div class="valuables-skeleton">
+                  <mat-skeleton-loader *ngFor="let i of [1,2,3,4,5]" 
+                    [attr.aria-label]="'Chargement valorisation ' + i"
+                    [ngStyle]="{'width': '100%', 'height': '40px', 'margin-bottom': '8px'}">
                   </mat-skeleton-loader>
                 </div>
               </ng-template>
@@ -486,9 +617,16 @@ interface CollectionRecord {
       height: 60px;
     }
 
-    /* Filtres */
+    /* Filtres et Recherche */
     .filters-section {
       margin-bottom: var(--spacing-xl);
+    }
+
+    .filters-row {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xl);
+      flex-wrap: wrap;
     }
 
     .filter-group {
@@ -502,6 +640,11 @@ interface CollectionRecord {
       align-items: center;
       gap: var(--spacing-xs);
       border-radius: var(--radius-md);
+    }
+
+    .search-field {
+      flex: 1;
+      min-width: 250px;
     }
 
     /* Table */
@@ -518,8 +661,13 @@ interface CollectionRecord {
       overflow-x: auto;
     }
 
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
     .records-table {
       width: 100%;
+      min-width: 800px;
     }
 
     .table-row {
@@ -530,44 +678,152 @@ interface CollectionRecord {
       background-color: var(--color-surface-variant);
     }
 
+    /* Cellules spécialisées */
+    .date-time-cell {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-xs);
+    }
+
+    .date {
+      font-weight: 500;
+      color: var(--color-text-primary);
+    }
+
+    .time {
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+    }
+
+    .tonnage-value {
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+
+    .site-name {
+      color: var(--color-text-secondary);
+      font-size: 0.875rem;
+    }
+
+    .documents-cell {
+      display: flex;
+      gap: var(--spacing-xs);
+      flex-wrap: wrap;
+    }
+
+    .doc-button {
+      width: 32px;
+      height: 32px;
+      line-height: 32px;
+    }
+
+    .doc-button mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Chips de type avec couleurs spécifiques */
     .type-chip {
       display: inline-flex;
       align-items: center;
       gap: var(--spacing-xs);
+      color: white !important;
+      font-weight: 500;
     }
 
-    .type-chip.recyclables {
-      background-color: #dcfce7;
-      color: #166534;
-    }
-
-    .type-chip.banals {
-      background-color: #f3f4f6;
-      color: #374151;
-    }
-
-    .type-chip.dangereux {
+    /* États d'erreur et vide */
+    .error-banner {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      padding: var(--spacing-lg);
       background-color: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: var(--radius-md);
       color: #dc2626;
+      margin-bottom: var(--spacing-lg);
     }
 
-    .status-chip {
-      font-size: 0.75rem;
+    .empty-state {
+      text-align: center;
+      padding: var(--spacing-3xl);
+      color: var(--color-text-secondary);
     }
 
-    .status-chip.completed {
-      background-color: #dcfce7;
-      color: #166534;
+    .empty-icon {
+      font-size: 4rem;
+      width: 4rem;
+      height: 4rem;
+      color: var(--color-text-muted);
+      margin-bottom: var(--spacing-lg);
     }
 
-    .status-chip.pending {
-      background-color: #fef3c7;
-      color: #92400e;
+    .empty-state h3 {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin-bottom: var(--spacing-md);
     }
 
-    .status-chip.cancelled {
-      background-color: #fef2f2;
-      color: #dc2626;
+    .empty-state p {
+      margin-bottom: var(--spacing-xl);
+    }
+
+    /* Section Valorisation */
+    .valuables-section {
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .valuables-card {
+      border-radius: var(--radius-lg);
+      box-shadow: var(--elevation-2);
+      border-left: 4px solid var(--color-primary);
+    }
+
+    .valuables-table-container {
+      overflow-x: auto;
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .valuables-table {
+      width: 100%;
+      min-width: 600px;
+    }
+
+    .valuables-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--spacing-lg);
+      background-color: var(--color-surface-variant);
+      border-radius: var(--radius-md);
+      flex-wrap: wrap;
+      gap: var(--spacing-lg);
+    }
+
+    .total-section {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+
+    .total-label {
+      font-weight: 500;
+      color: var(--color-text-secondary);
+    }
+
+    .total-value {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    .total-amount {
+      font-weight: 600;
+      color: var(--color-primary);
     }
 
     /* Responsive */
@@ -584,7 +840,7 @@ interface CollectionRecord {
 
       .hero-content {
         flex-direction: column;
-        text-align: center;
+      text-align: center;
         gap: var(--spacing-lg);
       }
 
@@ -639,12 +895,22 @@ interface CollectionRecord {
 })
 export class ClientDashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('revenueChart', { static: false }) revenueChartRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
   
   isLoading = true;
+  hasError = false;
   animatedCount = 0;
   collectionCount = 127;
   selectedFilter = 'all';
-  displayedColumns = ['date', 'type', 'weight', 'status'];
+  searchTerm = '';
+  displayedColumns = ['dateHeure', 'type', 'tonnage', 'site', 'documents'];
+  valuablesColumns = ['material', 'quantity', 'pricePerKg', 'total'];
+  
+  dataSource = new MatTableDataSource<PickupRecord>([]);
+  valuablesDataSource = new MatTableDataSource<any>([]);
+  valuablesLoading = false;
+  valuablesReport: ValuablesReport | null = null;
 
   kpiData = {
     recyclables: { value: 45.67, trend: 12 },
@@ -659,27 +925,19 @@ export class ClientDashboardComponent implements OnInit, OnDestroy, AfterViewIni
     sparklineLabels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin']
   };
 
-  allRecords: CollectionRecord[] = [
-    { id: 1, date: '2024-01-15', type: 'recyclables', weight: 2.5, status: 'completed' },
-    { id: 2, date: '2024-01-14', type: 'banals', weight: 1.8, status: 'completed' },
-    { id: 3, date: '2024-01-13', type: 'dangereux', weight: 0.5, status: 'completed' },
-    { id: 4, date: '2024-01-12', type: 'recyclables', weight: 3.2, status: 'completed' },
-    { id: 5, date: '2024-01-11', type: 'banals', weight: 2.1, status: 'pending' },
-    { id: 6, date: '2024-01-10', type: 'recyclables', weight: 1.9, status: 'completed' },
-    { id: 7, date: '2024-01-09', type: 'dangereux', weight: 0.3, status: 'completed' },
-    { id: 8, date: '2024-01-08', type: 'banals', weight: 2.7, status: 'completed' }
-  ];
-
-  filteredRecords: CollectionRecord[] = [];
+  // Données supprimées car maintenant gérées par le service
 
   constructor(
     private iconService: IconService,
-    private chartService: ChartService
+    private chartService: ChartService,
+    private dashboardService: DashboardService,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
     this.initializeData();
     this.animateCounter();
+    this.loadPickups();
   }
 
   ngAfterViewInit(): void {
@@ -687,6 +945,10 @@ export class ClientDashboardComponent implements OnInit, OnDestroy, AfterViewIni
     setTimeout(() => {
       this.loadSparklineChart();
     }, 100);
+    
+    // Configurer le tri et la pagination
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
   ngOnDestroy(): void {
@@ -695,11 +957,37 @@ export class ClientDashboardComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   private initializeData(): void {
-    // Simuler le chargement des données
-    setTimeout(() => {
-      this.filteredRecords = [...this.allRecords];
-      this.isLoading = false;
-    }, 1500);
+    // Configuration du filtre personnalisé
+    this.dataSource.filterPredicate = (data: PickupRecord, filter: string) => {
+      const searchStr = filter.toLowerCase();
+      return (
+        data.site.toLowerCase().includes(searchStr) ||
+        data.type.toLowerCase().includes(searchStr) ||
+        this.formatDate(data.date).toLowerCase().includes(searchStr) ||
+        data.heure.toLowerCase().includes(searchStr)
+      );
+    };
+  }
+
+  loadPickups(): void {
+    this.isLoading = true;
+    this.hasError = false;
+    
+    this.dashboardService.getPickups().subscribe({
+      next: (pickups) => {
+        this.dataSource.data = pickups;
+        this.isLoading = false;
+        this.applyFilter();
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des enlèvements:', error);
+        this.hasError = true;
+        this.isLoading = false;
+        this.snackBar.open('Erreur lors du chargement des données', 'Fermer', {
+          duration: 3000
+        });
+      }
+    });
   }
 
   private animateCounter(): void {
@@ -748,13 +1036,65 @@ export class ClientDashboardComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   onFilterChange(event: any): void {
-    const filter = event.value;
+    this.selectedFilter = event.value;
+    this.applyFilter();
     
-    if (filter === 'all') {
-      this.filteredRecords = [...this.allRecords];
-    } else {
-      this.filteredRecords = this.allRecords.filter(record => record.type === filter);
+    // Charger les données valorisables si filtre = recyclables
+    if (this.selectedFilter === 'recyclables') {
+      this.loadValuablesReport();
     }
+  }
+
+  applyFilter(): void {
+    // Appliquer le filtre de recherche
+    this.dataSource.filter = this.searchTerm.trim().toLowerCase();
+    
+    // Appliquer le filtre de type
+    if (this.selectedFilter !== 'all') {
+      const currentData = this.dataSource.data;
+      const filteredData = currentData.filter(record => record.type === this.selectedFilter);
+      this.dataSource.data = filteredData;
+    }
+  }
+
+  clearFilters(): void {
+    this.selectedFilter = 'all';
+    this.searchTerm = '';
+    this.dataSource.filter = '';
+    this.loadPickups();
+  }
+
+  loadValuablesReport(): void {
+    this.valuablesLoading = true;
+    
+    this.dashboardService.getValuablesReport().subscribe({
+      next: (report) => {
+        this.valuablesReport = report;
+        this.valuablesDataSource.data = report.details;
+        this.valuablesLoading = false;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement du rapport valorisables:', error);
+        this.valuablesLoading = false;
+        this.snackBar.open('Erreur lors du chargement du rapport valorisables', 'Fermer', {
+          duration: 3000
+        });
+      }
+    });
+  }
+
+  downloadDocument(url: string, filename: string): void {
+    this.dashboardService.downloadDocument(url, filename);
+    this.snackBar.open(`Téléchargement de ${filename}`, 'Fermer', {
+      duration: 2000
+    });
+  }
+
+  downloadReport(): void {
+    this.dashboardService.downloadReport();
+    this.snackBar.open('Téléchargement du rapport PDF', 'Fermer', {
+      duration: 2000
+    });
   }
 
   formatWeight(weight: number): string {
@@ -793,12 +1133,15 @@ export class ClientDashboardComponent implements OnInit, OnDestroy, AfterViewIni
     return labels[type as keyof typeof labels] || type;
   }
 
-  getStatusLabel(status: string): string {
-    const labels = {
-      completed: 'Terminé',
-      pending: 'En cours',
-      cancelled: 'Annulé'
-    };
-    return labels[status as keyof typeof labels] || status;
+  getDocumentIcon(type: string): string {
+    return this.dashboardService.getDocumentIcon(type);
+  }
+
+  getDocumentLabel(type: string): string {
+    return this.dashboardService.getDocumentLabel(type);
+  }
+
+  getWasteTypeColor(type: string): string {
+    return this.dashboardService.getWasteTypeColor(type);
   }
 }
