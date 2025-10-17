@@ -18,12 +18,7 @@ public class ClientController {
     
     @GetMapping("/dashboard")
     public DashboardDto getDashboard(@AuthenticationPrincipal Jwt jwt) {
-        // Extraire le clientId depuis le token JWT
-        Long clientId = jwt.getClaimAsLong("clientId");
-        
-        if (clientId == null) {
-            throw new IllegalArgumentException("clientId non trouvé dans le token JWT");
-        }
+        Long clientId = extractClientId(jwt);
         
         // Calculer les statistiques
         Long pickupsCount = pickupRepository.countByClientId(clientId);
@@ -39,5 +34,23 @@ public class ClientController {
         );
         
         return new DashboardDto(pickupsCount, kgSummary);
+    }
+
+    private Long extractClientId(Jwt jwt) {
+        Object claimValue = jwt.getClaims().get("clientId");
+        if (claimValue == null) {
+            throw new IllegalArgumentException("clientId non trouvé dans le token JWT");
+        }
+        if (claimValue instanceof Number) {
+            return ((Number) claimValue).longValue();
+        }
+        if (claimValue instanceof String) {
+            try {
+                return Long.parseLong((String) claimValue);
+            } catch (NumberFormatException ex) {
+                // fall through to error below
+            }
+        }
+        throw new IllegalArgumentException("clientId invalide dans le token JWT");
     }
 }
