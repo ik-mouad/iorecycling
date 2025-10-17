@@ -74,7 +74,7 @@ export class ChartService {
                   style: 'currency',
                   currency: 'MAD',
                   minimumFractionDigits: 0
-                }).format(value);
+                }).format(value || 0);
               }
             }
           }
