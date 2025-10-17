@@ -4,6 +4,7 @@ package ma.iorecycling.entity;
  * Type d'enlèvement de déchets
  */
 public enum PickupType {
+    ALL("Tous"),
     RECYCLABLE("Recyclable"),
     BANAL("Banal"),
     DANGEREUX("Dangereux");

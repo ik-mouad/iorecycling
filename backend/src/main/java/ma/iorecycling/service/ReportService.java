@@ -1,6 +1,7 @@
 package ma.iorecycling.service;
 
 import com.lowagie.text.*;
+import com.lowagie.text.pdf.BaseColor;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
