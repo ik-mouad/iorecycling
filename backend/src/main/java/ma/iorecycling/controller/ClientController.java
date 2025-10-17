@@ -19,7 +19,18 @@ public class ClientController {
     @GetMapping("/dashboard")
     public DashboardDto getDashboard(@AuthenticationPrincipal Jwt jwt) {
         // Extraire le clientId depuis le token JWT
-        Long clientId = jwt.getClaimAsLong("clientId");
+        Object clientIdObj = jwt.getClaim("clientId");
+        Long clientId = null;
+        
+        if (clientIdObj instanceof Number) {
+            clientId = ((Number) clientIdObj).longValue();
+        } else if (clientIdObj instanceof String) {
+            try {
+                clientId = Long.parseLong((String) clientIdObj);
+            } catch (NumberFormatException e) {
+                // Ignore
+            }
+        }
         
         if (clientId == null) {
             throw new IllegalArgumentException("clientId non trouvé dans le token JWT");
