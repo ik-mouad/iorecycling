@@ -69,14 +69,21 @@ interface RevenueData {
           <mat-card class="hero-card">
             <div class="hero-content">
               <div class="hero-icon">
-                <mat-icon class="truck-icon">local_shipping</mat-icon>
+                <mat-icon class="truck-icon" 
+                          [attr.aria-label]="'Icône camion pour les enlèvements'">local_shipping</mat-icon>
               </div>
               <div class="hero-text">
                 <h1 class="hero-title">
-                  <span class="counter" [attr.data-count]="collectionCount">{{ animatedCount }}</span>
+                  <span class="counter" 
+                        [attr.data-count]="collectionCount"
+                        [attr.aria-label]="'Nombre total d\'enlèvements: ' + animatedCount">{{ animatedCount }}</span>
                   <span class="counter-label">enlèvements effectués</span>
                 </h1>
                 <p class="hero-subtitle">Depuis le début du partenariat</p>
+                <div class="last-updated" *ngIf="lastUpdated">
+                  <mat-icon class="update-icon">schedule</mat-icon>
+                  <span class="update-text">Dernière mise à jour: {{ formatLastUpdated(lastUpdated) }}</span>
+                </div>
               </div>
             </div>
           </mat-card>
@@ -89,13 +96,19 @@ interface RevenueData {
             <mat-card class="kpi-card recyclables" *ngIf="!isLoading; else kpiSkeleton">
               <div class="kpi-content">
                 <div class="kpi-header">
-                  <mat-icon class="kpi-icon">autorenew</mat-icon>
-                  <div class="kpi-badge recyclables-badge">♻️</div>
+                  <mat-icon class="kpi-icon" 
+                            [matTooltip]="'Déchets recyclables collectés'"
+                            [attr.aria-label]="'Icône recyclables'">autorenew</mat-icon>
+                  <div class="kpi-badge recyclables-badge" 
+                       [attr.aria-label]="'Badge recyclables'">♻️</div>
                 </div>
-                <div class="kpi-value">{{ formatWeight(kpiData.recyclables.value) }}</div>
+                <div class="kpi-value" 
+                     [attr.aria-label]="'Quantité recyclables: ' + formatWeight(kpiData.recyclables.value)">{{ formatWeight(kpiData.recyclables.value) }}</div>
                 <div class="kpi-label">Recyclables</div>
                 <div class="kpi-trend" *ngIf="kpiData.recyclables.trend">
-                  <mat-chip class="trend-chip positive">+{{ kpiData.recyclables.trend }}%</mat-chip>
+                  <mat-chip class="trend-chip positive" 
+                            [matTooltip]="'Évolution positive de ' + kpiData.recyclables.trend + '%'"
+                            [attr.aria-label]="'Tendance positive: +' + kpiData.recyclables.trend + '%'">+{{ kpiData.recyclables.trend }}%</mat-chip>
                 </div>
               </div>
             </mat-card>
@@ -226,6 +239,16 @@ interface RevenueData {
             <mat-card-header>
               <mat-card-title>Historique des enlèvements</mat-card-title>
               <mat-card-subtitle>{{ dataSource.data.length }} enregistrement(s)</mat-card-subtitle>
+              <div class="table-actions">
+                <button mat-raised-button 
+                        color="primary" 
+                        (click)="exportToCSV()"
+                        [matTooltip]="'Exporter les données en format CSV'"
+                        [attr.aria-label]="'Exporter les données en CSV'">
+                  <mat-icon>download</mat-icon>
+                  <span>Exporter CSV</span>
+                </button>
+              </div>
             </mat-card-header>
           <mat-card-content>
               <!-- État de chargement -->
@@ -239,10 +262,15 @@ interface RevenueData {
 
                 <!-- État vide -->
                 <div *ngIf="!hasError && dataSource.data.length === 0" class="empty-state">
-                  <mat-icon class="empty-icon">inbox</mat-icon>
-                  <h3>Aucun enlèvement trouvé</h3>
-                  <p>Aucun enlèvement ne correspond à vos critères de recherche.</p>
-                  <button mat-raised-button color="primary" (click)="clearFilters()">
+                  <mat-icon class="empty-icon" 
+                            [attr.aria-label]="'Icône boîte vide'">inbox</mat-icon>
+                  <h3>🎉 Aucun enlèvement trouvé</h3>
+                  <p>Parfait ! Aucun enlèvement ne correspond à vos critères de recherche. Essayez de modifier vos filtres pour voir plus de données.</p>
+                  <button mat-raised-button 
+                          color="primary" 
+                          (click)="clearFilters()"
+                          [matTooltip]="'Réinitialiser tous les filtres'"
+                          [attr.aria-label]="'Réinitialiser les filtres pour voir tous les enlèvements'">
                     <mat-icon>clear_all</mat-icon>
                     <span>Voir tous les enlèvements</span>
                   </button>
@@ -399,12 +427,12 @@ interface RevenueData {
     .dashboard-container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: var(--spacing-xl);
+      padding: var(--spacing-lg);
     }
 
     /* En-tête Héro */
     .hero-section {
-      margin-bottom: var(--spacing-2xl);
+      margin-bottom: var(--spacing-xl);
     }
 
     .hero-card {
@@ -418,8 +446,8 @@ interface RevenueData {
     .hero-content {
       display: flex;
       align-items: center;
-      gap: var(--spacing-xl);
-      padding: var(--spacing-2xl);
+      gap: var(--spacing-lg);
+      padding: var(--spacing-xl);
     }
 
     .hero-icon {
@@ -461,21 +489,41 @@ interface RevenueData {
     .hero-subtitle {
       font-size: 1.125rem;
       opacity: 0.8;
-      margin: 0;
+      margin: 0 0 var(--spacing-sm) 0;
+    }
+
+    .last-updated {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      font-size: 0.875rem;
+      opacity: 0.7;
+      margin-top: var(--spacing-sm);
+    }
+
+    .update-icon {
+      font-size: 1rem;
+      width: 1rem;
+      height: 1rem;
+    }
+
+    .update-text {
+      font-family: 'Roboto', sans-serif;
+      font-weight: 400;
     }
 
     /* Section Métriques */
     .metrics-section {
       display: grid;
       grid-template-columns: 2fr 1fr;
-      gap: var(--spacing-xl);
-      margin-bottom: var(--spacing-2xl);
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-xl);
     }
 
     .kpis-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: var(--spacing-lg);
+      gap: var(--spacing-md);
     }
 
     .kpi-card {
@@ -491,7 +539,7 @@ interface RevenueData {
     }
 
     .kpi-content {
-      padding: var(--spacing-xl);
+      padding: var(--spacing-lg);
       text-align: center;
     }
 
@@ -649,12 +697,18 @@ interface RevenueData {
 
     /* Table */
     .table-section {
-      margin-bottom: var(--spacing-xl);
+      margin-bottom: var(--spacing-lg);
     }
 
     .table-card {
       border-radius: var(--radius-lg);
       box-shadow: var(--elevation-2);
+    }
+
+    .table-actions {
+      margin-left: auto;
+      display: flex;
+      gap: var(--spacing-sm);
     }
 
     .table-container {
@@ -911,6 +965,7 @@ export class ClientDashboardComponent implements OnInit, OnDestroy, AfterViewIni
   valuablesDataSource = new MatTableDataSource<any>([]);
   valuablesLoading = false;
   valuablesReport: ValuablesReport | null = null;
+  lastUpdated: Date | null = null;
 
   kpiData = {
     recyclables: { value: 45.67, trend: 12 },
@@ -977,6 +1032,7 @@ export class ClientDashboardComponent implements OnInit, OnDestroy, AfterViewIni
       next: (pickups) => {
         this.dataSource.data = pickups;
         this.isLoading = false;
+        this.lastUpdated = new Date();
         this.applyFilter();
       },
       error: (error) => {
@@ -1143,5 +1199,66 @@ export class ClientDashboardComponent implements OnInit, OnDestroy, AfterViewIni
 
   getWasteTypeColor(type: string): string {
     return this.dashboardService.getWasteTypeColor(type);
+  }
+
+  formatLastUpdated(date: Date): string {
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    
+    if (diffInMinutes < 1) {
+      return 'À l\'instant';
+    } else if (diffInMinutes < 60) {
+      return `Il y a ${diffInMinutes} min`;
+    } else if (diffInMinutes < 1440) {
+      const hours = Math.floor(diffInMinutes / 60);
+      return `Il y a ${hours}h`;
+    } else {
+      return date.toLocaleDateString('fr-FR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+  }
+
+  exportToCSV(): void {
+    // Simulation de l'export CSV
+    const csvData = this.dataSource.data.map(record => ({
+      'Date': this.formatDate(record.date),
+      'Heure': record.heure,
+      'Type': this.getTypeLabel(record.type),
+      'Tonnage': record.tonnage,
+      'Site': record.site,
+      'Documents': record.docs.map(doc => doc.name).join('; ')
+    }));
+
+    const csvContent = this.convertToCSV(csvData);
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `enlevements_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    this.snackBar.open('Export CSV téléchargé avec succès', 'Fermer', {
+      duration: 2000
+    });
+  }
+
+  private convertToCSV(data: any[]): string {
+    if (data.length === 0) return '';
+    
+    const headers = Object.keys(data[0]);
+    const csvRows = [
+      headers.join(','),
+      ...data.map(row => headers.map(header => `"${row[header]}"`).join(','))
+    ];
+    
+    return csvRows.join('\n');
   }
 }
