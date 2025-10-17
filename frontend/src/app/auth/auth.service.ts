@@ -15,7 +15,7 @@ export class AuthService {
   login(): void {
     console.log('Tentative de connexion...');
     // Redirection temporaire vers Keycloak
-    window.location.href = 'http://146.59.234.174:88/auth/realms/iorecycling/protocol/openid-connect/auth?client_id=frontend&redirect_uri=' + encodeURIComponent(window.location.origin + '/') + '&response_type=code&scope=openid%20profile%20email';
+    window.location.href = 'http://146.59.234.174:88/auth/realms/master/protocol/openid-connect/auth?client_id=frontend&redirect_uri=' + encodeURIComponent(window.location.origin + '/') + '&response_type=code&scope=openid%20profile%20email';
   }
 
   logout(): void {
