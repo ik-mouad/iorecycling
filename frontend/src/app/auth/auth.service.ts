@@ -16,11 +16,22 @@ export class AuthService {
   }
 
   private configure(): void {
+    console.log('Configuration OAuth en cours...');
     this.oauthService.configure(authConfig);
     this.oauthService.loadDiscoveryDocumentAndTryLogin().then(() => {
       const isAuthenticated = this.oauthService.hasValidAccessToken();
       this.isAuthenticatedSubject.next(isAuthenticated);
       console.log('Authentification:', isAuthenticated);
+      console.log('Token valide:', this.oauthService.hasValidAccessToken());
+      console.log('Claims:', this.oauthService.getIdentityClaims());
+      
+      // Si on revient de Keycloak avec un token valide, rediriger vers la page simple
+      if (isAuthenticated && window.location.pathname === '/') {
+        console.log('Redirection vers la page simple...');
+        setTimeout(() => {
+          window.location.href = '/simple';
+        }, 1000);
+      }
     }).catch((error) => {
       console.error('Erreur de configuration OAuth:', error);
       this.isAuthenticatedSubject.next(false);

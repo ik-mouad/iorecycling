@@ -21,6 +21,9 @@ import { AuthService } from '../../auth/auth.service';
           <p class="error-message" *ngIf="showError">
             Erreur de connexion. Vérifiez que Keycloak est accessible.
           </p>
+          <p class="debug-info" *ngIf="authService.isLoggedIn()">
+            ✅ Utilisateur connecté: {{ authService.getUserName() }}
+          </p>
         </mat-card-content>
         <mat-card-actions class="text-center">
           <button mat-raised-button color="primary" (click)="login()" class="full-width">
@@ -57,6 +60,12 @@ import { AuthService } from '../../auth/auth.service';
       color: #f44336;
       font-size: 0.9em;
       margin-top: 10px;
+    }
+    .debug-info {
+      color: #4caf50;
+      font-size: 0.9em;
+      margin-top: 10px;
+      font-weight: bold;
     }
   `]
 })
