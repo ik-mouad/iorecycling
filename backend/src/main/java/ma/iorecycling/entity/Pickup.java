@@ -3,11 +3,19 @@ package ma.iorecycling.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "pickups")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Pickup {
     
     @Id
@@ -35,75 +43,26 @@ public class Pickup {
     @Column(name = "kg_dangereux")
     private Double kgDangereux = 0.0;
     
-    // Constructeurs
-    public Pickup() {}
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PickupType type = PickupType.BANAL;
     
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "site_id")
+    private Site site;
+    
+    @OneToMany(mappedBy = "pickup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<PickupItem> items = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "pickup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Document> documents = new ArrayList<>();
+    
+    // Constructeur avec paramètres pour compatibilité
     public Pickup(Client client, LocalDate date, Double kgValorisables, Double kgBanals, Double kgDangereux) {
         this.client = client;
         this.date = date;
         this.kgValorisables = kgValorisables;
         this.kgBanals = kgBanals;
         this.kgDangereux = kgDangereux;
-    }
-    
-    // Getters et Setters
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public Client getClient() {
-        return client;
-    }
-    
-    public void setClient(Client client) {
-        this.client = client;
-    }
-    
-    public LocalDate getDate() {
-        return date;
-    }
-    
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-    
-    public Double getKgValorisables() {
-        return kgValorisables;
-    }
-    
-    public void setKgValorisables(Double kgValorisables) {
-        this.kgValorisables = kgValorisables;
-    }
-    
-    public Double getKgBanals() {
-        return kgBanals;
-    }
-    
-    public void setKgBanals(Double kgBanals) {
-        this.kgBanals = kgBanals;
-    }
-    
-    public Double getKgDangereux() {
-        return kgDangereux;
-    }
-    
-    public void setKgDangereux(Double kgDangereux) {
-        this.kgDangereux = kgDangereux;
-    }
-    
-    @Override
-    public String toString() {
-        return "Pickup{" +
-                "id=" + id +
-                ", client=" + (client != null ? client.getCode() : null) +
-                ", date=" + date +
-                ", kgValorisables=" + kgValorisables +
-                ", kgBanals=" + kgBanals +
-                ", kgDangereux=" + kgDangereux +
-                '}';
     }
 }
