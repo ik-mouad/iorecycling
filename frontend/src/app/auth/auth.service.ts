@@ -18,6 +18,17 @@ export class AuthService {
   private configure(): void {
     console.log('Configuration OAuth en cours...');
     this.oauthService.configure(authConfig);
+    
+    // Vérifier d'abord si on a des paramètres d'authentification dans l'URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const sessionState = urlParams.get('session_state');
+    
+    if (code) {
+      console.log('Code d\'autorisation détecté dans l\'URL:', code);
+      console.log('Session state:', sessionState);
+    }
+    
     this.oauthService.loadDiscoveryDocumentAndTryLogin().then(() => {
       const isAuthenticated = this.oauthService.hasValidAccessToken();
       this.isAuthenticatedSubject.next(isAuthenticated);
@@ -28,6 +39,8 @@ export class AuthService {
       // Si on revient de Keycloak avec un token valide, rediriger vers la page simple
       if (isAuthenticated && window.location.pathname === '/') {
         console.log('Redirection vers la page simple...');
+        // Nettoyer l'URL des paramètres d'authentification
+        window.history.replaceState({}, document.title, window.location.pathname);
         setTimeout(() => {
           window.location.href = '/simple';
         }, 1000);
