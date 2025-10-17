@@ -18,6 +18,9 @@ import { AuthService } from '../../auth/auth.service';
         </mat-card-header>
         <mat-card-content class="text-center mt-20">
           <p>Connectez-vous pour accéder à votre tableau de bord</p>
+          <p class="error-message" *ngIf="showError">
+            Erreur de connexion. Vérifiez que Keycloak est accessible.
+          </p>
         </mat-card-content>
         <mat-card-actions class="text-center">
           <button mat-raised-button color="primary" (click)="login()" class="full-width">
@@ -50,12 +53,24 @@ import { AuthService } from '../../auth/auth.service';
     .text-center {
       text-align: center;
     }
+    .error-message {
+      color: #f44336;
+      font-size: 0.9em;
+      margin-top: 10px;
+    }
   `]
 })
 export class LoginComponent {
+  showError = false;
+
   constructor(private authService: AuthService) {}
 
   login(): void {
-    this.authService.login();
+    this.showError = false;
+    try {
+      this.authService.login();
+    } catch (error) {
+      this.showError = true;
+    }
   }
 }
