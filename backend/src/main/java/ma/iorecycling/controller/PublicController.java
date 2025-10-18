@@ -15,3 +15,13 @@ public class PublicController {
         return Map.of("status", "UP");
     }
 }
+
+@RestController
+@RequestMapping("/api")
+class HealthController {
+    
+    @GetMapping("/health")
+    public Map<String, String> health() {
+        return Map.of("status", "UP", "service", "iorecycling-backend");
+    }
+}

@@ -29,6 +29,8 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/api/public/**").permitAll()
+                .requestMatchers("/actuator/**").permitAll() // Endpoints de santé Spring Boot
+                .requestMatchers("/api/health").permitAll() // Endpoint de santé personnalisé
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/client/**").permitAll() // Temporaire pour les tests
                 .anyRequest().authenticated()
