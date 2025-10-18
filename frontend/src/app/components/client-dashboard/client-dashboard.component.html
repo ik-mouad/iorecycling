@@ -9,10 +9,21 @@
           </div>
           <div class="hero-text">
             <h1 class="hero-title">
-              <span class="counter" data-testid="kpi-pickups">{{ pickupsCount }}</span>
+              <span class="counter" data-testid="kpi-pickups">
+                <ng-container *ngIf="!showKPISkeletons; else pickupSkeleton">
+                  {{ animatedPickupsCount }}
+                </ng-container>
+                <ng-template #pickupSkeleton>
+                  <mat-skeleton-loader [style.width.px]="60" [style.height.px]="48"></mat-skeleton-loader>
+                </ng-template>
+              </span>
               enlèvements effectués
             </h1>
             <p class="hero-subtitle">Depuis le début du partenariat</p>
+            <div class="last-refresh" *ngIf="lastRefreshTime">
+              <mat-icon>schedule</mat-icon>
+              <span>Dernière mise à jour: {{ lastRefreshTime | date:'short' }}</span>
+            </div>
           </div>
         </div>
       </mat-card>
@@ -28,7 +39,12 @@
             <span class="kpi-label">Recyclables</span>
           </div>
           <div class="kpi-value" data-testid="kpi-valorisables">
-            {{ formatNumber(valorisablesTonnage) }} t
+            <ng-container *ngIf="!showKPISkeletons; else valorisablesSkeleton">
+              {{ formatNumber(valorisablesTonnage) }} t
+            </ng-container>
+            <ng-template #valorisablesSkeleton>
+              <mat-skeleton-loader [style.width.px]="80" [style.height.px]="32"></mat-skeleton-loader>
+            </ng-template>
           </div>
           <div class="kpi-subtitle">Tonnes valorisables</div>
         </div>
@@ -42,7 +58,12 @@
             <span class="kpi-label">Banals</span>
           </div>
           <div class="kpi-value" data-testid="kpi-banals">
-            {{ formatNumber(banalsTonnage) }} t
+            <ng-container *ngIf="!showKPISkeletons; else banalsSkeleton">
+              {{ formatNumber(banalsTonnage) }} t
+            </ng-container>
+            <ng-template #banalsSkeleton>
+              <mat-skeleton-loader [style.width.px]="80" [style.height.px]="32"></mat-skeleton-loader>
+            </ng-template>
           </div>
           <div class="kpi-subtitle">Tonnes banales</div>
         </div>
@@ -56,7 +77,12 @@
             <span class="kpi-label">Dangereux</span>
           </div>
           <div class="kpi-value" data-testid="kpi-dangereux">
-            {{ formatNumber(dangereuxTonnage) }} t
+            <ng-container *ngIf="!showKPISkeletons; else dangereuxSkeleton">
+              {{ formatNumber(dangereuxTonnage) }} t
+            </ng-container>
+            <ng-template #dangereuxSkeleton>
+              <mat-skeleton-loader [style.width.px]="80" [style.height.px]="32"></mat-skeleton-loader>
+            </ng-template>
           </div>
           <div class="kpi-subtitle">Tonnes à détruire</div>
         </div>

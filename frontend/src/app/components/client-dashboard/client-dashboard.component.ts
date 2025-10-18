@@ -13,6 +13,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { MatSkeletonModule } from '@angular/material/skeleton';
+import { MatDividerModule } from '@angular/material/divider';
 import { FormsModule } from '@angular/forms';
 import { AuthenticatedLayoutComponent } from '../authenticated-layout/authenticated-layout.component';
 import { DashboardService, PickupRecord, ValorSummary } from '../../services/dashboard.service';
@@ -37,6 +39,8 @@ import { Chart, ChartConfiguration } from 'chart.js';
     MatInputModule,
     MatTooltipModule,
     MatSnackBarModule,
+    MatSkeletonModule,
+    MatDividerModule,
     FormsModule,
     AuthenticatedLayoutComponent
   ],
@@ -67,6 +71,14 @@ export class ClientDashboardComponent implements OnInit {
   isLoadingKPIs = true;
   isLoadingTable = true;
   isLoadingReport = false;
+  
+  // Skeleton states
+  showKPISkeletons = true;
+  showTableSkeletons = true;
+  
+  // Animation
+  animatedPickupsCount = 0;
+  lastRefreshTime: Date | null = null;
 
   // Valorization report
   valorizationReport: ValorSummary | null = null;
@@ -116,6 +128,7 @@ export class ClientDashboardComponent implements OnInit {
    */
   loadKPIs(): void {
     this.isLoadingKPIs = true;
+    this.showKPISkeletons = true;
     
     // Simulation de données - à remplacer par des appels API réels
     setTimeout(() => {
@@ -125,7 +138,39 @@ export class ClientDashboardComponent implements OnInit {
       this.dangereuxTonnage = 2.1;
       this.totalRevenue = 12500;
       this.isLoadingKPIs = false;
+      this.showKPISkeletons = false;
+      this.lastRefreshTime = new Date();
+      
+      // Animer le compteur
+      this.animateCounter();
     }, 1000);
+  }
+  
+  /**
+   * Anime le compteur de pickups
+   */
+  private animateCounter(): void {
+    const target = this.pickupsCount;
+    const duration = 800; // ms
+    const startTime = Date.now();
+    
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Easing function (ease-out)
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      
+      this.animatedPickupsCount = Math.floor(target * easeOut);
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        this.animatedPickupsCount = target;
+      }
+    };
+    
+    requestAnimationFrame(animate);
   }
 
   /**

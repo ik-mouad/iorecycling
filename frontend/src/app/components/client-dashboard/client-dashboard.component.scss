@@ -7,6 +7,8 @@
 .hero-title{font-size:2.5rem;font-weight:700;margin:0 0 8px 0}
 .counter{display:inline-block}
 .hero-subtitle{font-size:1.1rem;opacity:0.9;margin:0}
+.last-refresh{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:0.9rem;opacity:0.8}
+.last-refresh mat-icon{font-size:16px;width:16px;height:16px}
 
 .kpis-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
 
