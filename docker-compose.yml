@@ -67,12 +67,13 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-app}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-app}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-app123}
-      KEYCLOAK_AUTH_SERVER_URL: http://keycloak:8080/auth
-      KEYCLOAK_REALM: ${KEYCLOAK_REALM:-master}
-      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-iorecycling-backend}
       MINIO_ENDPOINT: http://minio:9000
       MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minio}
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minio123}
+      MINIO_BUCKET: docs
+      KEYCLOAK_AUTH_SERVER_URL: http://keycloak:8080/auth
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM:-master}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-iorecycling-backend}
     depends_on:
       postgres:
         condition: service_healthy

@@ -1,16 +1,21 @@
 package ma.iorecycling.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.Instant;
+
+/**
+ * Document associé à un enlèvement
+ */
 @Entity
-@Table(name = "documents")
+@Table(name = "document")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Document {
@@ -19,21 +24,54 @@ public class Document {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @NotNull(message = "L'enlèvement est obligatoire")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pickup_id", nullable = false)
-    private Pickup pickup;
+    @Column(name = "pickup_id", nullable = false)
+    private Long pickupId;
     
-    @NotBlank(message = "Le type de document est obligatoire")
-    @Size(max = 30, message = "Le type de document ne peut pas dépasser 30 caractères")
-    @Column(name = "doc_type", nullable = false)
-    private String docType;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "doc_type", nullable = false, length = 30)
+    private DocumentType docType;
     
-    @NotBlank(message = "Le nom du fichier est obligatoire")
-    @Column(nullable = false)
+    @Column(name = "filename", nullable = false, columnDefinition = "TEXT")
     private String filename;
     
-    @NotBlank(message = "L'URL est obligatoire")
-    @Column(nullable = false)
-    private String url;
+    @Column(name = "object_key", nullable = false, columnDefinition = "TEXT")
+    private String objectKey;
+    
+    @Column(name = "mime_type", length = 100)
+    private String mimeType;
+    
+    @Column(name = "file_size")
+    private Long fileSize;
+    
+    @CreationTimestamp
+    @Column(name = "created_at")
+    private Instant createdAt;
+    
+    @Column(name = "created_by", length = 50)
+    private String createdBy;
+    
+    // Relations
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pickup_id", insertable = false, updatable = false)
+    private Pickup pickup;
+    
+    /**
+     * Types de documents supportés
+     */
+    public enum DocumentType {
+        BORDEREAU("Bordereau de collecte"),
+        CERTIFICAT("Certificat de traitement"),
+        FACTURE("Facture"),
+        PHOTO("Photo de preuve");
+        
+        private final String description;
+        
+        DocumentType(String description) {
+            this.description = description;
+        }
+        
+        public String getDescription() {
+            return description;
+        }
+    }
 }

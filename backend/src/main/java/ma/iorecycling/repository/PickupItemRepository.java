@@ -1,44 +1,77 @@
 package ma.iorecycling.repository;
 
 import ma.iorecycling.entity.PickupItem;
-import ma.iorecycling.entity.PickupType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.Instant;
+import java.math.BigDecimal;
+import java.time.YearMonth;
 import java.util.List;
 
+/**
+ * Repository pour la gestion des items d'enlèvement
+ */
 @Repository
 public interface PickupItemRepository extends JpaRepository<PickupItem, Long> {
     
     /**
      * Trouve tous les items d'un enlèvement
      */
-    List<PickupItem> findByPickupId(Long pickupId);
+    List<PickupItem> findByPickupIdOrderByMaterial(Long pickupId);
     
     /**
-     * Trouve les items valorisables d'un client pour une période et un type
+     * Trouve tous les items d'un client pour un mois donné
      */
-    @Query("SELECT pi FROM PickupItem pi WHERE pi.pickup.client.id = :clientId " +
-           "AND pi.pickup.date BETWEEN :from AND :to " +
-           "AND pi.pickup.type = :type")
-    List<PickupItem> findByPickupClientIdAndPickupDateBetweenAndPickupType(
-        @Param("clientId") Long clientId, 
-        @Param("from") Instant from, 
-        @Param("to") Instant to, 
-        @Param("type") PickupType type
-    );
+    @Query("""
+        SELECT pi FROM PickupItem pi 
+        JOIN pi.pickup p 
+        WHERE p.client.id = :clientId 
+        AND EXTRACT(YEAR FROM p.date) = :year 
+        AND EXTRACT(MONTH FROM p.date) = :month
+        ORDER BY pi.material
+        """)
+    List<PickupItem> findByClientIdAndMonth(@Param("clientId") Long clientId, 
+                                           @Param("year") int year, 
+                                           @Param("month") int month);
     
     /**
-     * Trouve les items valorisables d'un client pour une période (tous types)
+     * Calcule le total des revenus pour un client et un mois
      */
-    @Query("SELECT pi FROM PickupItem pi WHERE pi.pickup.client.id = :clientId " +
-           "AND pi.pickup.date BETWEEN :from AND :to")
-    List<PickupItem> findByPickupClientIdAndPickupDateBetween(
-        @Param("clientId") Long clientId, 
-        @Param("from") Instant from, 
-        @Param("to") Instant to
-    );
+    @Query("""
+        SELECT COALESCE(SUM(pi.totalMad), 0) FROM PickupItem pi 
+        JOIN pi.pickup p 
+        WHERE p.client.id = :clientId 
+        AND EXTRACT(YEAR FROM p.date) = :year 
+        AND EXTRACT(MONTH FROM p.date) = :month
+        """)
+    BigDecimal calculateTotalRevenueForMonth(@Param("clientId") Long clientId, 
+                                           @Param("year") int year, 
+                                           @Param("month") int month);
+    
+    /**
+     * Trouve les matériaux uniques avec leurs totaux pour un client et un mois
+     */
+    @Query("""
+        SELECT pi.material, 
+               SUM(pi.qtyKg) as totalQty, 
+               AVG(pi.priceMadPerKg) as avgPrice,
+               SUM(pi.totalMad) as totalMad
+        FROM PickupItem pi 
+        JOIN pi.pickup p 
+        WHERE p.client.id = :clientId 
+        AND EXTRACT(YEAR FROM p.date) = :year 
+        AND EXTRACT(MONTH FROM p.date) = :month
+        GROUP BY pi.material
+        ORDER BY pi.material
+        """)
+    List<Object[]> findMaterialSummaryForMonth(@Param("clientId") Long clientId, 
+                                             @Param("year") int year, 
+                                             @Param("month") int month);
+    
+    /**
+     * Supprime tous les items d'un enlèvement
+     */
+    void deleteByPickupId(Long pickupId);
 }

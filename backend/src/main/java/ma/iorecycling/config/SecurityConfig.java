@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers("/actuator/**").permitAll() // Endpoints de santé Spring Boot
                 .requestMatchers("/api/health").permitAll() // Endpoint de santé personnalisé
+                .requestMatchers("/api/swagger-ui/**", "/v3/api-docs/**").hasRole("ADMIN") // Swagger UI protégé
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/client/**").permitAll() // Temporaire pour les tests
                 .anyRequest().authenticated()

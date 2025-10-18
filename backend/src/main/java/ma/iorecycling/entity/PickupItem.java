@@ -1,19 +1,22 @@
 package ma.iorecycling.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
-import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
+/**
+ * Item détaillé d'un enlèvement recyclable
+ */
 @Entity
-@Table(name = "pickup_items")
+@Table(name = "pickup_item")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class PickupItem {
@@ -22,23 +25,37 @@ public class PickupItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @NotNull(message = "L'enlèvement est obligatoire")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pickup_id", nullable = false)
-    private Pickup pickup;
+    @Column(name = "pickup_id", nullable = false)
+    private Long pickupId;
     
-    @NotBlank(message = "Le matériau est obligatoire")
-    @Size(max = 40, message = "Le nom du matériau ne peut pas dépasser 40 caractères")
-    @Column(nullable = false)
+    @Column(name = "material", nullable = false, length = 40)
     private String material;
     
-    @NotNull(message = "La quantité est obligatoire")
-    @PositiveOrZero(message = "La quantité doit être positive ou zéro")
-    @Column(name = "qty_kg", nullable = false, precision = 10, scale = 2)
-    private BigDecimal qtyKg = BigDecimal.ZERO;
+    @Column(name = "qty_kg", nullable = false, precision = 10, scale = 3)
+    private BigDecimal qtyKg;
     
-    @NotNull(message = "Le prix est obligatoire")
-    @PositiveOrZero(message = "Le prix doit être positif ou zéro")
-    @Column(name = "price_mad_per_kg", nullable = false, precision = 10, scale = 2)
-    private BigDecimal priceMadPerKg = BigDecimal.ZERO;
+    @Column(name = "price_mad_per_kg", nullable = false, precision = 10, scale = 3)
+    private BigDecimal priceMadPerKg;
+    
+    @Column(name = "total_mad", precision = 12, scale = 2, insertable = false, updatable = false)
+    private BigDecimal totalMad; // Calculé automatiquement par la DB
+    
+    @CreationTimestamp
+    @Column(name = "created_at")
+    private Instant createdAt;
+    
+    // Relations
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pickup_id", insertable = false, updatable = false)
+    private Pickup pickup;
+    
+    /**
+     * Calcule le total en MAD
+     */
+    public BigDecimal calculateTotal() {
+        if (qtyKg != null && priceMadPerKg != null) {
+            return qtyKg.multiply(priceMadPerKg);
+        }
+        return BigDecimal.ZERO;
+    }
 }

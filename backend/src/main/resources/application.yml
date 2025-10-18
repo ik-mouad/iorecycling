@@ -31,6 +31,24 @@ spring:
         jwt:
           issuer-uri: http://keycloak:8080/auth/realms/iorecycling
 
+# Configuration MinIO
+app:
+  minio:
+    endpoint: ${MINIO_ENDPOINT:http://minio:9000}
+    access-key: ${MINIO_ACCESS_KEY:minio}
+    secret-key: ${MINIO_SECRET_KEY:minio123}
+    bucket: ${MINIO_BUCKET:docs}
+    region: us-east-1
+
+# Configuration SpringDoc OpenAPI
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /api/swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+
 server:
   port: 8080
   servlet:

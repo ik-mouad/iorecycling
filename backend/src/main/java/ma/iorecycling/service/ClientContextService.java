@@ -1,45 +1,97 @@
 package ma.iorecycling.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service pour extraire le contexte client depuis le JWT
+ */
 @Service
 @Slf4j
 public class ClientContextService {
     
     /**
-     * Extrait le clientId depuis le token JWT
+     * Extrait le clientId depuis le JWT
      */
-    public Long extractClientId(Jwt jwt) {
-        Object claimValue = jwt.getClaims().get("clientId");
-        if (claimValue == null) {
-            log.error("clientId non trouvé dans le token JWT");
-            throw new IllegalArgumentException("clientId non trouvé dans le token JWT");
-        }
-        
-        if (claimValue instanceof Number) {
-            return ((Number) claimValue).longValue();
-        }
-        
-        if (claimValue instanceof String) {
-            try {
-                return Long.parseLong((String) claimValue);
-            } catch (NumberFormatException ex) {
-                log.error("clientId invalide dans le token JWT: {}", claimValue);
-                throw new IllegalArgumentException("clientId invalide dans le token JWT: " + claimValue);
+    public Long getCurrentClientId() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            
+            if (authentication == null || !(authentication.getPrincipal() instanceof Jwt)) {
+                log.warn("Aucun JWT trouvé dans le contexte de sécurité");
+                return null;
             }
+            
+            Jwt jwt = (Jwt) authentication.getPrincipal();
+            Object clientIdClaim = jwt.getClaim("clientId");
+            
+            if (clientIdClaim == null) {
+                log.warn("Claim 'clientId' manquant dans le JWT");
+                return null;
+            }
+            
+            // Gérer différents types de clientId
+            Long clientId;
+            if (clientIdClaim instanceof Integer) {
+                clientId = ((Integer) clientIdClaim).longValue();
+            } else if (clientIdClaim instanceof Long) {
+                clientId = (Long) clientIdClaim;
+            } else if (clientIdClaim instanceof String) {
+                clientId = Long.parseLong((String) clientIdClaim);
+            } else {
+                log.warn("Type de clientId non supporté: {}", clientIdClaim.getClass());
+                return null;
+            }
+            
+            log.debug("ClientId extrait: {}", clientId);
+            return clientId;
+            
+        } catch (Exception e) {
+            log.error("Erreur lors de l'extraction du clientId: {}", e.getMessage());
+            return null;
         }
-        
-        log.error("Type de clientId non supporté: {}", claimValue.getClass().getSimpleName());
-        throw new IllegalArgumentException("Type de clientId non supporté: " + claimValue.getClass().getSimpleName());
     }
     
     /**
-     * Extrait le clientId depuis le token JWT avec annotation
+     * Vérifie si l'utilisateur actuel est un admin
      */
-    public Long getClientId(@AuthenticationPrincipal Jwt jwt) {
-        return extractClientId(jwt);
+    public boolean isAdmin() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            
+            if (authentication == null) {
+                return false;
+            }
+            
+            return authentication.getAuthorities().stream()
+                    .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+                    
+        } catch (Exception e) {
+            log.error("Erreur lors de la vérification du rôle admin: {}", e.getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Extrait le nom d'utilisateur depuis le JWT
+     */
+    public String getCurrentUsername() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            
+            if (authentication == null || !(authentication.getPrincipal() instanceof Jwt)) {
+                return null;
+            }
+            
+            Jwt jwt = (Jwt) authentication.getPrincipal();
+            return jwt.getClaimAsString("preferred_username");
+            
+        } catch (Exception e) {
+            log.error("Erreur lors de l'extraction du nom d'utilisateur: {}", e.getMessage());
+            return null;
+        }
     }
 }

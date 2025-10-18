@@ -1,16 +1,22 @@
 package ma.iorecycling.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.Instant;
+
+/**
+ * Site de collecte d'un client
+ */
 @Entity
-@Table(name = "sites")
+@Table(name = "site")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Site {
@@ -19,13 +25,28 @@ public class Site {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @NotNull(message = "Le client est obligatoire")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_id", nullable = false)
-    private Client client;
+    @Column(name = "client_id", nullable = false)
+    private Long clientId;
     
-    @NotBlank(message = "Le nom du site est obligatoire")
-    @Size(max = 255, message = "Le nom du site ne peut pas dépasser 255 caractères")
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false, length = 100)
     private String name;
+    
+    @Column(name = "address", columnDefinition = "TEXT")
+    private String address;
+    
+    @Column(name = "contact_phone", length = 20)
+    private String contactPhone;
+    
+    @CreationTimestamp
+    @Column(name = "created_at")
+    private Instant createdAt;
+    
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private Instant updatedAt;
+    
+    // Relations
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "client_id", insertable = false, updatable = false)
+    private Client client;
 }
