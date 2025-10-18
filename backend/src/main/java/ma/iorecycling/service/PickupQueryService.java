@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.YearMonth;
 import java.time.ZoneOffset;
@@ -119,10 +120,10 @@ public class PickupQueryService {
         List<DocDTO> documents = pickup.getDocuments().stream()
             .map(doc -> DocDTO.builder()
                 .id(doc.getId())
-                .filename(doc.getFilename())
-                .type(doc.getDocType())
-                .mime(doc.getMimeType())
-                .url(storageService.getPresignedUrl(doc.getObjectKey(), 5)) // URL valide 5 minutes
+                .name(doc.getFilename())
+                .type(doc.getDocType().name())
+                .mimeType(doc.getMimeType())
+                .url(storageService.getPresignedUrl(doc.getObjectKey(), Duration.ofMinutes(5))) // URL valide 5 minutes
                 .build())
             .collect(Collectors.toList());
         

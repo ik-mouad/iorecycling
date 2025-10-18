@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DocDTO {
     
+    private Long id;
     private String name;
     private String type;
     private String url;
@@ -26,6 +27,7 @@ public class DocDTO {
      */
     public static DocDTO fromDocument(ma.iorecycling.entity.Document document, String downloadUrl) {
         return DocDTO.builder()
+                .id(document.getId())
                 .name(document.getFilename())
                 .type(document.getDocType().name())
                 .url(downloadUrl)
