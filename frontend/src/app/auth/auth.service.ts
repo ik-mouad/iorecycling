@@ -29,11 +29,8 @@ export class AuthService {
       // Nettoyer l'URL des paramètres d'authentification
       window.history.replaceState({}, document.title, window.location.pathname);
       
-      // Rediriger vers la page simple
-      console.log('Redirection vers la page simple...');
-      setTimeout(() => {
-        window.location.href = '/simple';
-      }, 1000);
+      // Ne pas rediriger automatiquement, laisser l'utilisateur naviguer
+      console.log('Authentification réussie, navigation libre activée');
     } else {
       console.log('Aucun code d\'autorisation trouvé');
       this.isAuthenticatedSubject.next(false);
