@@ -1,7 +1,14 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AdminPickupService, CreatePickupRequest, PickupItem } from '../../../services/admin-pickup.service';
 import { Client } from '../../../services/admin-client.service';
 
@@ -12,6 +19,19 @@ export interface PickupFormData {
 
 @Component({
   selector: 'app-pickup-form',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatSnackBarModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatSelectModule,
+    MatProgressSpinnerModule
+  ],
   templateUrl: './pickup-form.component.html',
   styleUrls: ['./pickup-form.component.scss']
 })
@@ -83,7 +103,7 @@ export class PickupFormComponent implements OnInit {
         : this.adminPickupService.createPickup(formData);
       
       operation.subscribe({
-        next: (pickup) => {
+        next: (pickup: any) => {
           this.snackBar.open(
             `Enlèvement ${this.isEditMode ? 'modifié' : 'créé'} avec succès`, 
             'Fermer', 
@@ -91,7 +111,7 @@ export class PickupFormComponent implements OnInit {
           );
           this.dialogRef.close(pickup);
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Erreur lors de la sauvegarde:', error);
           this.snackBar.open(
             `Erreur lors de la ${this.isEditMode ? 'modification' : 'création'} de l'enlèvement`, 

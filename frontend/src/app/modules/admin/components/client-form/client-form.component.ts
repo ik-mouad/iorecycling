@@ -1,7 +1,13 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AdminClientService, Client, CreateClientRequest } from '../../../services/admin-client.service';
 
 export interface ClientFormData {
@@ -10,6 +16,18 @@ export interface ClientFormData {
 
 @Component({
   selector: 'app-client-form',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatSnackBarModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressSpinnerModule
+  ],
   templateUrl: './client-form.component.html',
   styleUrls: ['./client-form.component.scss']
 })
@@ -53,7 +71,7 @@ export class ClientFormComponent implements OnInit {
         : this.adminClientService.createClient(formData);
       
       operation.subscribe({
-        next: (client) => {
+        next: (client: Client) => {
           this.snackBar.open(
             `Client ${this.isEditMode ? 'modifié' : 'créé'} avec succès`, 
             'Fermer', 
@@ -61,7 +79,7 @@ export class ClientFormComponent implements OnInit {
           );
           this.dialogRef.close(client);
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Erreur lors de la sauvegarde:', error);
           this.snackBar.open(
             `Erreur lors de la ${this.isEditMode ? 'modification' : 'création'} du client`, 

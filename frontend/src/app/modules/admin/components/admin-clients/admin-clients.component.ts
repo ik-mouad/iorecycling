@@ -1,14 +1,40 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AdminClientService, Client, Site } from '../../../services/admin-client.service';
 import { ClientFormComponent } from '../client-form/client-form.component';
 
 @Component({
   selector: 'app-admin-clients',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatDialogModule,
+    MatSnackBarModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatChipsModule,
+    MatTooltipModule,
+    MatProgressSpinnerModule
+  ],
   templateUrl: './admin-clients.component.html',
   styleUrls: ['./admin-clients.component.scss']
 })
@@ -41,11 +67,11 @@ export class AdminClientsComponent implements OnInit {
   loadClients(): void {
     this.isLoading = true;
     this.adminClientService.getClients().subscribe({
-      next: (clients) => {
+      next: (clients: Client[]) => {
         this.dataSource.data = clients;
         this.isLoading = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Erreur lors du chargement des clients:', error);
         this.snackBar.open('Erreur lors du chargement des clients', 'Fermer', { duration: 3000 });
         this.isLoading = false;
@@ -77,7 +103,7 @@ export class AdminClientsComponent implements OnInit {
           this.snackBar.open('Client supprimé avec succès', 'Fermer', { duration: 3000 });
           this.loadClients();
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Erreur lors de la suppression:', error);
           this.snackBar.open('Erreur lors de la suppression du client', 'Fermer', { duration: 3000 });
         }
