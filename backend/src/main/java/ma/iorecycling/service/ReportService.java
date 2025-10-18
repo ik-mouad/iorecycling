@@ -10,6 +10,7 @@ import ma.iorecycling.dto.ValorSummaryDTO;
 import ma.iorecycling.dto.ValorSummaryRowDTO;
 import org.springframework.stereotype.Service;
 
+import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
