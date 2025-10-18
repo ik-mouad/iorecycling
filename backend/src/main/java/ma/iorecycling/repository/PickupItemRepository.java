@@ -7,8 +7,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.YearMonth;
 import java.util.List;
+import ma.iorecycling.entity.PickupType;
 
 /**
  * Repository pour la gestion des items d'enlèvement
@@ -69,6 +71,24 @@ public interface PickupItemRepository extends JpaRepository<PickupItem, Long> {
     List<Object[]> findMaterialSummaryForMonth(@Param("clientId") Long clientId, 
                                              @Param("year") int year, 
                                              @Param("month") int month);
+    
+    /**
+     * Trouve les items d'un client pour une période et un type donnés
+     */
+    @Query("""
+        SELECT pi FROM PickupItem pi 
+        JOIN pi.pickup p 
+        WHERE p.client.id = :clientId 
+        AND p.date BETWEEN :from AND :to
+        AND p.type = :type
+        ORDER BY pi.material
+        """)
+    List<PickupItem> findByPickupClientIdAndPickupDateBetweenAndPickupType(
+        @Param("clientId") Long clientId,
+        @Param("from") Instant from,
+        @Param("to") Instant to,
+        @Param("type") PickupType type
+    );
     
     /**
      * Supprime tous les items d'un enlèvement

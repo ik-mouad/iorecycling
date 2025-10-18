@@ -14,7 +14,46 @@ import org.springframework.stereotype.Service;
 public class ClientContextService {
     
     /**
-     * Extrait le clientId depuis le JWT
+     * Extrait le clientId depuis un JWT donné
+     */
+    public Long getClientId(Jwt jwt) {
+        try {
+            if (jwt == null) {
+                log.warn("JWT null fourni");
+                return null;
+            }
+            
+            Object clientIdClaim = jwt.getClaim("clientId");
+            
+            if (clientIdClaim == null) {
+                log.warn("Claim 'clientId' manquant dans le JWT");
+                return null;
+            }
+            
+            // Gérer différents types de clientId
+            Long clientId;
+            if (clientIdClaim instanceof Integer) {
+                clientId = ((Integer) clientIdClaim).longValue();
+            } else if (clientIdClaim instanceof Long) {
+                clientId = (Long) clientIdClaim;
+            } else if (clientIdClaim instanceof String) {
+                clientId = Long.parseLong((String) clientIdClaim);
+            } else {
+                log.warn("Type de clientId non supporté: {}", clientIdClaim.getClass());
+                return null;
+            }
+            
+            log.debug("ClientId extrait: {}", clientId);
+            return clientId;
+            
+        } catch (Exception e) {
+            log.error("Erreur lors de l'extraction du clientId: {}", e.getMessage());
+            return null;
+        }
+    }
+    
+    /**
+     * Extrait le clientId depuis le JWT du contexte de sécurité actuel
      */
     public Long getCurrentClientId() {
         try {

@@ -29,6 +29,7 @@ public class PickupQueryService {
     
     private final PickupRepository pickupRepository;
     private final PickupItemRepository pickupItemRepository;
+    private final StorageService storageService;
     
     /**
      * Liste les enlèvements d'un client avec pagination et filtrage
@@ -71,20 +72,25 @@ public class PickupQueryService {
                 List<PickupItem> materialItems = entry.getValue();
                 
                 // Calculer la quantité totale
-                double totalQty = materialItems.stream()
-                    .mapToDouble(item -> item.getQtyKg().doubleValue())
-                    .sum();
+                BigDecimal totalQty = materialItems.stream()
+                    .map(PickupItem::getQtyKg)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
                 
                 // Calculer le prix moyen pondéré
                 BigDecimal totalValue = materialItems.stream()
                     .map(item -> item.getQtyKg().multiply(item.getPriceMadPerKg()))
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
                 
-                BigDecimal avgPrice = totalQty > 0 ? 
-                    totalValue.divide(BigDecimal.valueOf(totalQty), 2, RoundingMode.HALF_UP) : 
+                BigDecimal avgPrice = totalQty.compareTo(BigDecimal.ZERO) > 0 ? 
+                    totalValue.divide(totalQty, 2, RoundingMode.HALF_UP) : 
                     BigDecimal.ZERO;
                 
-                return new ValorSummaryRowDTO(material, totalQty, avgPrice, totalValue);
+                return ValorSummaryRowDTO.builder()
+                    .material(material)
+                    .qtyKg(totalQty)
+                    .pricePerKg(avgPrice)
+                    .totalMad(totalValue)
+                    .build();
             })
             .sorted((a, b) -> b.getTotalMad().compareTo(a.getTotalMad())) // Tri par total décroissant
             .collect(Collectors.toList());
@@ -111,16 +117,24 @@ public class PickupQueryService {
         
         // Mapper les documents
         List<DocDTO> documents = pickup.getDocuments().stream()
-            .map(doc -> new DocDTO(doc.getFilename(), doc.getDocType(), doc.getUrl()))
+            .map(doc -> DocDTO.builder()
+                .id(doc.getId())
+                .filename(doc.getFilename())
+                .type(doc.getDocType())
+                .mime(doc.getMimeType())
+                .url(storageService.getPresignedUrl(doc.getObjectKey(), 5)) // URL valide 5 minutes
+                .build())
             .collect(Collectors.toList());
         
-        return new PickupRowDTO(
-            pickup.getDate().atStartOfDay().toInstant(ZoneOffset.UTC),
-            pickup.getType().name(),
-            tonnage,
-            pickup.getSite() != null ? pickup.getSite().getName() : "Non spécifié",
-            documents
-        );
+        return PickupRowDTO.builder()
+            .id(pickup.getId())
+            .date(pickup.getDate())
+            .heure(java.time.LocalTime.of(8, 0)) // Heure par défaut
+            .type(pickup.getType().name())
+            .tonnageKg(BigDecimal.valueOf(tonnage))
+            .site(pickup.getSite() != null ? pickup.getSite().getName() : "Non spécifié")
+            .documents(documents)
+            .build();
     }
     
     /**

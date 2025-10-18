@@ -45,7 +45,7 @@ public class ClientPickupController {
     @GetMapping("/pickups")
     @PreAuthorize("hasAnyRole('CLIENT', 'ADMIN')")
     @Operation(summary = "Liste les enlèvements", description = "Récupère la liste paginée des enlèvements du client")
-    public ResponseEntity<Page<PickupRowDTO>> getPickups(
+    public ResponseEntity<?> getPickups(
             @Parameter(description = "Type d'enlèvement à filtrer") 
             @RequestParam(defaultValue = "ALL") PickupType type,
             @Parameter(description = "Numéro de page (0-based)") 
