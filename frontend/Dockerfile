@@ -13,6 +13,7 @@ RUN npm install
 COPY . .
 
 # Construire l'application
+# Force rebuild - 2025-01-27
 RUN npm run build
 
 # Stage de production
