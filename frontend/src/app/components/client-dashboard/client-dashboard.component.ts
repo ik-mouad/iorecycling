@@ -91,13 +91,24 @@ export class ClientDashboardComponent implements OnInit {
   ngAfterViewInit(): void {
     // Attendre que les ViewChild soient disponibles
     setTimeout(() => {
-      if (this.paginator) {
+      this.initializeTable();
+    }, 100);
+  }
+
+  /**
+   * Initialise le tableau avec pagination et tri
+   */
+  private initializeTable(): void {
+    try {
+      if (this.paginator && this.filteredDataSource) {
         this.filteredDataSource.paginator = this.paginator;
       }
-      if (this.sort) {
+      if (this.sort && this.filteredDataSource) {
         this.filteredDataSource.sort = this.sort;
       }
-    }, 0);
+    } catch (error) {
+      console.warn('Erreur lors de l\'initialisation du tableau:', error);
+    }
   }
 
   /**
@@ -128,6 +139,11 @@ export class ClientDashboardComponent implements OnInit {
         this.dataSource.data = response.content;
         this.applyFilters();
         this.isLoadingTable = false;
+        
+        // Réinitialiser le tableau après le chargement des données
+        setTimeout(() => {
+          this.initializeTable();
+        }, 100);
       },
       error: (error) => {
         console.error('Erreur lors du chargement des enlèvements:', error);
