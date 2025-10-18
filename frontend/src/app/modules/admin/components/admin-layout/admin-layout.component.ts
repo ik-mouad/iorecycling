@@ -1,13 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatCommonModule } from '@angular/material/core';
-import { MatRippleModule } from '@angular/material/core';
-import { MatTabNav, MatTabLink } from '@angular/material/tabs';
 import { AuthService } from '../../../../auth/auth.service';
 
 @Component({
@@ -16,14 +12,9 @@ import { AuthService } from '../../../../auth/auth.service';
   imports: [
     CommonModule,
     RouterModule,
-    MatTabsModule,
     MatIconModule,
     MatButtonModule,
-    MatMenuModule,
-    MatCommonModule,
-    MatRippleModule,
-    MatTabNav,
-    MatTabLink
+    MatMenuModule
   ],
   providers: [
     AuthService

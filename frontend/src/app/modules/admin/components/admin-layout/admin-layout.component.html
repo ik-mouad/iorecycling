@@ -28,29 +28,29 @@
 
   <!-- Navigation Tabs -->
   <nav class="admin-nav">
-    <mat-tab-nav-bar>
-      <a mat-tab-link 
+    <div class="nav-buttons">
+      <a mat-button 
          routerLink="/admin/clients" 
          routerLinkActive="active"
          [routerLinkActiveOptions]="{exact: false}">
         <mat-icon>business</mat-icon>
         Clients
       </a>
-      <a mat-tab-link 
+      <a mat-button 
          routerLink="/admin/pickups" 
          routerLinkActive="active"
          [routerLinkActiveOptions]="{exact: false}">
         <mat-icon>local_shipping</mat-icon>
         Enlèvements
       </a>
-      <a mat-tab-link 
+      <a mat-button 
          routerLink="/admin/documents" 
          routerLinkActive="active"
          [routerLinkActiveOptions]="{exact: false}">
         <mat-icon>description</mat-icon>
         Documents
       </a>
-    </mat-tab-nav-bar>
+    </div>
   </nav>
 
   <!-- Main Content -->
