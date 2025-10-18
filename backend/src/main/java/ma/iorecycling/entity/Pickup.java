@@ -19,6 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Pickup {
+    // Force rebuild
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
