@@ -157,9 +157,13 @@ jobs:
             echo "ATTENTION: Certains services ne sont pas en bonne santé"
             docker compose ps
             echo "Vérifiez les logs avec: docker compose logs"
+            echo "Si problème de base de données, utilisez: ./scripts/reset-db.sh"
           else
             echo "Tous les services sont en bonne santé"
           fi
+          
+          # Rendre le script reset-db exécutable
+          chmod +x scripts/reset-db.sh || true
           
           echo "$(date '+%Y-%m-%d %H:%M:%S') - Déploiement terminé"
           echo "Services déployés:"
