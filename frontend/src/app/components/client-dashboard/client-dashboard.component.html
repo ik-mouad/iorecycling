@@ -10,11 +10,11 @@
           <div class="hero-text">
             <h1 class="hero-title">
               <span class="counter" data-testid="kpi-pickups">
-                <ng-container *ngIf="!showKPISkeletons; else pickupSkeleton">
+                <ng-container *ngIf="!showKPISkeletons; else pickupSpinner">
                   {{ animatedPickupsCount }}
                 </ng-container>
-                <ng-template #pickupSkeleton>
-                  <mat-skeleton-loader [style.width.px]="60" [style.height.px]="48"></mat-skeleton-loader>
+                <ng-template #pickupSpinner>
+                  <mat-spinner [diameter]="40"></mat-spinner>
                 </ng-template>
               </span>
               enlèvements effectués
@@ -39,11 +39,11 @@
             <span class="kpi-label">Recyclables</span>
           </div>
           <div class="kpi-value" data-testid="kpi-valorisables">
-            <ng-container *ngIf="!showKPISkeletons; else valorisablesSkeleton">
+            <ng-container *ngIf="!showKPISkeletons; else valorisablesSpinner">
               {{ formatNumber(valorisablesTonnage) }} t
             </ng-container>
-            <ng-template #valorisablesSkeleton>
-              <mat-skeleton-loader [style.width.px]="80" [style.height.px]="32"></mat-skeleton-loader>
+            <ng-template #valorisablesSpinner>
+              <mat-spinner [diameter]="30"></mat-spinner>
             </ng-template>
           </div>
           <div class="kpi-subtitle">Tonnes valorisables</div>
@@ -58,11 +58,11 @@
             <span class="kpi-label">Banals</span>
           </div>
           <div class="kpi-value" data-testid="kpi-banals">
-            <ng-container *ngIf="!showKPISkeletons; else banalsSkeleton">
+            <ng-container *ngIf="!showKPISkeletons; else banalsSpinner">
               {{ formatNumber(banalsTonnage) }} t
             </ng-container>
-            <ng-template #banalsSkeleton>
-              <mat-skeleton-loader [style.width.px]="80" [style.height.px]="32"></mat-skeleton-loader>
+            <ng-template #banalsSpinner>
+              <mat-spinner [diameter]="30"></mat-spinner>
             </ng-template>
           </div>
           <div class="kpi-subtitle">Tonnes banales</div>
@@ -77,11 +77,11 @@
             <span class="kpi-label">Dangereux</span>
           </div>
           <div class="kpi-value" data-testid="kpi-dangereux">
-            <ng-container *ngIf="!showKPISkeletons; else dangereuxSkeleton">
+            <ng-container *ngIf="!showKPISkeletons; else dangereuxSpinner">
               {{ formatNumber(dangereuxTonnage) }} t
             </ng-container>
-            <ng-template #dangereuxSkeleton>
-              <mat-skeleton-loader [style.width.px]="80" [style.height.px]="32"></mat-skeleton-loader>
+            <ng-template #dangereuxSpinner>
+              <mat-spinner [diameter]="30"></mat-spinner>
             </ng-template>
           </div>
           <div class="kpi-subtitle">Tonnes à détruire</div>

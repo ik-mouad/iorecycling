@@ -13,7 +13,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
-import { MatSkeletonModule } from '@angular/material/skeleton';
 import { MatDividerModule } from '@angular/material/divider';
 import { FormsModule } from '@angular/forms';
 import { AuthenticatedLayoutComponent } from '../authenticated-layout/authenticated-layout.component';
@@ -39,7 +38,6 @@ import { Chart, ChartConfiguration } from 'chart.js';
     MatInputModule,
     MatTooltipModule,
     MatSnackBarModule,
-    MatSkeletonModule,
     MatDividerModule,
     FormsModule,
     AuthenticatedLayoutComponent
