@@ -12,6 +12,9 @@
 # SSH_KEY       : Clé privée SSH pour l'authentification
 # SSH_PORT      : Port SSH (optionnel, défaut: 22)
 # APP_DIR       : Répertoire de déploiement sur le serveur (ex: /opt/iorecycling)
+# E2E_USER      : Utilisateur pour les tests E2E (ex: client1)
+# E2E_PASS      : Mot de passe pour les tests E2E
+# E2E_BASE_URL  : URL de base pour les tests E2E (ex: http://146.59.234.174:88)
 #
 # CONFIGURATION :
 # - Développement : push sur 'develop' → déploiement sur branche develop
@@ -50,11 +53,56 @@ jobs:
     - name: Build backend with Maven
       run: mvn -B -f backend/pom.xml -DskipTests package
 
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Frontend build (sanity check)
+      run: |
+        cd frontend
+        npm ci
+        npm run build
+
     - name: Build frontend Docker image (sanity check)
       run: docker build ./frontend -t iorecycling-frontend:test
 
     - name: Clean up test image
       run: docker rmi iorecycling-frontend:test || true
+
+  e2e:
+    name: E2E Tests
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install Playwright
+      run: npx playwright install --with-deps
+
+    - name: Run E2E Tests
+      env:
+        E2E_USER: ${{ secrets.E2E_USER }}
+        E2E_PASS: ${{ secrets.E2E_PASS }}
+        E2E_BASE_URL: ${{ secrets.E2E_BASE_URL }}
+      run: |
+        npm ci
+        npm run e2e
+
+    - name: Upload E2E Report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 7
 
     # Étape E2E (facultative - décommentez si nécessaire)
     # - name: Install Node.js
@@ -76,7 +124,7 @@ jobs:
 
   deploy:
     name: Deploy to VPS
-    needs: build
+    needs: [build, e2e]
     runs-on: ubuntu-latest
     
     steps:

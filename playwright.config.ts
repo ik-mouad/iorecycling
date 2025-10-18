@@ -1,65 +1,61 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * @see https://playwright.dev/docs/test-configuration
+ * Configuration Playwright pour IORecycling
+ * 
+ * Cette configuration utilise un système d'authentification réutilisable :
+ * 1. Le projet "setup" fait l'authentification UI et sauvegarde la session
+ * 2. Les autres projets réutilisent cette session via storageState
  */
 export default defineConfig({
-  testDir: './tests/e2e',
-  /* Run tests in files in parallel */
+  testDir: './tests',
   fullyParallel: true,
-  /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  reporter: [
+    ['html', { open: 'never' }],
+    ['list']
+  ],
+  
   use: {
-    /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:88',
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+    baseURL: process.env.E2E_BASE_URL || 'http://localhost:88',
     trace: 'on-first-retry',
-    /* Take screenshot on failure */
     screenshot: 'only-on-failure',
-    /* Record video on failure */
     video: 'retain-on-failure',
   },
 
-  /* Configure projects for major browsers */
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: 'setup',
+      testMatch: /auth\.setup\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'] }
     },
-
+    {
+      name: 'chromium',
+      use: { 
+        ...devices['Desktop Chrome'], 
+        storageState: 'storage/auth.json'
+      },
+      dependencies: ['setup']
+    },
     {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      use: { 
+        ...devices['Desktop Firefox'], 
+        storageState: 'storage/auth.json'
+      },
+      dependencies: ['setup']
     },
-
     {
       name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
-
-    /* Test against mobile viewports. */
-    {
-      name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
-    },
-    {
-      name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
-    },
+      use: { 
+        ...devices['Desktop Safari'], 
+        storageState: 'storage/auth.json'
+      },
+      dependencies: ['setup']
+    }
   ],
 
-  /* Run your local dev server before starting the tests */
-  webServer: {
-    command: 'echo "Make sure your application is running on http://localhost:88"',
-    url: 'http://localhost:88',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-  },
+  webServer: undefined, // Pas de serveur local, on utilise l'URL externe
 });

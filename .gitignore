@@ -214,3 +214,9 @@ uploads/
 downloads/
 temp/
 cache/
+
+# Playwright
+storage/auth.json
+playwright-report/
+test-results/
+playwright/.cache/
