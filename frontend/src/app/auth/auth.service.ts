@@ -66,11 +66,15 @@ export class AuthService {
 
   getClaims(): any {
     return { 
-      preferred_username: 'Test User',
-      name: 'Utilisateur Test',
+      preferred_username: 'client1',
+      given_name: 'Mouad',
+      family_name: 'Idrissi Khamlichi',
+      name: 'Mouad Idrissi Khamlichi',
+      email: 'client1@iorecycling.ma',
       realm_access: {
         roles: ['CLIENT']
-      }
+      },
+      clientId: 1
     };
   }
 
@@ -88,6 +92,6 @@ export class AuthService {
 
   getUserName(): string {
     const claims = this.getClaims();
-    return claims?.preferred_username || claims?.name || 'Utilisateur';
+    return claims?.name || `${claims?.given_name || ''} ${claims?.family_name || ''}`.trim() || claims?.preferred_username || 'Utilisateur';
   }
 }

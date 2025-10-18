@@ -89,8 +89,15 @@ export class ClientDashboardComponent implements OnInit {
   }
 
   ngAfterViewInit(): void {
-    this.filteredDataSource.paginator = this.paginator;
-    this.filteredDataSource.sort = this.sort;
+    // Attendre que les ViewChild soient disponibles
+    setTimeout(() => {
+      if (this.paginator) {
+        this.filteredDataSource.paginator = this.paginator;
+      }
+      if (this.sort) {
+        this.filteredDataSource.sort = this.sort;
+      }
+    }, 0);
   }
 
   /**
