@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatCommonModule } from '@angular/material/core';
 import { MatRippleModule } from '@angular/material/core';
+import { MatTabNav, MatTabLink } from '@angular/material/tabs';
 import { AuthService } from '../../../../auth/auth.service';
 
 @Component({
@@ -20,7 +21,9 @@ import { AuthService } from '../../../../auth/auth.service';
     MatButtonModule,
     MatMenuModule,
     MatCommonModule,
-    MatRippleModule
+    MatRippleModule,
+    MatTabNav,
+    MatTabLink
   ],
   providers: [
     AuthService
