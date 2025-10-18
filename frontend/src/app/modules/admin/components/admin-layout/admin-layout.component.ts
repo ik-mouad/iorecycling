@@ -5,6 +5,8 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatCommonModule } from '@angular/material/core';
+import { MatRippleModule } from '@angular/material/core';
 import { AuthService } from '../../../../auth/auth.service';
 
 @Component({
@@ -16,7 +18,9 @@ import { AuthService } from '../../../../auth/auth.service';
     MatTabsModule,
     MatIconModule,
     MatButtonModule,
-    MatMenuModule
+    MatMenuModule,
+    MatCommonModule,
+    MatRippleModule
   ],
   providers: [
     AuthService
