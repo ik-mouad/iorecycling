@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
+import { RoleService } from '../services/role.service';
 
 /**
  * Guard pour vérifier les rôles utilisateur
@@ -13,6 +14,7 @@ export class RoleGuard implements CanActivate {
   
   constructor(
     private authService: AuthService,
+    private roleService: RoleService,
     private router: Router
   ) {}
 
@@ -32,10 +34,10 @@ export class RoleGuard implements CanActivate {
       return false;
     }
     
-    const userRoles = this.authService.getUserRoles();
-    const hasRequiredRole = requiredRoles.some(role => userRoles.includes(role));
+    const hasRequiredRole = requiredRoles.some(role => this.roleService.hasRole(role));
     
     if (!hasRequiredRole) {
+      console.log('Accès refusé: rôles requis:', requiredRoles, 'rôles utilisateur:', this.roleService.getUserRoles());
       this.router.navigate(['/']);
       return false;
     }

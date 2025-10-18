@@ -23,17 +23,16 @@ export class AuthService {
       console.log('Code d\'autorisation détecté dans l\'URL:', code);
       console.log('Session state:', sessionState);
       
-      // Simuler une authentification réussie
-      this.isAuthenticatedSubject.next(true);
-      
-      // Nettoyer l'URL des paramètres d'authentification
-      window.history.replaceState({}, document.title, window.location.pathname);
-      
-      // Ne pas rediriger automatiquement, laisser l'utilisateur naviguer
-      console.log('Authentification réussie, navigation libre activée');
+      // Échanger le code contre un token
+      this.exchangeCodeForToken(code);
     } else {
-      console.log('Aucun code d\'autorisation trouvé');
-      this.isAuthenticatedSubject.next(false);
+      // Vérifier si on a déjà un token valide
+      const token = localStorage.getItem('keycloak_token');
+      if (token && !this.isTokenExpired(token)) {
+        this.isAuthenticatedSubject.next(true);
+      } else {
+        this.isAuthenticatedSubject.next(false);
+      }
     }
   }
 
@@ -50,10 +49,18 @@ export class AuthService {
   }
 
   logout(): void {
+    // Supprimer le token
+    localStorage.removeItem('keycloak_token');
+    sessionStorage.removeItem('keycloak_token');
+    
     this.isAuthenticatedSubject.next(false);
     console.log('Déconnexion');
-    // Rediriger vers la page de login
-    window.location.href = '/';
+    
+    // Rediriger vers Keycloak pour la déconnexion
+    const logoutUrl = 'http://146.59.234.174:88/auth/realms/iorecycling/protocol/openid-connect/logout?' +
+      'redirect_uri=' + encodeURIComponent(window.location.origin + '/');
+    
+    window.location.href = logoutUrl;
   }
 
   isLoggedIn(): boolean {
@@ -65,6 +72,20 @@ export class AuthService {
   }
 
   getClaims(): any {
+    // Essayer de récupérer les claims depuis le localStorage ou sessionStorage
+    const token = localStorage.getItem('keycloak_token') || sessionStorage.getItem('keycloak_token');
+    
+    if (token) {
+      try {
+        // Décoder le JWT (partie payload)
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload;
+      } catch (error) {
+        console.error('Erreur lors du décodage du token:', error);
+      }
+    }
+    
+    // Fallback pour les tests
     return { 
       preferred_username: 'client1',
       given_name: 'Mouad',
@@ -105,5 +126,58 @@ export class AuthService {
   getUserName(): string {
     const claims = this.getClaims();
     return claims?.name || `${claims?.given_name || ''} ${claims?.family_name || ''}`.trim() || claims?.preferred_username || 'Utilisateur';
+  }
+
+  /**
+   * Échange le code d'autorisation contre un token
+   */
+  private exchangeCodeForToken(code: string): void {
+    const tokenUrl = 'http://146.59.234.174:88/auth/realms/iorecycling/protocol/openid-connect/token';
+    
+    const body = new URLSearchParams();
+    body.append('grant_type', 'authorization_code');
+    body.append('client_id', 'frontend');
+    body.append('code', code);
+    body.append('redirect_uri', window.location.origin + '/');
+    
+    fetch(tokenUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: body
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.access_token) {
+        localStorage.setItem('keycloak_token', data.access_token);
+        this.isAuthenticatedSubject.next(true);
+        
+        // Nettoyer l'URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        console.log('Token récupéré avec succès');
+      } else {
+        console.error('Erreur lors de la récupération du token:', data);
+        this.isAuthenticatedSubject.next(false);
+      }
+    })
+    .catch(error => {
+      console.error('Erreur lors de l\'échange du code:', error);
+      this.isAuthenticatedSubject.next(false);
+    });
+  }
+
+  /**
+   * Vérifie si le token est expiré
+   */
+  private isTokenExpired(token: string): boolean {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const currentTime = Math.floor(Date.now() / 1000);
+      return payload.exp < currentTime;
+    } catch (error) {
+      return true;
+    }
   }
 }
