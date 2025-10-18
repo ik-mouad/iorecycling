@@ -1,0 +1,141 @@
+.admin-layout {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.admin-header {
+  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.admin-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.admin-nav {
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+  position: sticky;
+  top: 80px;
+  z-index: 999;
+  
+  mat-tab-nav-bar {
+    max-width: 1200px;
+    margin: 0 auto;
+    
+    a[mat-tab-link] {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 24px;
+      text-decoration: none;
+      color: #666;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+      
+      &:hover {
+        color: #1976d2;
+        background-color: #f5f5f5;
+      }
+      
+      &.active {
+        color: #1976d2;
+        border-bottom: 2px solid #1976d2;
+      }
+    }
+  }
+}
+
+.admin-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  min-height: calc(100vh - 160px);
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .header-content {
+    padding: 12px 16px;
+  }
+  
+  .admin-title {
+    font-size: 20px;
+    
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+  }
+  
+  .admin-nav mat-tab-nav-bar a[mat-tab-link] {
+    padding: 12px 16px;
+    font-size: 14px;
+    
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+  
+  .admin-content {
+    padding: 16px;
+  }
+}

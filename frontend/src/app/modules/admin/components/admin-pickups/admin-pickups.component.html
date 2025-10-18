@@ -1,0 +1,137 @@
+<div class="admin-pickups">
+  <div class="page-header">
+    <div class="header-content">
+      <h2 class="page-title">
+        <mat-icon>local_shipping</mat-icon>
+        Gestion des Enlèvements
+      </h2>
+      <button mat-raised-button color="primary" (click)="openPickupForm()">
+        <mat-icon>add</mat-icon>
+        Nouvel Enlèvement
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="filters-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Client</mat-label>
+        <mat-select [(ngModel)]="filters.clientId" (selectionChange)="applyFilters()">
+          <mat-option [value]="null">Tous les clients</mat-option>
+          <mat-option *ngFor="let client of clients" [value]="client.id">
+            {{ client.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Type</mat-label>
+        <mat-select [(ngModel)]="filters.type" (selectionChange)="applyFilters()">
+          <mat-option [value]="null">Tous les types</mat-option>
+          <mat-option value="RECYCLABLE">Recyclable</mat-option>
+          <mat-option value="BANAL">Banal</mat-option>
+          <mat-option value="DANGEREUX">Dangereux</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Date de début</mat-label>
+        <input matInput type="date" [(ngModel)]="filters.dateFrom" (change)="applyFilters()">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Date de fin</mat-label>
+        <input matInput type="date" [(ngModel)]="filters.dateTo" (change)="applyFilters()">
+      </mat-form-field>
+
+      <button mat-button (click)="clearFilters()">
+        <mat-icon>clear</mat-icon>
+        Effacer
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Chargement des enlèvements...</p>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!isLoading" class="table-container">
+    <table mat-table [dataSource]="dataSource" class="pickups-table">
+      
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>ID</th>
+        <td mat-cell *matCellDef="let pickup">{{ pickup.id }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef>Date</th>
+        <td mat-cell *matCellDef="let pickup">{{ formatDate(pickup.date) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef>Type</th>
+        <td mat-cell *matCellDef="let pickup">
+          <mat-chip [color]="getTypeColor(pickup.type)">
+            <mat-icon>{{ getTypeIcon(pickup.type) }}</mat-icon>
+            {{ pickup.type }}
+          </mat-chip>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="tonnage">
+        <th mat-header-cell *matHeaderCellDef>Tonnage</th>
+        <td mat-cell *matCellDef="let pickup">{{ formatTonnage(pickup.tonnageKg) }} t</td>
+      </ng-container>
+
+      <ng-container matColumnDef="site">
+        <th mat-header-cell *matHeaderCellDef>Site</th>
+        <td mat-cell *matCellDef="let pickup">{{ pickup.site }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="client">
+        <th mat-header-cell *matHeaderCellDef>Client</th>
+        <td mat-cell *matCellDef="let pickup">{{ pickup.client }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let pickup">
+          <div class="actions">
+            <button mat-icon-button (click)="openPickupForm(pickup)" matTooltip="Modifier">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="deletePickup(pickup)" matTooltip="Supprimer">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <mat-paginator 
+      [length]="totalElements"
+      [pageSize]="filters.size || 20"
+      [pageSizeOptions]="[10, 20, 50]"
+      (page)="onPageChange($event)"
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && dataSource.data.length === 0" class="empty-state">
+    <mat-icon>local_shipping</mat-icon>
+    <h3>Aucun enlèvement trouvé</h3>
+    <p>Commencez par créer votre premier enlèvement.</p>
+    <button mat-raised-button color="primary" (click)="openPickupForm()">
+      <mat-icon>add</mat-icon>
+      Créer un enlèvement
+    </button>
+  </div>
+</div>

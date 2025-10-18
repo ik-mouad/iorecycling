@@ -1,0 +1,121 @@
+<div class="admin-clients">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h2 class="page-title">
+        <mat-icon>business</mat-icon>
+        Gestion des Clients
+      </h2>
+      <button mat-raised-button color="primary" (click)="openClientForm()">
+        <mat-icon>add</mat-icon>
+        Nouveau Client
+      </button>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-section">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Rechercher un client</mat-label>
+      <input matInput 
+             [(ngModel)]="searchTerm" 
+             (input)="applyFilter()"
+             placeholder="Nom, code...">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Chargement des clients...</p>
+  </div>
+
+  <!-- Clients Table -->
+  <div *ngIf="!isLoading" class="table-container">
+    <table mat-table [dataSource]="dataSource" class="clients-table">
+      
+      <!-- ID Column -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>ID</th>
+        <td mat-cell *matCellDef="let client">{{ client.id }}</td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Nom</th>
+        <td mat-cell *matCellDef="let client">
+          <div class="client-name">
+            <strong>{{ client.name }}</strong>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Code Column -->
+      <ng-container matColumnDef="code">
+        <th mat-header-cell *matHeaderCellDef>Code</th>
+        <td mat-cell *matCellDef="let client">
+          <mat-chip>{{ client.code }}</mat-chip>
+        </td>
+      </ng-container>
+
+      <!-- Sites Column -->
+      <ng-container matColumnDef="sites">
+        <th mat-header-cell *matHeaderCellDef>Sites</th>
+        <td mat-cell *matCellDef="let client">
+          <div class="sites-info">
+            <span class="sites-count">{{ getSitesCount(client.sites) }} site(s)</span>
+            <mat-tooltip [matTooltip]="getSitesNames(client.sites)">
+              <mat-icon>info</mat-icon>
+            </mat-tooltip>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Created At Column -->
+      <ng-container matColumnDef="createdAt">
+        <th mat-header-cell *matHeaderCellDef>Créé le</th>
+        <td mat-cell *matCellDef="let client">{{ formatDate(client.createdAt) }}</td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let client">
+          <div class="actions">
+            <button mat-icon-button 
+                    (click)="openClientForm(client)"
+                    matTooltip="Modifier"
+                    aria-label="Modifier le client">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button 
+                    color="warn"
+                    (click)="deleteClient(client)"
+                    matTooltip="Supprimer"
+                    aria-label="Supprimer le client">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <!-- Paginator -->
+    <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && dataSource.data.length === 0" class="empty-state">
+    <mat-icon>business_center</mat-icon>
+    <h3>Aucun client trouvé</h3>
+    <p>Commencez par créer votre premier client.</p>
+    <button mat-raised-button color="primary" (click)="openClientForm()">
+      <mat-icon>add</mat-icon>
+      Créer un client
+    </button>
+  </div>
+</div>

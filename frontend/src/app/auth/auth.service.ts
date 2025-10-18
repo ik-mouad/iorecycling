@@ -86,6 +86,14 @@ export class AuthService {
     return claims.realm_access.roles.includes(role);
   }
 
+  getUserRoles(): string[] {
+    const claims = this.getClaims();
+    if (!claims || !claims.realm_access || !claims.realm_access.roles) {
+      return [];
+    }
+    return claims.realm_access.roles;
+  }
+
   getClientId(): number | null {
     return 1; // Temporaire pour les tests
   }

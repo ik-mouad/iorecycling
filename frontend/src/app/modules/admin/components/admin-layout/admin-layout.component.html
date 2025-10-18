@@ -1,0 +1,60 @@
+<div class="admin-layout">
+  <!-- Header -->
+  <header class="admin-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1 class="admin-title">
+          <mat-icon>admin_panel_settings</mat-icon>
+          Administration IORecycling
+        </h1>
+      </div>
+      <div class="header-right">
+        <span class="user-info">
+          <mat-icon>person</mat-icon>
+          {{ getUserName() }}
+        </span>
+        <button mat-icon-button [matMenuTriggerFor]="userMenu" aria-label="Menu utilisateur">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Se déconnecter</span>
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="admin-nav">
+    <mat-tab-nav-bar>
+      <a mat-tab-link 
+         routerLink="/admin/clients" 
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{exact: false}">
+        <mat-icon>business</mat-icon>
+        Clients
+      </a>
+      <a mat-tab-link 
+         routerLink="/admin/pickups" 
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{exact: false}">
+        <mat-icon>local_shipping</mat-icon>
+        Enlèvements
+      </a>
+      <a mat-tab-link 
+         routerLink="/admin/documents" 
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{exact: false}">
+        <mat-icon>description</mat-icon>
+        Documents
+      </a>
+    </mat-tab-nav-bar>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="admin-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>
