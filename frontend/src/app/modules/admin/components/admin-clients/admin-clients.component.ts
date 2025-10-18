@@ -35,6 +35,9 @@ import { ClientFormComponent } from '../client-form/client-form.component';
     MatTooltipModule,
     MatProgressSpinnerModule
   ],
+  providers: [
+    AdminClientService
+  ],
   templateUrl: './admin-clients.component.html',
   styleUrls: ['./admin-clients.component.scss']
 })

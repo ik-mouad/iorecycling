@@ -28,6 +28,9 @@ export interface ClientFormData {
     MatIconModule,
     MatProgressSpinnerModule
   ],
+  providers: [
+    AdminClientService
+  ],
   templateUrl: './client-form.component.html',
   styleUrls: ['./client-form.component.scss']
 })

@@ -18,6 +18,9 @@ import { AuthService } from '../../../auth/auth.service';
     MatButtonModule,
     MatMenuModule
   ],
+  providers: [
+    AuthService
+  ],
   templateUrl: './admin-layout.component.html',
   styleUrls: ['./admin-layout.component.scss']
 })

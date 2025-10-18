@@ -94,6 +94,10 @@ export class AuthService {
     return claims.realm_access.roles;
   }
 
+  isAuthenticated(): boolean {
+    return this.isAuthenticatedSubject.value;
+  }
+
   getClientId(): number | null {
     return 1; // Temporaire pour les tests
   }

@@ -27,7 +27,7 @@ export class RoleGuard implements CanActivate {
       return true;
     }
     
-    if (!this.authService.isAuthenticated$.value) {
+    if (!this.authService.isAuthenticated()) {
       this.router.navigate(['/']);
       return false;
     }

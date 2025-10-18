@@ -38,6 +38,10 @@ import { PickupFormComponent } from '../pickup-form/pickup-form.component';
     MatTooltipModule,
     MatProgressSpinnerModule
   ],
+  providers: [
+    AdminPickupService,
+    AdminClientService
+  ],
   templateUrl: './admin-pickups.component.html',
   styleUrls: ['./admin-pickups.component.scss']
 })

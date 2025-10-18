@@ -32,6 +32,9 @@ export interface PickupFormData {
     MatSelectModule,
     MatProgressSpinnerModule
   ],
+  providers: [
+    AdminPickupService
+  ],
   templateUrl: './pickup-form.component.html',
   styleUrls: ['./pickup-form.component.scss']
 })
