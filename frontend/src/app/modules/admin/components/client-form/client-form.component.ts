@@ -8,7 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { AdminClientService, Client, CreateClientRequest } from '../../../services/admin-client.service';
+import { AdminClientService, Client, CreateClientRequest } from '../../../../services/admin-client.service';
 
 export interface ClientFormData {
   client?: Client;

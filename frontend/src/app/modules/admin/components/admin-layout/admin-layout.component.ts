@@ -5,7 +5,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
-import { AuthService } from '../../../auth/auth.service';
+import { AuthService } from '../../../../auth/auth.service';
 
 @Component({
   selector: 'app-admin-layout',

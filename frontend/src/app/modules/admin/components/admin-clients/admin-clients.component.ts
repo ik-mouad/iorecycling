@@ -13,7 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { AdminClientService, Client, Site } from '../../../services/admin-client.service';
+import { AdminClientService, Client, Site } from '../../../../services/admin-client.service';
 import { ClientFormComponent } from '../client-form/client-form.component';
 
 @Component({

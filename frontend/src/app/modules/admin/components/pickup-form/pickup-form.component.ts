@@ -9,8 +9,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { AdminPickupService, CreatePickupRequest, PickupItem } from '../../../services/admin-pickup.service';
-import { Client } from '../../../services/admin-client.service';
+import { AdminPickupService, CreatePickupRequest, PickupItem } from '../../../../services/admin-pickup.service';
+import { Client } from '../../../../services/admin-client.service';
 
 export interface PickupFormData {
   pickup?: any;
