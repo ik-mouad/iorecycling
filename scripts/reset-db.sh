@@ -42,7 +42,14 @@ docker compose -f $COMPOSE_FILE up -d
 
 # Attendre que les services démarrent
 echo "⏳ Attente du démarrage des services..."
-sleep 10
+sleep 15
+
+# Initialiser Keycloak si nécessaire
+if [ "$ENVIRONMENT" = "dev" ] || [ "$ENVIRONMENT" = "qualif" ]; then
+    echo "🔐 Initialisation de Keycloak..."
+    chmod +x scripts/init-keycloak.sh
+    ./scripts/init-keycloak.sh || echo "⚠️  Initialisation Keycloak échouée, mais les services continuent"
+fi
 
 # Vérifier l'état des services
 echo "📊 État des services:"
