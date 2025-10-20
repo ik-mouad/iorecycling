@@ -25,7 +25,8 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 
 @RestController
-@RequestMapping("/api/client")
+@Deprecated
+@RequestMapping("/api/client-legacy")
 @RequiredArgsConstructor
 @Slf4j
 public class ClientDashboardController {
