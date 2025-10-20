@@ -41,7 +41,8 @@ export class AuthService {
   login(): void {
     console.log('Tentative de connexion...');
     // Redirection directe vers Keycloak
-    const authUrl = 'http://146.59.234.174:88/auth/realms/iorecycling/protocol/openid-connect/auth?' +
+    const base = `${window.location.origin}/auth/realms/iorecycling/protocol/openid-connect`;
+    const authUrl = `${base}/auth?` +
       'client_id=frontend&' +
       'redirect_uri=' + encodeURIComponent(window.location.origin + '/') + '&' +
       'response_type=code&' +
@@ -59,8 +60,8 @@ export class AuthService {
     console.log('Déconnexion');
     
     // Rediriger vers Keycloak pour la déconnexion
-    const logoutUrl = 'http://146.59.234.174:88/auth/realms/iorecycling/protocol/openid-connect/logout?' +
-      'redirect_uri=' + encodeURIComponent(window.location.origin + '/');
+    const base = `${window.location.origin}/auth/realms/iorecycling/protocol/openid-connect`;
+    const logoutUrl = `${base}/logout?redirect_uri=` + encodeURIComponent(window.location.origin + '/');
     
     window.location.href = logoutUrl;
   }
@@ -138,7 +139,7 @@ export class AuthService {
    * Échange le code d'autorisation contre un token
    */
   private exchangeCodeForToken(code: string): void {
-    const tokenUrl = 'http://146.59.234.174:88/auth/realms/iorecycling/protocol/openid-connect/token';
+    const tokenUrl = `${window.location.origin}/auth/realms/iorecycling/protocol/openid-connect/token`;
     
     const body = new URLSearchParams();
     body.append('grant_type', 'authorization_code');
