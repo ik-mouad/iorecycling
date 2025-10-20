@@ -1,19 +1,14 @@
 import { HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { OAuthService } from 'angular-oauth2-oidc';
 
+// Intercepteur minimaliste: ajoute le Bearer token stocké par AuthService
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const oauthService = inject(OAuthService);
-  
-  if (oauthService.hasValidAccessToken()) {
-    const token = oauthService.getAccessToken();
-    const authReq = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    return next(authReq);
+  const token = typeof localStorage !== 'undefined' ? localStorage.getItem('keycloak_token') : null;
+  if (token) {
+    return next(
+      req.clone({
+        setHeaders: { Authorization: `Bearer ${token}` }
+      })
+    );
   }
-  
   return next(req);
 };
