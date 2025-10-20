@@ -54,8 +54,8 @@ class ClientDashboardControllerTest {
         ValorSummaryDTO mockSummary = new ValorSummaryDTO(
             "2024-01",
             Arrays.asList(
-                new ma.iorecycling.dto.ValorSummaryRowDTO("CARTON", 100.0, new BigDecimal("1.50"), new BigDecimal("150.00")),
-                new ma.iorecycling.dto.ValorSummaryRowDTO("PLASTIQUE", 50.0, new BigDecimal("2.00"), new BigDecimal("100.00"))
+                new ma.iorecycling.dto.ValorSummaryRowDTO("CARTON", BigDecimal.valueOf(100.0), new BigDecimal("1.50"), new BigDecimal("150.00")),
+                new ma.iorecycling.dto.ValorSummaryRowDTO("PLASTIQUE", BigDecimal.valueOf(50.0), new BigDecimal("2.00"), new BigDecimal("100.00"))
             ),
             new BigDecimal("250.00"),
             "MAD"
