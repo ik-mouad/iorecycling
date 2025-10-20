@@ -1,9 +1,8 @@
 :88 {
   encode gzip
 
-  handle_path /auth/* {
-    reverse_proxy keycloak:8080
-  }
+  # Ne pas strip /auth car Keycloak est servi sous KC_HTTP_RELATIVE_PATH=/auth
+  reverse_proxy /auth/* keycloak:8080
 
   handle_path /api/* {
     reverse_proxy backend:8080
