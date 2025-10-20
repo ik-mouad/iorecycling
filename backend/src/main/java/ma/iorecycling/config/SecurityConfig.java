@@ -5,15 +5,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,12 +23,12 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers("/actuator/**").permitAll() // Endpoints de santé Spring Boot
                 .requestMatchers("/api/health").permitAll() // Endpoint de santé personnalisé
+                .requestMatchers("/api/public/**").permitAll()
+                .requestMatchers("/api/client/**").permitAll() // Temporaire pour les tests
                 .requestMatchers("/api/swagger-ui/**", "/v3/api-docs/**").hasRole("ADMIN") // Swagger UI protégé
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/client/**").permitAll() // Temporaire pour les tests
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2
