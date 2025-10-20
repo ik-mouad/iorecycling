@@ -22,7 +22,6 @@ services:
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       KC_HTTP_ENABLED: "true"
       KC_PROXY: "edge"
-      KC_HTTP_RELATIVE_PATH: "/auth"
       KC_HOSTNAME_STRICT: "false"
       KC_HOSTNAME_STRICT_HTTPS: "false"
       KC_DB: postgres
