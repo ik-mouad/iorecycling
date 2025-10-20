@@ -4,9 +4,11 @@
   @authRoot path /auth
   redir @authRoot /auth/ 308
 
-  reverse_proxy /auth/* keycloak:8080
+  handle /auth/* {
+    reverse_proxy keycloak:8080
+  }
 
-  handle_path /api/* {
+  handle /api/* {
     reverse_proxy backend:8080
   }
 
