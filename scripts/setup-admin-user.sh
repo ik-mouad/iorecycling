@@ -23,9 +23,9 @@ ADMIN_USERNAME="admin"
 ADMIN_PASSWORD="admin123"
 ADMIN_EMAIL="admin@iorecycling.ma"
 
-# Fonction pour exécuter des commandes kcadm
+# Fonction pour exécuter des commandes kcadm (docker compose v2)
 run_kcadm() {
-    docker-compose exec -T keycloak /opt/keycloak/bin/kcadm.sh "$@"
+    docker compose exec -T keycloak /opt/keycloak/bin/kcadm.sh "$@"
 }
 
 echo "🔑 Connexion à Keycloak..."
@@ -79,12 +79,20 @@ else
 fi
 
 echo "🌐 Création du client frontend..."
-# Vérifier si le client existe déjà
-if run_kcadm get clients -r $REALM --query clientId=iorecycling-frontend >/dev/null 2>&1; then
-    echo "   Le client 'iorecycling-frontend' existe déjà"
+# Vérifier si le client existe déjà (clientId=frontend attendu par le frontend Angular)
+if run_kcadm get clients -r $REALM --query clientId=frontend >/dev/null 2>&1; then
+    echo "   Le client 'frontend' existe déjà"
 else
-    echo "   Création du client 'iorecycling-frontend'..."
-    run_kcadm create clients -r $REALM -s clientId=iorecycling-frontend -s enabled=true -s publicClient=true -s standardFlowEnabled=true -s implicitFlowEnabled=false -s directAccessGrantsEnabled=false -s 'redirectUris=["http://localhost:4200/*","http://146.59.234.174:88/*"]' -s 'webOrigins=["http://localhost:4200","http://146.59.234.174:88"]'
+    echo "   Création du client 'frontend'..."
+    run_kcadm create clients -r $REALM \
+      -s clientId=frontend \
+      -s enabled=true \
+      -s publicClient=true \
+      -s standardFlowEnabled=true \
+      -s implicitFlowEnabled=false \
+      -s directAccessGrantsEnabled=false \
+      -s 'redirectUris=["http://localhost:4200/*","http://146.59.234.174:88/*"]' \
+      -s 'webOrigins=["http://localhost:4200","http://146.59.234.174:88"]'
 fi
 
 echo ""
