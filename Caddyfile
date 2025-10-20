@@ -2,10 +2,8 @@
   encode gzip
 
   # Keycloak est configuré avec KC_HTTP_RELATIVE_PATH=/auth
-  # On utilise handle_path pour préserver le /auth dans l'URL
-  handle_path /auth/* {
-    reverse_proxy keycloak:8080
-  }
+  # On proxy /auth/* vers keycloak:8080
+  reverse_proxy /auth/* keycloak:8080
 
   handle_path /api/* {
     reverse_proxy backend:8080
