@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { RoleService } from '../services/role.service';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +10,7 @@ export class AuthService {
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
-  constructor() {
+  constructor(private router: Router, private roleService: RoleService) {
     console.log('AuthService initialisé');
     this.checkAuthStatus();
   }
@@ -30,6 +32,7 @@ export class AuthService {
       const token = localStorage.getItem('keycloak_token');
       if (token && !this.isTokenExpired(token)) {
         this.isAuthenticatedSubject.next(true);
+        this.navigatePostLogin();
       } else {
         this.isAuthenticatedSubject.next(false);
       }
@@ -116,6 +119,10 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
+    const token = localStorage.getItem('keycloak_token') || sessionStorage.getItem('keycloak_token');
+    if (token && !this.isTokenExpired(token)) {
+      return true;
+    }
     return this.isAuthenticatedSubject.value;
   }
 
@@ -157,6 +164,7 @@ export class AuthService {
         window.history.replaceState({}, document.title, window.location.pathname);
         
         console.log('Token récupéré avec succès');
+        this.navigatePostLogin();
       } else {
         console.error('Erreur lors de la récupération du token:', data);
         this.isAuthenticatedSubject.next(false);
@@ -178,6 +186,22 @@ export class AuthService {
       return payload.exp < currentTime;
     } catch (error) {
       return true;
+    }
+  }
+
+  /**
+   * Redirige l'utilisateur après authentification selon ses rôles
+   */
+  private navigatePostLogin(): void {
+    const currentPath = window.location.pathname || '';
+    const alreadyOnTarget = currentPath.startsWith('/admin') || currentPath.startsWith('/client');
+    if (alreadyOnTarget) {
+      return;
+    }
+    if (this.roleService.isAdmin()) {
+      this.router.navigateByUrl('/admin');
+    } else {
+      this.router.navigateByUrl('/client');
     }
   }
 }
