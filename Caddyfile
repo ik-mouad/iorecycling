@@ -1,11 +1,9 @@
 :88 {
   encode gzip
 
-  # Keycloak est maintenant accessible directement sur le port 8080
-  # On utilise handle_path pour /auth/* vers keycloak:8080
-  handle_path /auth/* {
-    reverse_proxy keycloak:8080
-  }
+  # Keycloak avec KC_HTTP_RELATIVE_PATH=/auth
+  # On proxy /auth/* vers keycloak:8080 SANS strip du /auth
+  reverse_proxy /auth/* keycloak:8080
 
   handle_path /api/* {
     reverse_proxy backend:8080
