@@ -8,8 +8,8 @@ set -e
 echo "🔧 Configuration de l'utilisateur admin dans Keycloak..."
 
 # Attendre que Keycloak soit prêt
-echo "⏳ Attente que Keycloak soit prêt..."
-until curl -f http://localhost:8080/auth/realms/master >/dev/null 2>&1; do
+echo "⏳ Attente que Keycloak soit prêt via Caddy (http://127.0.0.1:88)..."
+until curl -sf http://127.0.0.1:88/auth/realms/master >/dev/null 2>&1; do
     echo "   Keycloak n'est pas encore prêt, attente..."
     sleep 5
 done
