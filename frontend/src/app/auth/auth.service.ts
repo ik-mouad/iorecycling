@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { RoleService } from '../services/role.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +9,7 @@ export class AuthService {
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
-  constructor(private router: Router, private roleService: RoleService) {
+  constructor(private router: Router) {
     console.log('AuthService initialisé');
     this.checkAuthStatus();
   }
@@ -198,7 +197,9 @@ export class AuthService {
     if (alreadyOnTarget) {
       return;
     }
-    if (this.roleService.isAdmin()) {
+    const claims = this.getClaims();
+    const roles: string[] = claims?.realm_access?.roles || [];
+    if (roles.includes('ADMIN')) {
       this.router.navigateByUrl('/admin');
     } else {
       this.router.navigateByUrl('/client');
