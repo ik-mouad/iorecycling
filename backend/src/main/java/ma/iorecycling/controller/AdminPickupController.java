@@ -23,11 +23,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -282,13 +282,26 @@ public class AdminPickupController {
      * DTO pour la création/mise à jour d'un enlèvement
      */
     public static class CreatePickupRequest {
+        @NotNull(message = "L'ID du client est obligatoire")
         private Long clientId;
+        
+        @NotNull(message = "La date est obligatoire")
         private LocalDate date;
+        
+        @NotNull(message = "Le type d'enlèvement est obligatoire")
         private PickupType type;
+        
         private Long siteId;
+        
+        @PositiveOrZero(message = "Le poids valorisable doit être positif ou zéro")
         private Double kgValorisables;
+        
+        @PositiveOrZero(message = "Le poids banal doit être positif ou zéro")
         private Double kgBanals;
+        
+        @PositiveOrZero(message = "Le poids dangereux doit être positif ou zéro")
         private Double kgDangereux;
+        
         private List<PickupItemRequest> items;
         
         // Getters et setters
@@ -317,8 +330,15 @@ public class AdminPickupController {
         public void setItems(List<PickupItemRequest> items) { this.items = items; }
         
         public static class PickupItemRequest {
+            @NotNull(message = "Le matériau est obligatoire")
             private String material;
+            
+            @NotNull(message = "La quantité est obligatoire")
+            @PositiveOrZero(message = "La quantité doit être positive ou zéro")
             private java.math.BigDecimal qtyKg;
+            
+            @NotNull(message = "Le prix est obligatoire")
+            @PositiveOrZero(message = "Le prix doit être positif ou zéro")
             private java.math.BigDecimal priceMadPerKg;
             
             // Getters et setters
