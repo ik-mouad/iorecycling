@@ -1,68 +1,112 @@
 .societes-list-container {
-  padding: 24px;
+  padding: 0;
   max-width: 1400px;
   margin: 0 auto;
+  animation: fadeIn var(--transition-base) ease-out;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: var(--spacing-6);
+  padding: var(--spacing-4) 0;
 
   h1 {
     margin: 0;
-    font-size: 28px;
-    font-weight: 500;
-    color: #333;
+    font-size: 2rem;
+    font-weight: 700;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: var(--color-text-primary);
+    letter-spacing: -0.02em;
   }
 
   button {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-3) var(--spacing-5);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    box-shadow: var(--elevation-2);
+    transition: all var(--transition-fast);
+    
+    &:hover {
+      box-shadow: var(--elevation-4);
+      transform: translateY(-1px);
+    }
+    
     mat-icon {
-      margin-right: 8px;
+      font-size: 1.25rem;
+      width: 1.25rem;
+      height: 1.25rem;
     }
   }
 }
 
 .table-container {
-  background: white;
-  border-radius: 8px;
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--elevation-2);
+  border: 1px solid var(--color-border-light);
+  transition: all var(--transition-base);
+
+  &:hover {
+    box-shadow: var(--elevation-3);
+  }
 
   table {
     width: 100%;
 
     th {
-      background-color: #f5f5f5;
+      background: linear-gradient(180deg, var(--color-background-secondary) 0%, var(--color-surface) 100%);
       font-weight: 600;
-      color: #555;
+      color: var(--color-text-primary);
+      font-size: 0.8125rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: var(--spacing-4) var(--spacing-4);
+      border-bottom: 2px solid var(--color-border);
     }
 
     td {
-      padding: 16px;
+      padding: var(--spacing-4);
+      border-bottom: 1px solid var(--color-border-light);
+      transition: background-color var(--transition-fast);
+    }
+
+    tr:hover td {
+      background-color: var(--color-surface-hover);
     }
 
     code {
-      background: #f0f0f0;
-      padding: 4px 8px;
-      border-radius: 4px;
+      background: var(--color-primary-50);
+      color: var(--color-primary-700);
+      padding: var(--spacing-1) var(--spacing-2);
+      border-radius: var(--radius-sm);
       font-family: 'Courier New', monospace;
-      font-size: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: 1px solid var(--color-primary-200);
     }
 
     .badge {
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 12px;
-      background-color: #e0e0e0;
-      color: #333;
-      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      padding: var(--spacing-1) var(--spacing-3);
+      border-radius: var(--radius-full);
+      background-color: var(--color-background-secondary);
+      color: var(--color-text-secondary);
+      font-size: 0.75rem;
       font-weight: 600;
+      border: 1px solid var(--color-border);
 
       &.badge-success {
-        background-color: #c8e6c9;
-        color: #2e7d32;
+        background: var(--color-success);
+        color: white;
+        border: none;
+        box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
       }
     }
   }
@@ -74,14 +118,33 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: var(--z-modal);
 }
 
 mat-paginator {
-  background: #fafafa;
-  border-top: 1px solid #e0e0e0;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border-light);
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-4);
+    
+    h1 {
+      font-size: 1.5rem;
+    }
+  }
+  
+  .table-container {
+    overflow-x: auto;
+  }
 }
