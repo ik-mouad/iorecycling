@@ -37,28 +37,28 @@ export class SiteService {
    * Récupère un site par son ID
    */
   getSiteById(id: number): Observable<Site> {
-    return this.http.get<Site>(`${this.apiUrl}/sites/${id}`);
+    return this.http.get<Site>(`${this.adminApiUrl}/sites/${id}`);
   }
 
   /**
    * Crée un nouveau site pour une société
    */
   createSite(societeId: number, site: Partial<Site>): Observable<Site> {
-    return this.http.post<Site>(`${this.apiUrl}/societes/${societeId}/sites`, site);
+    return this.http.post<Site>(`${this.adminApiUrl}/societes/${societeId}/sites`, site);
   }
 
   /**
    * Met à jour un site
    */
   updateSite(id: number, site: Partial<Site>): Observable<Site> {
-    return this.http.put<Site>(`${this.apiUrl}/sites/${id}`, site);
+    return this.http.put<Site>(`${this.adminApiUrl}/sites/${id}`, site);
   }
 
   /**
    * Supprime un site
    */
   deleteSite(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/sites/${id}`);
+    return this.http.delete<void>(`${this.adminApiUrl}/sites/${id}`);
   }
 }
 
