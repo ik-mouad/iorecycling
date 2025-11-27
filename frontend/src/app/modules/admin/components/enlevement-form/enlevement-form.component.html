@@ -1,0 +1,224 @@
+<div class="enlevement-form-container">
+  <h1>Créer un enlèvement</h1>
+
+  <mat-stepper linear #stepper>
+    <!-- ÉTAPE 1 : Informations générales -->
+    <mat-step [stepControl]="step1Form" label="Informations générales">
+      <form [formGroup]="step1Form">
+        <mat-card>
+          <mat-card-content>
+            <!-- Date -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Date de l'enlèvement</mat-label>
+              <input matInput [matDatepicker]="picker" formControlName="dateEnlevement">
+              <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+
+            <!-- Société -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Société</mat-label>
+              <mat-select formControlName="societeId">
+                <mat-option *ngFor="let societe of societes" [value]="societe.id">
+                  {{ societe.raisonSociale }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <!-- Site -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Site</mat-label>
+              <mat-select
+                formControlName="siteId"
+                [disabled]="!step1Form.value.societeId || sitesLoading">
+                <mat-option *ngIf="sitesLoading" disabled>
+                  Chargement des sites...
+                </mat-option>
+                <mat-option *ngFor="let site of sites" [value]="site.id">
+                  {{ site.name }}
+                </mat-option>
+                <mat-option *ngIf="!sitesLoading && step1Form.value.societeId && sites.length === 0" disabled>
+                  Aucun site disponible pour cette société
+                </mat-option>
+              </mat-select>
+              <mat-hint *ngIf="!step1Form.value.societeId">Sélectionnez d'abord une société</mat-hint>
+            </mat-form-field>
+
+            <!-- Observation -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Observation</mat-label>
+              <textarea matInput formControlName="observation" rows="3" 
+                placeholder="Commentaires, remarques sur la collecte..."></textarea>
+            </mat-form-field>
+          </mat-card-content>
+        </mat-card>
+
+        <div class="step-actions">
+          <button mat-button (click)="cancel()">Annuler</button>
+          <button mat-raised-button color="primary" matStepperNext [disabled]="step1Form.invalid">
+            Suivant
+          </button>
+        </div>
+      </form>
+    </mat-step>
+
+    <!-- ÉTAPE 2 : Items (lignes de détail) -->
+    <mat-step [stepControl]="step2Form" label="Détails des déchets">
+      <form [formGroup]="step2Form">
+        <div formArrayName="items">
+          <mat-card *ngFor="let item of itemsFormArray.controls; let i = index" [formGroupName]="i" class="item-card">
+            <mat-card-header>
+              <mat-card-title>
+                Item {{ i + 1 }}
+                <button mat-icon-button color="warn" (click)="removeItem(i)" *ngIf="itemsFormArray.length > 1">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="item-row">
+                <!-- Type de déchet -->
+                <mat-form-field appearance="outline" class="field-type">
+                  <mat-label>Type de déchet</mat-label>
+                  <mat-select formControlName="typeDechet">
+                    <mat-option value="VALORISABLE">🔄 Valorisable (recyclable)</mat-option>
+                    <mat-option value="BANAL">🗑️ Banal (ordinaire)</mat-option>
+                    <mat-option value="A_ELIMINER">☣️ A éliminer (dangereux)</mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <!-- Sous-type (si VALORISABLE) -->
+                <mat-form-field appearance="outline" class="field-sous-type" *ngIf="item.value.typeDechet === 'VALORISABLE'">
+                  <mat-label>Sous-type *</mat-label>
+                  <mat-select formControlName="sousType">
+                    <mat-option value="CARTON">Carton</mat-option>
+                    <mat-option value="PLASTIQUE_PET">Plastique PET</mat-option>
+                    <mat-option value="PLASTIQUE_PEHD">Plastique PEHD</mat-option>
+                    <mat-option value="ALUMINIUM">Aluminium</mat-option>
+                    <mat-option value="FER">Fer</mat-option>
+                    <mat-option value="CUIVRE">Cuivre</mat-option>
+                    <mat-option value="PAPIER">Papier</mat-option>
+                    <mat-option value="VERRE">Verre</mat-option>
+                  </mat-select>
+                  <mat-error>Obligatoire pour VALORISABLE</mat-error>
+                </mat-form-field>
+
+                <!-- Quantité -->
+                <mat-form-field appearance="outline" class="field-quantite">
+                  <mat-label>Quantité (kg)</mat-label>
+                  <input matInput type="number" step="0.001" formControlName="quantiteKg">
+                </mat-form-field>
+
+                <!-- Prix unitaire -->
+                <mat-form-field appearance="outline" class="field-prix">
+                  <mat-label>Prix (MAD/kg)</mat-label>
+                  <input matInput type="number" step="0.01" formControlName="prixUnitaireMad">
+                </mat-form-field>
+
+                <!-- Montant calculé -->
+                <div class="field-montant">
+                  <strong>Montant</strong>
+                  <div class="montant-value">
+                    {{ calculateMontant(item.value) | number:'1.2-2' }} MAD
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <button mat-stroked-button color="primary" (click)="addItem()" class="add-item-btn">
+          <mat-icon>add</mat-icon>
+          Ajouter un item
+        </button>
+
+        <div class="step-actions">
+          <button mat-button matStepperPrevious>Précédent</button>
+          <button mat-raised-button color="primary" matStepperNext [disabled]="step2Form.invalid">
+            Suivant
+          </button>
+        </div>
+      </form>
+    </mat-step>
+
+    <!-- ÉTAPE 3 : Récapitulatif -->
+    <mat-step label="Récapitulatif">
+      <mat-card class="recap-card">
+        <mat-card-header>
+          <mat-card-title>Récapitulatif de l'enlèvement</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <!-- Informations générales -->
+          <div class="recap-section">
+            <h3>📋 Informations générales</h3>
+            <p><strong>Date :</strong> {{ step1Form.value.dateEnlevement | date:'dd/MM/yyyy' }}</p>
+            <p><strong>Société :</strong> {{ getSocieteNom(step1Form.value.societeId) }}</p>
+            <p><strong>Site :</strong> {{ getSiteNom(step1Form.value.siteId) }}</p>
+            <p *ngIf="step1Form.value.observation"><strong>Observation :</strong> {{ step1Form.value.observation }}</p>
+          </div>
+
+          <!-- Items -->
+          <div class="recap-section">
+            <h3>📦 Détails des déchets</h3>
+            <table class="recap-table">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Sous-type</th>
+                  <th>Quantité (kg)</th>
+                  <th>Prix/kg</th>
+                  <th>Montant</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of itemsFormArray.value; let i = index" 
+                    [class]="'type-' + item.typeDechet.toLowerCase()">
+                  <td>{{ getTypeDechetLabel(item.typeDechet) }}</td>
+                  <td>{{ item.sousType || '-' }}</td>
+                  <td>{{ item.quantiteKg | number:'1.3-3' }}</td>
+                  <td>{{ item.prixUnitaireMad | number:'1.2-2' }} MAD</td>
+                  <td><strong>{{ calculateMontant(item) | number:'1.2-2' }} MAD</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Totaux -->
+          <div class="recap-section recap-totaux">
+            <h3>💰 Totaux calculés</h3>
+            <div class="totaux-grid">
+              <div class="totaux-item">
+                <span>Poids total</span>
+                <strong>{{ calculateTotaux().poidsTotal | number:'1.3-3' }} kg</strong>
+              </div>
+              <div class="totaux-item success">
+                <span>Budget valorisation</span>
+                <strong>+ {{ calculateTotaux().budgetValorisation | number:'1.2-2' }} MAD</strong>
+              </div>
+              <div class="totaux-item danger">
+                <span>Budget traitement</span>
+                <strong>- {{ calculateTotaux().budgetTraitement | number:'1.2-2' }} MAD</strong>
+              </div>
+              <div class="totaux-item primary">
+                <span>Bilan net</span>
+                <strong>{{ calculateTotaux().bilanNet > 0 ? '+' : '' }}{{ calculateTotaux().bilanNet | number:'1.2-2' }} MAD</strong>
+              </div>
+              <div class="totaux-item">
+                <span>Taux de valorisation</span>
+                <strong>{{ calculateTotaux().tauxValorisation | number:'1.1-1' }} %</strong>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <div class="step-actions">
+        <button mat-button matStepperPrevious [disabled]="loading">Précédent</button>
+        <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="loading">
+          <mat-icon *ngIf="!loading">check</mat-icon>
+          {{ loading ? 'Création en cours...' : 'Créer l\'enlèvement' }}
+        </button>
+      </div>
+    </mat-step>
+  </mat-stepper>
+</div>

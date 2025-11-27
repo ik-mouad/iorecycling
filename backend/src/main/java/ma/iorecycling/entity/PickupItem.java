@@ -1,6 +1,9 @@
 package ma.iorecycling.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,10 +11,12 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 
 /**
- * Item détaillé d'un enlèvement recyclable
+ * Entité représentant une ligne de détail d'un enlèvement
+ * Chaque item représente un type de déchet spécifique avec sa quantité et son prix
  */
 @Entity
 @Table(name = "pickup_item")
@@ -25,37 +30,61 @@ public class PickupItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name = "pickup_id", nullable = false)
-    private Long pickupId;
+    @NotNull(message = "L'enlèvement est obligatoire")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "enlevement_id", nullable = false)
+    private Enlevement enlevement;
     
-    @Column(name = "material", nullable = false, length = 40)
-    private String material;
+    @NotNull(message = "Le type de déchet est obligatoire")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type_dechet", nullable = false, length = 20)
+    private TypeDechet typeDechet;
     
-    @Column(name = "qty_kg", nullable = false, precision = 10, scale = 3)
-    private BigDecimal qtyKg;
+    @Size(max = 50, message = "Le sous-type ne peut pas dépasser 50 caractères")
+    @Column(name = "sous_type", length = 50)
+    private String sousType;
     
-    @Column(name = "price_mad_per_kg", nullable = false, precision = 10, scale = 3)
-    private BigDecimal priceMadPerKg;
+    @NotNull(message = "La quantité est obligatoire")
+    @PositiveOrZero(message = "La quantité doit être positive ou zéro")
+    @Column(name = "quantite_kg", nullable = false, precision = 10, scale = 3)
+    private BigDecimal quantiteKg;
     
-    @Column(name = "total_mad", precision = 12, scale = 2, insertable = false, updatable = false)
-    private BigDecimal totalMad; // Calculé automatiquement par la DB
+    @NotNull(message = "Le prix unitaire est obligatoire")
+    @PositiveOrZero(message = "Le prix unitaire doit être positif ou zéro")
+    @Column(name = "prix_unitaire_mad", nullable = false, precision = 10, scale = 3)
+    private BigDecimal prixUnitaireMad;
+    
+    @Column(name = "montant_mad", precision = 12, scale = 2)
+    private BigDecimal montantMad;
     
     @CreationTimestamp
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
     private Instant createdAt;
     
-    // Relations
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pickup_id", insertable = false, updatable = false)
-    private Pickup pickup;
+    /**
+     * Enum pour les types de déchets
+     */
+    public enum TypeDechet {
+        VALORISABLE,  // Déchets recyclables (génère un revenu)
+        BANAL,        // Déchets ordinaires (génère un coût)
+        A_ELIMINER    // Déchets dangereux (génère un coût élevé + documents obligatoires)
+    }
     
     /**
-     * Calcule le total en MAD
+     * Hook JPA unique pour effectuer les validations et calculs avant insert/update
      */
-    public BigDecimal calculateTotal() {
-        if (qtyKg != null && priceMadPerKg != null) {
-            return qtyKg.multiply(priceMadPerKg);
+    @PrePersist
+    @PreUpdate
+    public void validateAndCalculate() {
+        if (TypeDechet.VALORISABLE.equals(typeDechet) && (sousType == null || sousType.trim().isEmpty())) {
+            throw new IllegalStateException("Le sous-type est obligatoire pour les déchets VALORISABLE");
         }
-        return BigDecimal.ZERO;
+        
+        if (quantiteKg != null && prixUnitaireMad != null) {
+            montantMad = quantiteKg.multiply(prixUnitaireMad)
+                    .setScale(2, RoundingMode.HALF_UP);
+        } else {
+            montantMad = BigDecimal.ZERO;
+        }
     }
 }

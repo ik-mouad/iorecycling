@@ -1,20 +1,29 @@
 package ma.iorecycling.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ma.iorecycling.entity.ClientUser;
+import ma.iorecycling.repository.ClientUserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 /**
  * Service pour extraire le contexte client depuis le JWT
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ClientContextService {
     
+    private final ClientUserRepository clientUserRepository;
+    
     /**
-     * Extrait le clientId depuis un JWT donné
+     * Extrait l'ID de la société depuis un JWT donné
+     * Cherche d'abord le claim clientId, sinon utilise l'email pour trouver le ClientUser
      */
     public Long getClientId(Jwt jwt) {
         try {
@@ -23,37 +32,60 @@ public class ClientContextService {
                 return null;
             }
             
+            // Essayer d'abord le claim clientId (si présent)
             Object clientIdClaim = jwt.getClaim("clientId");
+            if (clientIdClaim != null) {
+                Long clientId;
+                if (clientIdClaim instanceof Integer) {
+                    clientId = ((Integer) clientIdClaim).longValue();
+                } else if (clientIdClaim instanceof Long) {
+                    clientId = (Long) clientIdClaim;
+                } else if (clientIdClaim instanceof String) {
+                    clientId = Long.parseLong((String) clientIdClaim);
+                } else {
+                    log.warn("Type de clientId non supporté: {}", clientIdClaim.getClass());
+                    return null;
+                }
+                log.debug("ClientId extrait depuis claim: {}", clientId);
+                return clientId;
+            }
             
-            if (clientIdClaim == null) {
-                log.warn("Claim 'clientId' manquant dans le JWT");
+            // Sinon, extraire l'email ou le username du JWT
+            String email = jwt.getClaimAsString("email");
+            if (email == null || email.isEmpty()) {
+                email = jwt.getClaimAsString("preferred_username");
+            }
+            
+            if (email == null || email.isEmpty()) {
+                log.warn("Email et preferred_username manquants dans le JWT");
                 return null;
             }
             
-            // Gérer différents types de clientId
-            Long clientId;
-            if (clientIdClaim instanceof Integer) {
-                clientId = ((Integer) clientIdClaim).longValue();
-            } else if (clientIdClaim instanceof Long) {
-                clientId = (Long) clientIdClaim;
-            } else if (clientIdClaim instanceof String) {
-                clientId = Long.parseLong((String) clientIdClaim);
-            } else {
-                log.warn("Type de clientId non supporté: {}", clientIdClaim.getClass());
+            // Chercher le ClientUser par email
+            Optional<ClientUser> clientUserOpt = clientUserRepository.findByEmail(email);
+            if (clientUserOpt.isEmpty()) {
+                log.warn("Aucun ClientUser trouvé pour l'email: {}", email);
                 return null;
             }
             
-            log.debug("ClientId extrait: {}", clientId);
-            return clientId;
+            ClientUser clientUser = clientUserOpt.get();
+            if (!clientUser.getActive()) {
+                log.warn("ClientUser inactif pour l'email: {}", email);
+                return null;
+            }
+            
+            Long societeId = clientUser.getSociete() != null ? clientUser.getSociete().getId() : null;
+            log.debug("Société ID extraite pour email {}: {}", email, societeId);
+            return societeId;
             
         } catch (Exception e) {
-            log.error("Erreur lors de l'extraction du clientId: {}", e.getMessage());
+            log.error("Erreur lors de l'extraction du clientId: {}", e.getMessage(), e);
             return null;
         }
     }
     
     /**
-     * Extrait le clientId depuis le JWT du contexte de sécurité actuel
+     * Extrait l'ID de la société depuis le JWT du contexte de sécurité actuel
      */
     public Long getCurrentClientId() {
         try {
@@ -65,31 +97,10 @@ public class ClientContextService {
             }
             
             Jwt jwt = (Jwt) authentication.getPrincipal();
-            Object clientIdClaim = jwt.getClaim("clientId");
-            
-            if (clientIdClaim == null) {
-                log.warn("Claim 'clientId' manquant dans le JWT");
-                return null;
-            }
-            
-            // Gérer différents types de clientId
-            Long clientId;
-            if (clientIdClaim instanceof Integer) {
-                clientId = ((Integer) clientIdClaim).longValue();
-            } else if (clientIdClaim instanceof Long) {
-                clientId = (Long) clientIdClaim;
-            } else if (clientIdClaim instanceof String) {
-                clientId = Long.parseLong((String) clientIdClaim);
-            } else {
-                log.warn("Type de clientId non supporté: {}", clientIdClaim.getClass());
-                return null;
-            }
-            
-            log.debug("ClientId extrait: {}", clientId);
-            return clientId;
+            return getClientId(jwt);
             
         } catch (Exception e) {
-            log.error("Erreur lors de l'extraction du clientId: {}", e.getMessage());
+            log.error("Erreur lors de l'extraction du clientId: {}", e.getMessage(), e);
             return null;
         }
     }

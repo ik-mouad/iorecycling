@@ -1,6 +1,9 @@
 package ma.iorecycling.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,9 +12,12 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Site de collecte d'un client
+ * Entité représentant un site de collecte d'une société
+ * Un site appartient à une seule société
  */
 @Entity
 @Table(name = "site")
@@ -25,20 +31,21 @@ public class Site {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name = "client_id", nullable = false)
-    private Long clientId;
+    @NotNull(message = "La société est obligatoire")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "societe_id", nullable = false)
+    private Societe societe;
     
+    @NotBlank(message = "Le nom du site est obligatoire")
+    @Size(max = 100, message = "Le nom ne peut pas dépasser 100 caractères")
     @Column(name = "name", nullable = false, length = 100)
     private String name;
     
-    @Column(name = "address", columnDefinition = "TEXT")
-    private String address;
-    
-    @Column(name = "contact_phone", length = 20)
-    private String contactPhone;
+    @Column(name = "adresse", columnDefinition = "TEXT")
+    private String adresse;
     
     @CreationTimestamp
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
     private Instant createdAt;
     
     @UpdateTimestamp
@@ -46,7 +53,7 @@ public class Site {
     private Instant updatedAt;
     
     // Relations
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_id", insertable = false, updatable = false)
-    private Client client;
+    @OneToMany(mappedBy = "site", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<Enlevement> enlevements = new ArrayList<>();
 }

@@ -1,0 +1,79 @@
+<div class="demande-form-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Demander un enlèvement</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <p class="info-message">
+        💡 Remplissez ce formulaire pour demander un enlèvement ponctuel.
+        Vous serez notifié dès que votre demande sera traitée.
+      </p>
+
+      <form [formGroup]="demandeForm" (ngSubmit)="onSubmit()">
+        
+        <!-- Date souhaitée -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Date souhaitée *</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="dateSouhaitee">
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-hint>Date à laquelle vous souhaitez l'enlèvement</mat-hint>
+        </mat-form-field>
+
+        <!-- Heure souhaitée -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Heure souhaitée (optionnel)</mat-label>
+          <input matInput formControlName="heureSouhaitee" placeholder="Ex: 09h00 - 11h00">
+          <mat-hint>Plage horaire souhaitée</mat-hint>
+        </mat-form-field>
+
+        <!-- Site -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Site *</mat-label>
+          <mat-select formControlName="siteId">
+            <mat-option *ngFor="let site of sites" [value]="site.id">
+              {{ site.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Type de déchets estimé -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Type de déchets estimé</mat-label>
+          <input matInput formControlName="typeDechetEstime" placeholder="Ex: Carton et plastique">
+          <mat-hint>Type de déchets à collecter</mat-hint>
+        </mat-form-field>
+
+        <!-- Quantité estimée -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Quantité estimée (kg)</mat-label>
+          <input matInput type="number" formControlName="quantiteEstimee" placeholder="Ex: 200">
+          <mat-hint>Estimation du poids total</mat-hint>
+        </mat-form-field>
+
+        <!-- Commentaire -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Commentaire</mat-label>
+          <textarea 
+            matInput 
+            formControlName="commentaire" 
+            rows="4"
+            placeholder="Informations complémentaires...">
+          </textarea>
+        </mat-form-field>
+
+        <!-- Boutons -->
+        <div class="form-actions">
+          <button mat-button type="button" (click)="cancel()" [disabled]="loading">
+            Annuler
+          </button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="demandeForm.invalid || loading">
+            {{ loading ? 'Envoi en cours...' : 'Envoyer la demande' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
+

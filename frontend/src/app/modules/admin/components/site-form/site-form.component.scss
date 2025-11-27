@@ -1,0 +1,22 @@
+.site-form {
+  min-width: 400px;
+}
+
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+mat-dialog-content {
+  padding: 24px;
+}
+
+mat-dialog-actions {
+  padding: 16px 24px;
+}
+

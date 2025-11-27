@@ -30,25 +30,41 @@
   <nav class="admin-nav">
     <div class="nav-buttons">
       <a mat-button 
-         routerLink="/admin/clients" 
+         routerLink="/admin/societes" 
          routerLinkActive="active"
          [routerLinkActiveOptions]="{exact: false}">
         <mat-icon>business</mat-icon>
-        Clients
+        Sociétés
       </a>
       <a mat-button 
-         routerLink="/admin/pickups" 
+         routerLink="/admin/enlevements" 
          routerLinkActive="active"
          [routerLinkActiveOptions]="{exact: false}">
         <mat-icon>local_shipping</mat-icon>
         Enlèvements
       </a>
       <a mat-button 
-         routerLink="/admin/documents" 
-         routerLinkActive="active"
-         [routerLinkActiveOptions]="{exact: false}">
-        <mat-icon>description</mat-icon>
-        Documents
+         routerLink="/admin/demandes" 
+         routerLinkActive="active">
+        <mat-icon>assignment</mat-icon>
+        Demandes
+        <span class="badge" *ngIf="getPendingDemandesCount() > 0">{{ getPendingDemandesCount() }}</span>
+      </a>
+      <a mat-button 
+         routerLink="/admin/planning" 
+         routerLinkActive="active">
+        <mat-icon>calendar_month</mat-icon>
+        Planning
+      </a>
+      <a mat-button 
+         routerLink="/admin/recurrences" 
+         routerLinkActive="active">
+        <mat-icon>schedule</mat-icon>
+        Récurrences
+      </a>
+      <a mat-stroked-button color="primary" routerLink="/admin/enlevements/new">
+        <mat-icon>add_circle</mat-icon>
+        Nouvel enlèvement
       </a>
     </div>
   </nav>

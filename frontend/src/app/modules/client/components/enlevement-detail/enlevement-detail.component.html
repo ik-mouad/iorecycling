@@ -1,0 +1,156 @@
+<div class="enlevement-detail-container" *ngIf="enlevement">
+  <div class="header">
+    <div>
+      <button mat-icon-button (click)="backToList()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h1>Enlèvement {{ enlevement.numeroEnlevement }}</h1>
+    </div>
+  </div>
+
+  <!-- Informations générales -->
+  <mat-card class="info-card">
+    <mat-card-header>
+      <mat-card-title>Informations générales</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Numéro</label>
+          <div><code class="numero">{{ enlevement.numeroEnlevement }}</code></div>
+        </div>
+        <div class="info-item">
+          <label>Date</label>
+          <div>{{ enlevement.dateEnlevement | date:'dd/MM/yyyy' }}</div>
+        </div>
+        <div class="info-item">
+          <label>Site</label>
+          <div>📍 {{ enlevement.siteNom }}</div>
+        </div>
+        <div class="info-item" *ngIf="enlevement.observation">
+          <label>Observation</label>
+          <div>{{ enlevement.observation }}</div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Détails des déchets -->
+  <mat-card class="items-card">
+    <mat-card-header>
+      <mat-card-title>Détails des déchets</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <table mat-table [dataSource]="enlevement.items || []" class="items-table">
+        <ng-container matColumnDef="typeDechet">
+          <th mat-header-cell *matHeaderCellDef>Type</th>
+          <td mat-cell *matCellDef="let item">
+            <mat-chip [ngClass]="'type-' + item.typeDechet.toLowerCase()">
+              {{ getTypeDechetLabel(item.typeDechet) }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="sousType">
+          <th mat-header-cell *matHeaderCellDef>Sous-type</th>
+          <td mat-cell *matCellDef="let item">{{ item.sousType || '-' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="quantiteKg">
+          <th mat-header-cell *matHeaderCellDef>Quantité (kg)</th>
+          <td mat-cell *matCellDef="let item">{{ item.quantiteKg | number:'1.3-3' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="prixUnitaireMad">
+          <th mat-header-cell *matHeaderCellDef>Prix unitaire</th>
+          <td mat-cell *matCellDef="let item">{{ item.prixUnitaireMad | number:'1.2-2' }} MAD</td>
+        </ng-container>
+
+        <ng-container matColumnDef="montant">
+          <th mat-header-cell *matHeaderCellDef>Montant</th>
+          <td mat-cell *matCellDef="let item">
+            <strong>{{ (item.quantiteKg * item.prixUnitaireMad) | number:'1.2-2' }} MAD</strong>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Totaux et statistiques -->
+  <mat-card class="totals-card">
+    <mat-card-header>
+      <mat-card-title>Totaux et statistiques</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="totals-grid">
+        <div class="total-item">
+          <label>Poids total</label>
+          <div class="value">{{ enlevement.poidsTotal | number:'1.1-1' }} kg</div>
+        </div>
+        <div class="total-item success">
+          <label>Budget valorisation</label>
+          <div class="value">+{{ enlevement.budgetValorisation | number:'1.2-2' }} MAD</div>
+        </div>
+        <div class="total-item danger">
+          <label>Budget traitement</label>
+          <div class="value">-{{ enlevement.budgetTraitement | number:'1.2-2' }} MAD</div>
+        </div>
+        <div class="total-item" [ngClass]="getBilanClass(enlevement.bilanNet)">
+          <label>Bilan net</label>
+          <div class="value">
+            {{ enlevement.bilanNet > 0 ? '+' : '' }}{{ enlevement.bilanNet | number:'1.2-2' }} MAD
+          </div>
+        </div>
+        <div class="total-item">
+          <label>Taux de valorisation</label>
+          <div class="value">
+            <mat-chip [ngClass]="getTauxClass(enlevement.tauxValorisation)">
+              {{ enlevement.tauxValorisation | number:'1.0-0' }}%
+            </mat-chip>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Documents associés -->
+  <mat-card class="documents-card">
+    <mat-card-header>
+      <mat-card-title>Documents Associés</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="loadingDocuments" class="loading-documents">
+        <mat-spinner [diameter]="30"></mat-spinner>
+      </div>
+      <div *ngIf="!loadingDocuments && documents.length > 0" class="documents-list">
+        <div *ngFor="let doc of documents" class="document-item">
+          <div class="document-info">
+            <mat-icon>description</mat-icon>
+            <div>
+              <strong>{{ doc.fileName }}</strong>
+              <small>{{ doc.typeDocument }}</small>
+            </div>
+          </div>
+          <div class="document-actions">
+            <button mat-raised-button color="primary" (click)="downloadDocument(doc)">
+              <mat-icon>download</mat-icon>
+              Télécharger
+            </button>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="!loadingDocuments && documents.length === 0" class="empty-state">
+        <mat-icon>folder_off</mat-icon>
+        <p>Aucun document associé pour le moment.</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<div *ngIf="loading" class="loading-overlay">
+  <mat-spinner></mat-spinner>
+</div>
+

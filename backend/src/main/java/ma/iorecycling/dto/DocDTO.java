@@ -28,11 +28,11 @@ public class DocDTO {
     public static DocDTO fromDocument(ma.iorecycling.entity.Document document, String downloadUrl) {
         return DocDTO.builder()
                 .id(document.getId())
-                .name(document.getFilename())
-                .type(document.getDocType().name())
+                .name(document.getFileName())
+                .type(document.getTypeDocument().name())
                 .url(downloadUrl)
-                .description(document.getDocType().getDescription())
-                .fileSize(document.getFileSize())
+                .description(document.getTypeDocument().getDescription())
+                .fileSize(document.getSize())
                 .mimeType(document.getMimeType())
                 .build();
     }

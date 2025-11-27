@@ -1,0 +1,87 @@
+<div class="admin-demandes-container">
+  <div class="header">
+    <h1>Gestion des Demandes d'Enlèvements</h1>
+  </div>
+
+  <mat-card class="demandes-card">
+    <mat-card-header>
+      <mat-card-title>Demandes en attente de traitement</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="loading" class="loading-overlay">
+        <mat-spinner></mat-spinner>
+      </div>
+
+      <table mat-table [dataSource]="demandes" class="mat-elevation-z2" *ngIf="!loading && demandes.length > 0">
+        <ng-container matColumnDef="numeroDemande">
+          <th mat-header-cell *matHeaderCellDef>Numéro</th>
+          <td mat-cell *matCellDef="let demande">
+            <code class="numero">{{ demande.numeroDemande }}</code>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="societeNom">
+          <th mat-header-cell *matHeaderCellDef>Société</th>
+          <td mat-cell *matCellDef="let demande">{{ demande.societeNom }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="siteNom">
+          <th mat-header-cell *matHeaderCellDef>Site</th>
+          <td mat-cell *matCellDef="let demande">
+            <small>📍 {{ demande.siteNom }}</small>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="dateSouhaitee">
+          <th mat-header-cell *matHeaderCellDef>Date souhaitée</th>
+          <td mat-cell *matCellDef="let demande">
+            {{ demande.dateSouhaitee | date:'dd/MM/yyyy' }}
+            <small *ngIf="demande.heureSouhaitee"> à {{ demande.heureSouhaitee }}</small>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="statut">
+          <th mat-header-cell *matHeaderCellDef>Statut</th>
+          <td mat-cell *matCellDef="let demande">
+            <mat-chip [ngClass]="getStatutClass(demande.statut)">
+              {{ getStatutLabel(demande.statut) }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let demande">
+            <button 
+              mat-raised-button 
+              color="primary" 
+              (click)="validerDemande(demande)"
+              *ngIf="demande.statut === 'EN_ATTENTE'"
+              matTooltip="Valider la demande">
+              <mat-icon>check_circle</mat-icon>
+              Valider
+            </button>
+            <button 
+              mat-raised-button 
+              color="warn" 
+              (click)="refuserDemande(demande)"
+              *ngIf="demande.statut === 'EN_ATTENTE'"
+              matTooltip="Refuser la demande">
+              <mat-icon>cancel</mat-icon>
+              Refuser
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <div class="empty-state" *ngIf="!loading && demandes.length === 0">
+        <mat-icon>inbox</mat-icon>
+        <p>Aucune demande en attente</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+

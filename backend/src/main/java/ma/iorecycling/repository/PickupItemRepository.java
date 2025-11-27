@@ -7,13 +7,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.YearMonth;
+import java.time.LocalDate;
 import java.util.List;
-import ma.iorecycling.entity.PickupType;
 
 /**
- * Repository pour la gestion des items d'enlèvement
+ * Repository pour l'entité PickupItem
  */
 @Repository
 public interface PickupItemRepository extends JpaRepository<PickupItem, Long> {
@@ -21,77 +19,77 @@ public interface PickupItemRepository extends JpaRepository<PickupItem, Long> {
     /**
      * Trouve tous les items d'un enlèvement
      */
-    List<PickupItem> findByPickupIdOrderByMaterial(Long pickupId);
-    
-    /**
-     * Trouve tous les items d'un client pour un mois donné
-     */
-    @Query("""
-        SELECT pi FROM PickupItem pi 
-        JOIN pi.pickup p 
-        WHERE p.client.id = :clientId 
-        AND EXTRACT(YEAR FROM p.date) = :year 
-        AND EXTRACT(MONTH FROM p.date) = :month
-        ORDER BY pi.material
-        """)
-    List<PickupItem> findByClientIdAndMonth(@Param("clientId") Long clientId, 
-                                           @Param("year") int year, 
-                                           @Param("month") int month);
-    
-    /**
-     * Calcule le total des revenus pour un client et un mois
-     */
-    @Query("""
-        SELECT COALESCE(SUM(pi.totalMad), 0) FROM PickupItem pi 
-        JOIN pi.pickup p 
-        WHERE p.client.id = :clientId 
-        AND EXTRACT(YEAR FROM p.date) = :year 
-        AND EXTRACT(MONTH FROM p.date) = :month
-        """)
-    BigDecimal calculateTotalRevenueForMonth(@Param("clientId") Long clientId, 
-                                           @Param("year") int year, 
-                                           @Param("month") int month);
-    
-    /**
-     * Trouve les matériaux uniques avec leurs totaux pour un client et un mois
-     */
-    @Query("""
-        SELECT pi.material, 
-               SUM(pi.qtyKg) as totalQty, 
-               AVG(pi.priceMadPerKg) as avgPrice,
-               SUM(pi.totalMad) as totalMad
-        FROM PickupItem pi 
-        JOIN pi.pickup p 
-        WHERE p.client.id = :clientId 
-        AND EXTRACT(YEAR FROM p.date) = :year 
-        AND EXTRACT(MONTH FROM p.date) = :month
-        GROUP BY pi.material
-        ORDER BY pi.material
-        """)
-    List<Object[]> findMaterialSummaryForMonth(@Param("clientId") Long clientId, 
-                                             @Param("year") int year, 
-                                             @Param("month") int month);
-    
-    /**
-     * Trouve les items d'un client pour une période et un type donnés
-     */
-    @Query("""
-        SELECT pi FROM PickupItem pi 
-        JOIN pi.pickup p 
-        WHERE p.client.id = :clientId 
-        AND p.date BETWEEN :from AND :to
-        AND p.type = :type
-        ORDER BY pi.material
-        """)
-    List<PickupItem> findByPickupClientIdAndPickupDateBetweenAndPickupType(
-        @Param("clientId") Long clientId,
-        @Param("from") Instant from,
-        @Param("to") Instant to,
-        @Param("type") PickupType type
-    );
+    List<PickupItem> findByEnlevementId(Long enlevementId);
     
     /**
      * Supprime tous les items d'un enlèvement
      */
-    void deleteByPickupId(Long pickupId);
+    void deleteByEnlevementId(Long enlevementId);
+    
+    /**
+     * Calcule la quantité totale par type de déchet pour une société sur une période
+     */
+    @Query("SELECT i.typeDechet, SUM(i.quantiteKg) " +
+           "FROM PickupItem i JOIN i.enlevement e " +
+           "WHERE e.societe.id = :societeId " +
+           "AND e.dateEnlevement BETWEEN :dateDebut AND :dateFin " +
+           "GROUP BY i.typeDechet")
+    List<Object[]> sumQuantiteByTypeForSocieteAndPeriod(
+            @Param("societeId") Long societeId,
+            @Param("dateDebut") LocalDate dateDebut,
+            @Param("dateFin") LocalDate dateFin);
+    
+    /**
+     * Calcule le budget total par type de déchet pour une société sur une période
+     */
+    @Query("SELECT i.typeDechet, SUM(i.montantMad) " +
+           "FROM PickupItem i JOIN i.enlevement e " +
+           "WHERE e.societe.id = :societeId " +
+           "AND e.dateEnlevement BETWEEN :dateDebut AND :dateFin " +
+           "GROUP BY i.typeDechet")
+    List<Object[]> sumMontantByTypeForSocieteAndPeriod(
+            @Param("societeId") Long societeId,
+            @Param("dateDebut") LocalDate dateDebut,
+            @Param("dateFin") LocalDate dateFin);
+    
+    /**
+     * Calcule le budget de valorisation (VALORISABLE uniquement)
+     */
+    @Query("SELECT COALESCE(SUM(i.montantMad), 0) " +
+           "FROM PickupItem i JOIN i.enlevement e " +
+           "WHERE e.societe.id = :societeId " +
+           "AND e.dateEnlevement BETWEEN :dateDebut AND :dateFin " +
+           "AND i.typeDechet = 'VALORISABLE'")
+    BigDecimal calculateBudgetValorisation(
+            @Param("societeId") Long societeId,
+            @Param("dateDebut") LocalDate dateDebut,
+            @Param("dateFin") LocalDate dateFin);
+    
+    /**
+     * Calcule le budget A ELIMINER (BANAL + A_ELIMINER)
+     */
+    @Query("SELECT COALESCE(SUM(i.montantMad), 0) " +
+           "FROM PickupItem i JOIN i.enlevement e " +
+           "WHERE e.societe.id = :societeId " +
+           "AND e.dateEnlevement BETWEEN :dateDebut AND :dateFin " +
+           "AND i.typeDechet IN ('BANAL', 'A_ELIMINER')")
+    BigDecimal calculateBudgetTraitement(
+            @Param("societeId") Long societeId,
+            @Param("dateDebut") LocalDate dateDebut,
+            @Param("dateFin") LocalDate dateFin);
+    
+    /**
+     * Détail par sous-type pour les VALORISABLE
+     */
+    @Query("SELECT i.sousType, SUM(i.quantiteKg), SUM(i.montantMad) " +
+           "FROM PickupItem i JOIN i.enlevement e " +
+           "WHERE e.societe.id = :societeId " +
+           "AND e.dateEnlevement BETWEEN :dateDebut AND :dateFin " +
+           "AND i.typeDechet = 'VALORISABLE' " +
+           "GROUP BY i.sousType " +
+           "ORDER BY SUM(i.quantiteKg) DESC")
+    List<Object[]> getDetailValorisableBySousType(
+            @Param("societeId") Long societeId,
+            @Param("dateDebut") LocalDate dateDebut,
+            @Param("dateFin") LocalDate dateFin);
 }

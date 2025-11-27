@@ -23,7 +23,7 @@ echo "✅ Keycloak est démarré"
 
 # Attendre que Keycloak soit prêt
 echo "⏳ Attente que Keycloak soit prêt..."
-until curl -f http://localhost:8080/health/ready 2>/dev/null; do
+until curl -sf http://localhost:8081/auth/realms/master >/dev/null 2>&1; do
     echo "   Keycloak n'est pas encore prêt, attente..."
     sleep 5
 done
@@ -31,7 +31,7 @@ done
 echo "✅ Keycloak est prêt"
 
 # Variables
-KEYCLOAK_URL="http://localhost:8080"
+KEYCLOAK_URL="http://localhost:8081/auth"
 ADMIN_USER="admin"
 ADMIN_PASSWORD="admin"
 REALM_NAME="iorecycling"
@@ -75,17 +75,9 @@ else
     echo "✅ Realm '$REALM_NAME' créé"
 fi
 
-# Obtenir le token pour le realm iorecycling
-REALM_TOKEN=$(curl -s -X POST "$KEYCLOAK_URL/realms/$REALM_NAME/protocol/openid-connect/token" \
-    -H "Content-Type: application/x-www-form-urlencoded" \
-    -d "username=$ADMIN_USER" \
-    -d "password=$ADMIN_PASSWORD" \
-    -d "grant_type=password" \
-    -d "client_id=admin-cli" | jq -r '.access_token')
-
 # Vérifier si le client existe
-CLIENT_EXISTS=$(curl -s -H "Authorization: Bearer $REALM_TOKEN" \
-    "$KEYCLOAK_URL/admin/realms/$REALM_NAME/clients?clientId=$CLIENT_ID" | jq -r '.[0].id // empty')
+CLIENT_EXISTS=$(curl -s -H "Authorization: Bearer $TOKEN" \
+    "$KEYCLOAK_URL/admin/realms/$REALM_NAME/clients?clientId=$CLIENT_ID" | jq -r 'if type=="array" and length>0 and (.[0]|has("id")) then .[0].id else empty end')
 
 if [ -n "$CLIENT_EXISTS" ]; then
     echo "ℹ️  Le client '$CLIENT_ID' existe déjà"
@@ -93,7 +85,7 @@ else
     # Créer le client frontend
     echo "🏗️  Création du client '$CLIENT_ID'..."
     curl -s -X POST "$KEYCLOAK_URL/admin/realms/$REALM_NAME/clients" \
-        -H "Authorization: Bearer $REALM_TOKEN" \
+        -H "Authorization: Bearer $TOKEN" \
         -H "Content-Type: application/json" \
         -d '{
             "clientId": "'$CLIENT_ID'",
@@ -115,7 +107,7 @@ echo "👥 Création des utilisateurs de test..."
 
 # Utilisateur client1
 curl -s -X POST "$KEYCLOAK_URL/admin/realms/$REALM_NAME/users" \
-    -H "Authorization: Bearer $REALM_TOKEN" \
+    -H "Authorization: Bearer $TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
         "username": "client1",
@@ -136,7 +128,7 @@ curl -s -X POST "$KEYCLOAK_URL/admin/realms/$REALM_NAME/users" \
 
 # Utilisateur admin
 curl -s -X POST "$KEYCLOAK_URL/admin/realms/$REALM_NAME/users" \
-    -H "Authorization: Bearer $REALM_TOKEN" \
+    -H "Authorization: Bearer $TOKEN" \
     -H "Content-Type: application/json" \
     -d '{
         "username": "admin",

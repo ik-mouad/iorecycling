@@ -1,20 +1,40 @@
-.document-upload {
-  min-width: 400px;
-  
-  h2[mat-dialog-title] {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 0 0 24px 0;
-    color: #333;
-    font-size: 20px;
-    font-weight: 600;
-    
-    mat-icon {
-      color: #1976d2;
-      font-size: 24px;
-      width: 24px;
-      height: 24px;
-    }
+.upload-form {
+  min-width: 500px;
+}
+
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px 0;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.file-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+
+  button {
+    width: 100%;
+    justify-content: flex-start;
   }
+
+  .file-info {
+    font-size: 12px;
+    color: #666;
+    margin-left: 8px;
+  }
+}
+
+mat-dialog-content {
+  padding: 24px;
+}
+
+mat-dialog-actions {
+  padding: 16px 24px;
 }

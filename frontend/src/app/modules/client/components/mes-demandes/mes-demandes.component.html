@@ -1,0 +1,98 @@
+<div class="mes-demandes-container">
+  <div class="header">
+    <h1>Mes Demandes d'Enlèvements</h1>
+    <button mat-raised-button color="primary" (click)="createDemande()">
+      <mat-icon>add</mat-icon>
+      Nouvelle Demande
+    </button>
+  </div>
+
+  <div class="table-container">
+    <table mat-table [dataSource]="demandes" class="mat-elevation-z2">
+      
+      <!-- Numéro -->
+      <ng-container matColumnDef="numeroDemande">
+        <th mat-header-cell *matHeaderCellDef>Numéro</th>
+        <td mat-cell *matCellDef="let demande">
+          <code>{{ demande.numeroDemande }}</code>
+        </td>
+      </ng-container>
+
+      <!-- Date souhaitée -->
+      <ng-container matColumnDef="dateSouhaitee">
+        <th mat-header-cell *matHeaderCellDef>Date souhaitée</th>
+        <td mat-cell *matCellDef="let demande">
+          {{ demande.dateSouhaitee | date:'dd/MM/yyyy' }}
+          <div *ngIf="demande.heureSouhaitee" class="heure">
+            ⏰ {{ demande.heureSouhaitee }}
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Site -->
+      <ng-container matColumnDef="siteNom">
+        <th mat-header-cell *matHeaderCellDef>Site</th>
+        <td mat-cell *matCellDef="let demande">
+          📍 {{ demande.siteNom }}
+        </td>
+      </ng-container>
+
+      <!-- Quantité estimée -->
+      <ng-container matColumnDef="quantiteEstimee">
+        <th mat-header-cell *matHeaderCellDef>Quantité</th>
+        <td mat-cell *matCellDef="let demande">
+          <span *ngIf="demande.quantiteEstimee">~{{ demande.quantiteEstimee }} kg</span>
+          <span *ngIf="!demande.quantiteEstimee">-</span>
+        </td>
+      </ng-container>
+
+      <!-- Statut -->
+      <ng-container matColumnDef="statut">
+        <th mat-header-cell *matHeaderCellDef>Statut</th>
+        <td mat-cell *matCellDef="let demande">
+          <mat-chip [ngClass]="getStatutClass(demande.statut)">
+            {{ getStatutLabel(demande.statut) }}
+          </mat-chip>
+        </td>
+      </ng-container>
+
+      <!-- Date création -->
+      <ng-container matColumnDef="dateCreation">
+        <th mat-header-cell *matHeaderCellDef>Créée le</th>
+        <td mat-cell *matCellDef="let demande">
+          {{ demande.dateCreation | date:'dd/MM/yyyy HH:mm' }}
+        </td>
+      </ng-container>
+
+      <!-- Actions -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let demande">
+          <button mat-icon-button color="warn" 
+                  (click)="annulerDemande(demande)"
+                  *ngIf="canAnnuler(demande)"
+                  matTooltip="Annuler">
+            <mat-icon>cancel</mat-icon>
+          </button>
+          <span *ngIf="!canAnnuler(demande)">-</span>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <mat-paginator 
+      [length]="totalElements"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[10, 20, 50]"
+      (page)="onPageChange($event)"
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+
+  <div *ngIf="loading" class="loading-overlay">
+    <mat-spinner></mat-spinner>
+  </div>
+</div>
+

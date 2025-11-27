@@ -127,7 +127,16 @@ export class AuthService {
   }
 
   getClientId(): number | null {
-    return 1; // Temporaire pour les tests
+    const claims = this.getClaims();
+    if (claims?.clientId) {
+      return typeof claims.clientId === 'number' ? claims.clientId : parseInt(claims.clientId, 10);
+    }
+    // Fallback temporaire pour les tests
+    return 1;
+  }
+
+  getSocieteId(): number | null {
+    return this.getClientId(); // clientId est en fait le societeId
   }
 
   getUserName(): string {

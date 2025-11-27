@@ -1,173 +1,91 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of, delay } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { DashboardKpis } from '../models/dashboard.model';
+import { environment } from '../../environments/environment';
 
-export interface PickupDocument {
-  name: string;
-  url: string;
-  type: 'bordereau' | 'certificat' | 'facture' | 'photo';
-}
-
-export interface PickupRecord {
-  id: number;
-  date: string;
-  heure: string;
-  type: 'recyclables' | 'banals' | 'dangereux';
-  tonnage: number;
-  site: string;
-  docs: PickupDocument[];
-}
-
-export interface ValuablesDetail {
-  id: number;
-  material: string;
-  quantity: number; // en tonnes
-  pricePerKg: number; // en MAD
-  total: number; // en MAD
-}
-
-export interface ValorSummaryRowDTO {
-  material: string;
-  qtyKg: number;
-  pricePerKg: number;
-  totalMad: number;
-}
-
-export interface ValorSummary {
-  month: string; // YYYY-MM
-  rows: ValorSummaryRowDTO[];
-  grandTotalMad: number;
-  currency: string;
-}
-
-export interface ValuablesReport {
-  month: string;
-  year: number;
-  details: ValuablesDetail[];
-  totalAmount: number;
-}
-
+/**
+ * Service Angular pour le Dashboard Client
+ * Consomme les APIs du backend ClientDashboardKpisController
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class DashboardService {
-  private baseUrl = '/api/client';
+  private apiUrl = `${environment.apiUrl}/client/dashboard`;
 
   constructor(private http: HttpClient) {}
 
   /**
-   * Récupère la liste des enlèvements avec pagination et filtrage
+   * Récupère tous les KPIs pour une période
    */
-  getPickups(page: number = 0, size: number = 50, type: string = 'ALL'): Observable<{content: PickupRecord[], totalElements: number, totalPages: number}> {
-    const params = new HttpParams()
-      .set('page', page.toString())
-      .set('size', size.toString())
-      .set('type', type);
-    
-    return this.http.get<{content: PickupRecord[], totalElements: number, totalPages: number}>(`${this.baseUrl}/pickups`, { params }).pipe(
-      catchError(error => {
-        console.error('Erreur lors de la récupération des enlèvements:', error);
-        return of({content: [], totalElements: 0, totalPages: 0});
-      })
-    );
+  getKpis(dateDebut?: string, dateFin?: string): Observable<DashboardKpis> {
+    let params = new HttpParams();
+
+    if (dateDebut) {
+      params = params.set('dateDebut', dateDebut);
+    }
+    if (dateFin) {
+      params = params.set('dateFin', dateFin);
+    }
+
+    return this.http.get<DashboardKpis>(`${this.apiUrl}/kpis`, { params });
   }
 
   /**
-   * Récupère le rapport des valorisables pour le mois en cours
+   * Récupère le nombre d'enlèvements pour une période
    */
-  getValuablesReport(month?: string): Observable<ValorSummary> {
-    const currentDate = new Date();
-    const targetMonth = month || `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}`;
+  getEnlevementsCount(dateDebut?: string, dateFin?: string): Observable<number> {
+    let params = new HttpParams();
 
-    const params = new HttpParams().set('month', targetMonth);
+    if (dateDebut) {
+      params = params.set('dateDebut', dateDebut);
+    }
+    if (dateFin) {
+      params = params.set('dateFin', dateFin);
+    }
 
-    return this.http.get<ValorSummary>(`${this.baseUrl}/valorisables/summary`, { params }).pipe(
-      catchError(error => {
-        console.error('Erreur lors de la récupération du rapport valorisables:', error);
-        return of({
-          month: targetMonth,
-          rows: [],
-          grandTotalMad: 0,
-          currency: "MAD"
-        });
-      })
-    );
+    return this.http.get<number>(`${this.apiUrl}/count`, { params });
   }
 
   /**
-   * Télécharge un document
+   * Calcule les dates pour les périodes prédéfinies
    */
-  downloadDocument(url: string, filename: string): void {
-    // Simulation du téléchargement
-    console.log(`Téléchargement de ${filename} depuis ${url}`);
-    
-    // Version réelle (à implémenter quand l'API sera prête)
-    /*
-    this.http.get(url, { responseType: 'blob' }).subscribe({
-      next: (blob) => {
-        const downloadUrl = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = downloadUrl;
-        link.download = filename;
-        link.click();
-        window.URL.revokeObjectURL(downloadUrl);
-      },
-      error: (error) => {
-        console.error('Erreur lors du téléchargement:', error);
-      }
-    });
-    */
-  }
+  getPeriodeDates(periode: string): { dateDebut: string | null; dateFin: string | null } {
+    const today = new Date();
+    let dateDebut: Date | null = null;
+    let dateFin: Date = today;
 
-  /**
-   * Télécharge le rapport PDF
-   */
-  downloadReport(month?: string): void {
-    const currentDate = new Date();
-    const targetMonth = month || `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}`;
-    
-    const filename = `rapport-valorisation-${targetMonth}.pdf`;
-    const url = `${this.baseUrl}/report?month=${targetMonth}`;
-    
-    this.downloadDocument(url, filename);
-  }
+    switch (periode) {
+      case 'mois-en-cours':
+        dateDebut = new Date(today.getFullYear(), today.getMonth(), 1);
+        break;
+      case 'mois-precedent':
+        dateDebut = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        dateFin = new Date(today.getFullYear(), today.getMonth(), 0);
+        break;
+      case '3-mois':
+        dateDebut = new Date(today.getFullYear(), today.getMonth() - 3, today.getDate());
+        break;
+      case '6-mois':
+        dateDebut = new Date(today.getFullYear(), today.getMonth() - 6, today.getDate());
+        break;
+      case 'annee-en-cours':
+        dateDebut = new Date(today.getFullYear(), 0, 1);
+        break;
+      case 'depuis-debut':
+        return { dateDebut: null, dateFin: null };
+      default:
+        dateDebut = new Date(today.getFullYear(), today.getMonth(), 1);
+    }
 
-  /**
-   * Obtient l'icône pour un type de document
-   */
-  getDocumentIcon(type: string): string {
-    const iconMap: { [key: string]: string } = {
-      'bordereau': 'description',
-      'certificat': 'verified',
-      'facture': 'receipt',
-      'photo': 'image'
+    return {
+      dateDebut: dateDebut ? this.formatDate(dateDebut) : null,
+      dateFin: this.formatDate(dateFin)
     };
-    return iconMap[type] || 'description';
   }
 
-  /**
-   * Obtient le label pour un type de document
-   */
-  getDocumentLabel(type: string): string {
-    const labelMap: { [key: string]: string } = {
-      'bordereau': 'Bordereau',
-      'certificat': 'Certificat',
-      'facture': 'Facture',
-      'photo': 'Photo'
-    };
-    return labelMap[type] || 'Document';
-  }
-
-  /**
-   * Obtient la couleur pour un type de déchet
-   */
-  getWasteTypeColor(type: string): string {
-    const colorMap: { [key: string]: string } = {
-      'recyclables': '#10B981',
-      'banals': '#9CA3AF',
-      'dangereux': '#F43F5E'
-    };
-    return colorMap[type] || '#6B7280';
+  private formatDate(date: Date): string {
+    return date.toISOString().split('T')[0]; // Format: YYYY-MM-DD
   }
 }

@@ -29,6 +29,12 @@ public class StorageService {
     @Value("${app.minio.bucket:docs}")
     private String bucketName;
     
+    @Value("${app.minio.endpoint:http://minio:9000}")
+    private String internalEndpoint;
+    
+    @Value("${app.minio.public-endpoint:http://localhost:9000}")
+    private String publicEndpoint;
+    
     /**
      * Initialise le bucket au démarrage
      */
@@ -75,7 +81,18 @@ public class StorageService {
     public String put(Long clientId, Long pickupId, String docType, String filename, InputStream inputStream, String mimeType) {
         try {
             String objectKey = generateObjectKey(clientId, pickupId, docType, filename);
-            
+            return putWithKey(objectKey, inputStream, mimeType);
+        } catch (Exception e) {
+            log.error("Erreur lors de l'upload du fichier: {}", e.getMessage());
+            throw new RuntimeException("Impossible d'uploader le fichier", e);
+        }
+    }
+    
+    /**
+     * Upload un fichier avec une clé S3 spécifique
+     */
+    public String putWithKey(String objectKey, InputStream inputStream, String mimeType) {
+        try {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
                     .key(objectKey)
@@ -109,7 +126,44 @@ public class StorageService {
                     .build();
             
             PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(presignRequest);
-            return presignedRequest.url().toString();
+            String url = presignedRequest.url().toString();
+            
+            // Remplacer l'URL interne par l'URL publique pour que le navigateur puisse y accéder
+            // MinIO peut générer des URLs avec différents hostnames (minio, docs.minio, etc.)
+            if (internalEndpoint != null && publicEndpoint != null && !internalEndpoint.equals(publicEndpoint)) {
+                try {
+                    java.net.URL urlObj = new java.net.URL(url);
+                    String currentHost = urlObj.getHost();
+                    int currentPort = urlObj.getPort() != -1 ? urlObj.getPort() : urlObj.getDefaultPort();
+                    
+                    // Extraire le hostname et port de l'endpoint public
+                    java.net.URL publicUrlObj = new java.net.URL(publicEndpoint);
+                    String publicHost = publicUrlObj.getHost();
+                    int publicPort = publicUrlObj.getPort() != -1 ? publicUrlObj.getPort() : publicUrlObj.getDefaultPort();
+                    
+                    // Si le hostname actuel est un hostname interne (minio, docs.minio, etc.), le remplacer
+                    if (currentHost.contains("minio") || currentHost.contains("docs")) {
+                        String newUrl = url.replace(currentHost + ":" + currentPort, publicHost + ":" + publicPort);
+                        if (currentPort == -1) {
+                            // Si pas de port explicite, remplacer juste le hostname
+                            newUrl = url.replace(currentHost, publicHost);
+                            // Ajouter le port si nécessaire
+                            if (publicPort != -1 && publicPort != 80 && publicPort != 443) {
+                                newUrl = newUrl.replace(publicHost, publicHost + ":" + publicPort);
+                            }
+                        }
+                        url = newUrl;
+                        log.debug("URL presignée convertie de {}:{} vers {}:{}", currentHost, currentPort, publicHost, publicPort);
+                    }
+                } catch (Exception e) {
+                    log.warn("Erreur lors du remplacement de l'URL presignée: {}", e.getMessage());
+                    // Fallback: remplacement simple
+                    url = url.replace("http://minio:", "http://localhost:");
+                    url = url.replace("http://docs.minio:", "http://localhost:");
+                }
+            }
+            
+            return url;
             
         } catch (Exception e) {
             log.error("Erreur lors de la génération de l'URL pré-signée: {}", e.getMessage());

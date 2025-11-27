@@ -1,0 +1,56 @@
+package ma.iorecycling.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
+
+/**
+ * DTO pour l'entité Enlevement
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class EnlevementDTO {
+    
+    private Long id;
+    private String numeroEnlevement;
+    private LocalDate dateEnlevement;
+    
+    // Informations société
+    private Long societeId;
+    private String societeNom;
+    
+    // Informations site
+    private Long siteId;
+    private String siteNom;
+    
+    private String observation;
+    
+    // Items détaillés
+    private List<PickupItemDTO> items;
+    
+    // Calculs automatiques
+    private BigDecimal poidsTotal;
+    private BigDecimal budgetValorisation;
+    private BigDecimal budgetTraitement;
+    private BigDecimal bilanNet;
+    private Double tauxValorisation;
+    
+    // Documents
+    private List<DocumentDTO> documents;
+    private Boolean bsdiPresent;
+    private Boolean pvPresent;
+    
+    // Métadonnées
+    private String createdBy;
+    private Instant createdAt;
+    private Instant updatedAt;
+}
+

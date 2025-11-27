@@ -18,10 +18,11 @@ CREATE TABLE site (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Ajout des colonnes à la table pickups
 ALTER TABLE pickups 
-ADD COLUMN type VARCHAR(20) NOT NULL DEFAULT 'BANAL',
-ADD COLUMN site_id BIGINT REFERENCES site(id) ON DELETE SET NULL;
+ADD COLUMN IF NOT EXISTS type VARCHAR(20) NOT NULL DEFAULT 'BANAL';
+
+ALTER TABLE pickups 
+ADD COLUMN IF NOT EXISTS site_id BIGINT REFERENCES site(id) ON DELETE SET NULL;
 
 -- Table des items d'enlèvement (pour les recyclables détaillés)
 CREATE TABLE pickup_item (

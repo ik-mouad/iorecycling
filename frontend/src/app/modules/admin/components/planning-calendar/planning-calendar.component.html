@@ -1,0 +1,60 @@
+<div class="planning-calendar-container">
+  <div class="header">
+    <h1>Planning des Enlèvements</h1>
+    <div class="header-actions">
+      <button mat-icon-button (click)="previousMonth()" matTooltip="Mois précédent">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <button mat-button (click)="goToToday()">
+        Aujourd'hui
+      </button>
+      <button mat-icon-button (click)="nextMonth()" matTooltip="Mois suivant">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <mat-card class="calendar-card">
+    <mat-card-header>
+      <mat-card-title>{{ getMonthName() }} {{ currentYear }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="loading" class="loading-overlay">
+        <mat-spinner></mat-spinner>
+      </div>
+
+      <div class="calendar" *ngIf="!loading">
+        <!-- En-têtes des jours -->
+        <div class="calendar-header">
+          <div class="day-header" *ngFor="let day of ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']">
+            {{ day }}
+          </div>
+        </div>
+
+        <!-- Semaines -->
+        <div class="calendar-week" *ngFor="let week of weeks">
+          <div 
+            class="calendar-day" 
+            *ngFor="let day of week"
+            [class.today]="isToday(day)"
+            [class.other-month]="!isCurrentMonth(day)">
+            <div class="day-number">{{ day.getDate() }}</div>
+            <div class="planning-items">
+              <div 
+                *ngFor="let item of getPlanningForDate(day)" 
+                class="planning-item"
+                [ngClass]="getStatutClass(item.statut)">
+                <small>{{ item.heurePrevue || 'N/A' }}</small>
+                <div class="item-info">
+                  <strong>{{ item.societeNom }}</strong>
+                  <span>{{ item.siteNom }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+

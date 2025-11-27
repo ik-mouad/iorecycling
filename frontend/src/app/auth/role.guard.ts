@@ -2,8 +2,8 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from './auth.service';
 
-export const roleGuard = (requiredRole: string): CanActivateFn => {
-  return (route, state) => {
+const buildRoleGuard = (requiredRole: string): CanActivateFn => {
+  return () => {
     const authService = inject(AuthService);
     const router = inject(Router);
 
@@ -11,7 +11,10 @@ export const roleGuard = (requiredRole: string): CanActivateFn => {
       return true;
     }
 
-    router.navigate(['/client']);
+    router.navigate(['/']);
     return false;
   };
 };
+
+export const adminGuard: CanActivateFn = buildRoleGuard('ADMIN');
+export const clientGuard: CanActivateFn = buildRoleGuard('CLIENT');

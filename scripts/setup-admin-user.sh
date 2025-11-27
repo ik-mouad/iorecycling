@@ -5,6 +5,8 @@
 
 set -e
 
+export MSYS2_ARG_CONV_EXCL="*"
+
 echo "🔧 Configuration de l'utilisateur admin dans Keycloak..."
 
 # Attendre que Keycloak soit prêt
@@ -17,7 +19,7 @@ done
 echo "✅ Keycloak est prêt !"
 
 # Variables
-KEYCLOAK_URL="http://localhost:8080"
+KEYCLOAK_URL="http://localhost:8080/auth"
 REALM="iorecycling"
 ADMIN_USERNAME="admin"
 ADMIN_PASSWORD="admin123"
@@ -99,7 +101,7 @@ echo ""
 echo "✅ Configuration terminée !"
 echo ""
 echo "📋 Informations de connexion admin :"
-echo "   URL: http://localhost:8080/auth/admin"
+echo "   URL: http://localhost:8081/auth/admin"
 echo "   Realm: $REALM"
 echo "   Utilisateur: $ADMIN_USERNAME"
 echo "   Mot de passe: $ADMIN_PASSWORD"

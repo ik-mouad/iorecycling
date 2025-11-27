@@ -1,0 +1,33 @@
+.user-form {
+  min-width: 320px;
+
+  mat-dialog-content {
+    padding-top: 8px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  mat-slide-toggle {
+    grid-column: 1 / -1;
+    margin-top: 8px;
+  }
+
+  mat-dialog-actions {
+    padding: 16px 0 0;
+
+    button[mat-raised-button] {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+}
+

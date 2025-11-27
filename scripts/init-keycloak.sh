@@ -10,7 +10,7 @@ echo "=============================================="
 
 # Attendre que Keycloak soit prêt
 echo "⏳ Attente que Keycloak soit prêt..."
-until curl -f http://localhost:8080/health/ready 2>/dev/null; do
+until curl -sf http://localhost:8081/auth/realms/master >/dev/null 2>&1; do
     echo "   Keycloak n'est pas encore prêt, attente..."
     sleep 5
 done
@@ -18,7 +18,7 @@ done
 echo "✅ Keycloak est prêt"
 
 # Variables
-KEYCLOAK_URL="http://localhost:8080"
+KEYCLOAK_URL="http://localhost:8081/auth"
 ADMIN_USER="admin"
 ADMIN_PASSWORD="admin"
 REALM_NAME="iorecycling"

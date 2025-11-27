@@ -1,0 +1,63 @@
+.recurrences-list-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 500;
+  }
+}
+
+.recurrences-card {
+  margin-bottom: 24px;
+}
+
+.loading-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+table {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 64px 24px;
+  color: #999;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+  }
+
+  p {
+    font-size: 18px;
+    margin-bottom: 24px;
+  }
+}
+
+.chip-active {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.chip-inactive {
+  background-color: #f8d7da;
+  color: #842029;
+}
+
