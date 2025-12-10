@@ -1,9 +1,18 @@
 :88 {
   encode gzip
-  reverse_proxy /auth/* keycloak:8080 {
-    header_up X-Forwarded-Proto "https"
-  }
-  reverse_proxy /api/* backend:8080
-  reverse_proxy frontend:80
-}
 
+  @authRoot path /auth
+  redir @authRoot /auth/ 308
+
+  handle /auth/* {
+    reverse_proxy keycloak:8080
+  }
+
+  handle /api/* {
+    reverse_proxy backend:8080
+  }
+
+  handle {
+    reverse_proxy frontend:80
+  }
+}

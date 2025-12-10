@@ -1,0 +1,448 @@
+/* ============================================
+   PREMIUM DESIGN SYSTEM - Mes Demandes
+   ============================================ */
+
+// Design Tokens
+$gray-50: #f9fafb;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-300: #d1d5db;
+$gray-400: #9ca3af;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-700: #374151;
+$gray-900: #0a0a0a;
+
+$blue-50: #f0f9ff;
+$blue-500: #3b82f6;
+$blue-600: #2563eb;
+$blue-700: #1d4ed8;
+$blue-800: #0369a1;
+
+$green-50: #f0fdf4;
+$green-500: #10b981;
+$green-600: #059669;
+
+$amber-50: #fffbeb;
+$amber-100: #fef3c7;
+$amber-500: #f59e0b;
+$amber-600: #d97706;
+$amber-700: #92400e;
+
+$red-50: #fef2f2;
+$red-500: #ef4444;
+$red-600: #dc2626;
+
+$white: #ffffff;
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+
+// Container
+.mes-demandes-container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 32px;
+  background: $gray-50;
+  min-height: 100vh;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================
+// HEADER PREMIUM
+// ============================================
+.page-header {
+  margin-bottom: 48px;
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  .header-left {
+    flex: 1;
+
+    .page-title {
+      margin: 0 0 8px 0;
+      font-size: 32px;
+      font-weight: 700;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: $gray-900;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .page-description {
+      margin: 0;
+      font-size: 15px;
+      color: $gray-500;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .primary-button {
+      height: 44px;
+      padding: 0 20px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: $shadow-sm;
+      transition: all 0.2s ease;
+      background: $blue-600;
+      color: white;
+      border: none;
+
+      &:hover:not(:disabled) {
+        background: $blue-700;
+        box-shadow: $shadow-md;
+        transform: translateY(-1px);
+      }
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+}
+
+// ============================================
+// TABLE CARD PREMIUM
+// ============================================
+.table-card {
+  background: $white;
+  border-radius: 12px;
+  border: 1px solid $gray-200;
+  box-shadow: $shadow-sm;
+  overflow: hidden;
+
+  .table-wrapper {
+    overflow-x: auto;
+  }
+
+  .premium-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+
+    .table-header-row {
+      background: $gray-50;
+    }
+
+    .table-header {
+      padding: 16px 24px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: $gray-600;
+      border-bottom: 1px solid $gray-200;
+      background: $gray-50;
+      white-space: nowrap;
+
+      &.table-header-actions {
+        text-align: right;
+        width: 80px;
+      }
+    }
+
+    .table-row {
+      transition: background-color 0.15s ease;
+      border-bottom: 1px solid $gray-100;
+
+      &:hover {
+        background: $gray-50;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    .table-cell {
+      padding: 20px 24px;
+      border-bottom: none;
+      vertical-align: middle;
+
+      &.table-cell-actions {
+        text-align: right;
+      }
+    }
+
+    .date-text,
+    .site-text {
+      font-size: 14px;
+      color: $gray-500;
+      line-height: 1.5;
+    }
+
+    .time-text {
+      color: $gray-400;
+      font-size: 13px;
+    }
+
+    .no-data {
+      color: $gray-400;
+      font-size: 14px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.4;
+      white-space: nowrap;
+
+      &.badge-ice {
+        background: $blue-50;
+        color: $blue-800;
+        font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+        font-weight: 600;
+      }
+
+      &.badge-weight {
+        background: $gray-100;
+        color: $gray-700;
+      }
+
+      &.badge-statut-attente {
+        background: $amber-100;
+        color: $amber-700;
+      }
+
+      &.badge-statut-validee {
+        background: $green-50;
+        color: $green-600;
+      }
+
+      &.badge-statut-planifiee {
+        background: $blue-50;
+        color: $blue-700;
+      }
+
+      &.badge-statut-realisee {
+        background: $green-50;
+        color: $green-600;
+        font-weight: 600;
+      }
+
+      &.badge-statut-refusee {
+        background: $red-50;
+        color: $red-600;
+      }
+
+      &.badge-statut-annulee {
+        background: $gray-100;
+        color: $gray-600;
+      }
+    }
+
+    .action-button {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      color: $gray-500;
+      transition: all 0.15s ease;
+
+      &.action-cancel {
+        color: $red-500;
+
+        &:hover {
+          background: $red-50;
+          color: $red-600;
+        }
+      }
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .no-actions {
+      color: $gray-400;
+      font-size: 14px;
+      font-style: italic;
+    }
+  }
+}
+
+// ============================================
+// PAGINATION PREMIUM
+// ============================================
+.pagination-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-top: 1px solid $gray-100;
+  background: $gray-50;
+
+  .pagination-left {
+    display: flex;
+    align-items: center;
+
+    .page-size-field {
+      width: 120px;
+      margin: 0;
+
+      ::ng-deep {
+        .mat-mdc-form-field-subscript-wrapper {
+          display: none;
+        }
+
+        .mat-mdc-text-field-wrapper {
+          height: 36px;
+        }
+      }
+    }
+  }
+
+  .pagination-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .pagination-info {
+      font-size: 14px;
+      color: $gray-600;
+      margin-right: 8px;
+      font-weight: 500;
+    }
+
+    .pagination-button {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      color: $gray-600;
+      transition: all 0.15s ease;
+
+      &:hover:not(:disabled) {
+        background: $gray-100;
+        color: $gray-900;
+      }
+
+      &:disabled {
+        color: $gray-300;
+        cursor: not-allowed;
+      }
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+}
+
+// ============================================
+// LOADING OVERLAY
+// ============================================
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+// ============================================
+// RESPONSIVE
+// ============================================
+@media (max-width: 1024px) {
+  .mes-demandes-container {
+    padding: 24px;
+  }
+
+  .page-header {
+    .header-content {
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .header-actions {
+      width: 100%;
+
+      .primary-button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+
+  .pagination-wrapper {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+
+    .pagination-left,
+    .pagination-right {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .mes-demandes-container {
+    padding: 16px;
+  }
+
+  .page-header {
+    margin-bottom: 32px;
+
+    .header-left {
+      .page-title {
+        font-size: 24px;
+      }
+
+      .page-description {
+        font-size: 14px;
+      }
+    }
+  }
+
+  .table-card {
+    .premium-table {
+      .table-header,
+      .table-cell {
+        padding: 12px 16px;
+        font-size: 13px;
+      }
+    }
+  }
+}

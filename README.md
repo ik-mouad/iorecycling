@@ -41,6 +41,26 @@ Une fois l'application démarrée :
 - **Keycloak** : http://localhost:88/auth/
 - **MinIO Console** : http://localhost:9001/
 
+## 🔧 Scripts de maintenance
+
+### Reset de la base de données
+```bash
+# Reset complet (développement)
+./scripts/reset-db.sh
+
+# Reset pour qualification
+./scripts/reset-db.sh qualif
+
+# Reset pour production
+./scripts/reset-db.sh prod
+```
+
+### Déploiement qualification
+```bash
+# Déploiement complet sur l'environnement de qualification
+./scripts/deploy-qualif.sh
+```
+
 ## 🧪 Tests
 
 ### Tests E2E avec Playwright

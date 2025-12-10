@@ -6,13 +6,14 @@ WORKDIR /app
 # Copier les fichiers de configuration
 COPY package*.json ./
 
-# Installer les dépendances
-RUN npm ci --only=production
+# Installer les dépendances (incluant dev dependencies pour le build)
+RUN npm install
 
 # Copier le code source
 COPY . .
 
 # Construire l'application
+# Force rebuild - 2025-01-27
 RUN npm run build
 
 # Stage de production

@@ -7,7 +7,8 @@ RUN mvn -q -DskipTests dependency:go-offline
 
 # Copier le code source et construire l'application
 COPY src ./src
-RUN mvn -q -DskipTests clean package
+# Force rebuild - 2025-01-27
+RUN mvn -q -Dmaven.test.skip=true clean package
 
 # Stage de production
 FROM eclipse-temurin:21-jre-alpine

@@ -1,0 +1,78 @@
+<div class="pickup-form">
+  <h2 mat-dialog-title class="dialog-title">
+    <mat-icon>{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
+    <span>{{ isEditMode ? 'Modifier l\'enlèvement' : 'Nouvel enlèvement' }}</span>
+  </h2>
+
+  <mat-dialog-content class="dialog-content">
+    <form [formGroup]="pickupForm" (ngSubmit)="onSubmit()">
+      <div class="form-fields">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Client *</mat-label>
+          <mat-select formControlName="clientId">
+            <mat-option *ngFor="let client of data.clients" [value]="client.id">
+              {{ client.name }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>business</mat-icon>
+          <mat-error>{{ getErrorMessage('clientId') }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Date *</mat-label>
+          <input matInput type="date" formControlName="date">
+          <mat-icon matPrefix>event</mat-icon>
+          <mat-error>{{ getErrorMessage('date') }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Type *</mat-label>
+          <mat-select formControlName="type">
+            <mat-option value="RECYCLABLE">🔄 Recyclable</mat-option>
+            <mat-option value="BANAL">🗑️ Banal</mat-option>
+            <mat-option value="DANGEREUX">☣️ Dangereux</mat-option>
+          </mat-select>
+          <mat-icon matPrefix>category</mat-icon>
+          <mat-error>{{ getErrorMessage('type') }}</mat-error>
+        </mat-form-field>
+
+        <div class="tonnage-section">
+          <h3 class="section-title">Quantités (kg)</h3>
+          <div class="tonnage-fields">
+            <mat-form-field appearance="outline" class="tonnage-field">
+              <mat-label>Kg Recyclable</mat-label>
+              <input matInput type="number" formControlName="kgRecyclables" min="0">
+              <mat-icon matPrefix>scale</mat-icon>
+              <mat-error>{{ getErrorMessage('kgRecyclables') }}</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="tonnage-field">
+              <mat-label>Kg Banals</mat-label>
+              <input matInput type="number" formControlName="kgBanals" min="0">
+              <mat-icon matPrefix>scale</mat-icon>
+              <mat-error>{{ getErrorMessage('kgBanals') }}</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="tonnage-field">
+              <mat-label>Kg Dangereux</mat-label>
+              <input matInput type="number" formControlName="kgDangereux" min="0">
+              <mat-icon matPrefix>scale</mat-icon>
+              <mat-error>{{ getErrorMessage('kgDangereux') }}</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button type="button" (click)="onCancel()" [disabled]="isLoading" class="cancel-button">
+      Annuler
+    </button>
+    <button mat-raised-button color="primary" type="submit" (click)="onSubmit()" [disabled]="pickupForm.invalid || isLoading" class="submit-button">
+      <mat-spinner *ngIf="isLoading" diameter="20" class="button-spinner"></mat-spinner>
+      <mat-icon *ngIf="!isLoading">{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+      <span>{{ isEditMode ? 'Modifier' : 'Créer' }}</span>
+    </button>
+  </mat-dialog-actions>
+</div>

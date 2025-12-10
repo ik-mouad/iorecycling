@@ -1,0 +1,132 @@
+<div class="admin-clients-container">
+  <!-- Header Premium -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1 class="page-title">Gestion des Clients</h1>
+        <p class="page-description">Gérez vos clients et leurs sites associés</p>
+      </div>
+      <div class="header-actions">
+        <button mat-raised-button color="primary" class="primary-button" (click)="openClientForm()">
+          <mat-icon>add</mat-icon>
+          <span>Nouveau Client</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search & Filters Card -->
+  <div class="search-filters-card">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Rechercher un client</mat-label>
+      <input matInput 
+             [(ngModel)]="searchTerm" 
+             (input)="applyFilter()"
+             placeholder="Nom, code...">
+      <mat-icon matPrefix>search</mat-icon>
+    </mat-form-field>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p class="loading-text">Chargement des clients...</p>
+  </div>
+
+  <!-- Table Card -->
+  <div *ngIf="!isLoading" class="table-card">
+    <div class="table-wrapper">
+      <table mat-table [dataSource]="dataSource" class="premium-table">
+        
+        <!-- ID Column -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef class="table-header">ID</th>
+          <td mat-cell *matCellDef="let client" class="table-cell">{{ client.id }}</td>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef class="table-header">Nom</th>
+          <td mat-cell *matCellDef="let client" class="table-cell">
+            <div class="client-name">
+              <strong>{{ client.name }}</strong>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Code Column -->
+        <ng-container matColumnDef="code">
+          <th mat-header-cell *matHeaderCellDef class="table-header">Code</th>
+          <td mat-cell *matCellDef="let client" class="table-cell">
+            <span class="badge badge-code">{{ client.code }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Sites Column -->
+        <ng-container matColumnDef="sites">
+          <th mat-header-cell *matHeaderCellDef class="table-header">Sites</th>
+          <td mat-cell *matCellDef="let client" class="table-cell">
+            <div class="sites-info">
+              <span class="badge badge-sites">{{ getSitesCount(client.sites) }} site(s)</span>
+              <button mat-icon-button [matMenuTriggerFor]="sitesMenu" *ngIf="getSitesCount(client.sites) > 0" class="info-button">
+                <mat-icon>info</mat-icon>
+              </button>
+              <mat-menu #sitesMenu="matMenu">
+                <div class="sites-menu-content">
+                  <div *ngFor="let site of client.sites" class="site-item">{{ site.name }}</div>
+                </div>
+              </mat-menu>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Created At Column -->
+        <ng-container matColumnDef="createdAt">
+          <th mat-header-cell *matHeaderCellDef class="table-header">Créé le</th>
+          <td mat-cell *matCellDef="let client" class="table-cell">{{ formatDate(client.createdAt) }}</td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="table-header text-right">Actions</th>
+          <td mat-cell *matCellDef="let client" class="table-cell text-right">
+            <button mat-icon-button [matMenuTriggerFor]="rowMenu" class="action-button">
+              <mat-icon>more_horiz</mat-icon>
+            </button>
+            <mat-menu #rowMenu="matMenu">
+              <button mat-menu-item (click)="openClientForm(client)">
+                <mat-icon>edit</mat-icon>
+                <span>Modifier</span>
+              </button>
+              <button mat-menu-item (click)="deleteClient(client)" class="delete-action">
+                <mat-icon>delete</mat-icon>
+                <span>Supprimer</span>
+              </button>
+            </mat-menu>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns" class="table-header-row"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" class="table-row"></tr>
+      </table>
+    </div>
+
+    <!-- Paginator -->
+    <mat-paginator 
+      [pageSizeOptions]="[10, 25, 50]" 
+      showFirstLastButtons
+      class="premium-paginator">
+    </mat-paginator>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && dataSource.data.length === 0" class="empty-state">
+    <mat-icon class="empty-icon">business_center</mat-icon>
+    <h3 class="empty-title">Aucun client trouvé</h3>
+    <p class="empty-description">Commencez par créer votre premier client.</p>
+    <button mat-raised-button color="primary" class="primary-button" (click)="openClientForm()">
+      <mat-icon>add</mat-icon>
+      <span>Créer un client</span>
+    </button>
+  </div>
+</div>

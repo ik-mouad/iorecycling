@@ -1,0 +1,65 @@
+<div class="planning-calendar-container">
+  <!-- Header Premium -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1 class="page-title">Planning des Enlèvements</h1>
+        <p class="page-description">Vue mensuelle du planning des enlèvements planifiés</p>
+      </div>
+      <div class="header-actions">
+        <button mat-icon-button (click)="previousMonth()" matTooltip="Mois précédent" class="nav-button">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <button mat-button (click)="goToToday()" class="today-button">
+          Aujourd'hui
+        </button>
+        <button mat-icon-button (click)="nextMonth()" matTooltip="Mois suivant" class="nav-button">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calendar Card -->
+  <div class="calendar-card">
+    <div class="calendar-header-section">
+      <h2 class="calendar-title">{{ getMonthName() }} {{ currentYear }}</h2>
+    </div>
+
+    <div *ngIf="loading" class="loading-overlay">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+
+    <div class="calendar" *ngIf="!loading">
+      <!-- En-têtes des jours -->
+      <div class="calendar-header">
+        <div class="day-header" *ngFor="let day of ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']">
+          {{ day }}
+        </div>
+      </div>
+
+      <!-- Semaines -->
+      <div class="calendar-week" *ngFor="let week of weeks">
+        <div 
+          class="calendar-day" 
+          *ngFor="let day of week"
+          [class.today]="isToday(day)"
+          [class.other-month]="!isCurrentMonth(day)">
+          <div class="day-number">{{ day.getDate() }}</div>
+          <div class="planning-items">
+            <div 
+              *ngFor="let item of getPlanningForDate(day)" 
+              class="planning-item"
+              [ngClass]="getStatutClass(item.statut)">
+              <div class="item-time">{{ item.heurePrevue || 'N/A' }}</div>
+              <div class="item-info">
+                <strong>{{ item.societeNom }}</strong>
+                <span>{{ item.siteNom }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

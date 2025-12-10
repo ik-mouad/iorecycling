@@ -1,4 +1,3 @@
-version: "3.9"
 services:
   postgres:
     image: postgres:16
@@ -18,12 +17,16 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:26.0
     command: ["start-dev","--http-port=8080"]
+    ports:
+      - "8081:8080"
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       KC_HTTP_ENABLED: "true"
-      KC_PROXY: "edge"
       KC_HTTP_RELATIVE_PATH: "/auth"
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_URL: "http://localhost:88/auth"
+      KC_PROXY: "edge"
       KC_HOSTNAME_STRICT: "false"
       KC_HOSTNAME_STRICT_HTTPS: "false"
       KC_DB: postgres
@@ -34,7 +37,7 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/auth/health/ready || exit 1"]
+      test: ["CMD-SHELL", "echo > /dev/tcp/localhost/8080"]
       interval: 30s
       timeout: 10s
       retries: 10
@@ -50,6 +53,7 @@ services:
     volumes:
       - minio:/data
     ports:
+      - "9000:9000"
       - "9001:9001"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
@@ -68,20 +72,27 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-app}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-app}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-app123}
-      KEYCLOAK_AUTH_SERVER_URL: http://keycloak:8080/auth
-      KEYCLOAK_REALM: ${KEYCLOAK_REALM:-master}
-      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-iorecycling-backend}
       MINIO_ENDPOINT: http://minio:9000
       MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minio}
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minio123}
+      MINIO_BUCKET: docs
+      KEYCLOAK_AUTH_SERVER_URL: http://keycloak:8080/auth
+      KEYCLOAK_REALM: iorecycling
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-iorecycling-backend}
+      KEYCLOAK_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USERNAME:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KEYCLOAK_ADMIN_CLIENT_ID: ${KEYCLOAK_ADMIN_CLIENT_ID:-admin-cli}
+      KEYCLOAK_ADMIN_REALM: iorecycling
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/auth/realms/iorecycling/protocol/openid-connect/certs
     depends_on:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/api/health || exit 1"]
+      test: ["CMD-SHELL", "pgrep -f 'java.*app.jar' || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
+      start_period: 40s
     restart: unless-stopped
 
   frontend:
@@ -89,7 +100,7 @@ services:
     depends_on: 
       - backend
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:80 || exit 1"]
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:80 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -108,7 +119,7 @@ services:
       backend:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:88 || exit 1"]
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:88 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3

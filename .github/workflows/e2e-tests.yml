@@ -1,0 +1,96 @@
+name: Tests E2E
+
+on:
+  push:
+    branches: [ develop, main ]
+  pull_request:
+    branches: [ develop, main ]
+  schedule:
+    # Exécuter les tests E2E tous les jours à 2h du matin
+    - cron: '0 2 * * *'
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install E2E dependencies
+      working-directory: ./e2e
+      run: npm install
+      
+    - name: Install Playwright browsers
+      working-directory: ./e2e
+      run: npx playwright install --with-deps
+      
+    - name: Wait for application to be ready
+      run: |
+        echo "Attente que l'application soit prête..."
+        timeout 300 bash -c 'until curl -f http://146.59.234.174:88/api/public/health; do sleep 10; done'
+        
+    - name: Run E2E tests
+      working-directory: ./e2e
+      env:
+        E2E_USER: ${{ secrets.E2E_USER }}
+        E2E_PASS: ${{ secrets.E2E_PASS }}
+        E2E_MONTH: '2025-01'
+      run: npm run e2e
+      
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report
+        path: e2e/playwright-report/
+        retention-days: 30
+        
+    - name: Upload test videos
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: playwright-videos
+        path: e2e/test-results/
+        retention-days: 7
+        
+    - name: Comment PR with test results
+      if: github.event_name == 'pull_request' && always()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          
+          // Lire les résultats des tests
+          const resultsPath = path.join('e2e', 'test-results', 'results.json');
+          if (fs.existsSync(resultsPath)) {
+            const results = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
+            const stats = results.stats;
+            
+            const comment = `## 🧪 Résultats des tests E2E
+            
+            **Statistiques :**
+            - ✅ Tests réussis : ${stats.passed}
+            - ❌ Tests échoués : ${stats.failed}
+            - ⏭️ Tests ignorés : ${stats.skipped}
+            - ⏱️ Durée totale : ${stats.duration}ms
+            
+            ${stats.failed > 0 ? '⚠️ Certains tests ont échoué. Consultez les artefacts pour plus de détails.' : '🎉 Tous les tests sont passés !'}
+            
+            [📊 Rapport détaillé](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+          }
+
+

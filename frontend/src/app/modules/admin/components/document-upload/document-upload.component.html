@@ -1,0 +1,71 @@
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon>cloud_upload</mat-icon>
+  <span>{{ data.type === 'enlevement' ? 'Upload document d\'enlèvement' : 'Upload document mensuel' }}</span>
+</h2>
+
+<form [formGroup]="uploadForm" (ngSubmit)="submit()" class="upload-form">
+  <mat-dialog-content class="dialog-content">
+    <div class="form-fields">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Type de document *</mat-label>
+        <mat-select formControlName="typeDocument">
+          <mat-option *ngFor="let type of documentTypes" [value]="type.value">
+            {{ type.label }}
+          </mat-option>
+        </mat-select>
+        <mat-icon matPrefix>description</mat-icon>
+        <mat-error *ngIf="uploadForm.get('typeDocument')?.hasError('required')">
+          Le type de document est obligatoire
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field" *ngIf="data.type === 'mensuel'">
+        <mat-label>Période (mois) *</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="periodeMois" placeholder="MM/YYYY">
+        <mat-icon matPrefix>calendar_today</mat-icon>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker startView="year" [startAt]="today"></mat-datepicker>
+        <mat-error *ngIf="uploadForm.get('periodeMois')?.hasError('required')">
+          La période est obligatoire
+        </mat-error>
+      </mat-form-field>
+
+      <div class="file-upload-section">
+        <label class="file-label">Fichier à uploader *</label>
+        <div class="file-upload">
+          <input 
+            type="file" 
+            #fileInput
+            id="fileInput" 
+            (change)="onFileSelected($event)"
+            accept=".pdf,.jpg,.jpeg,.png"
+            style="display: none;">
+          <button 
+            mat-raised-button 
+            type="button" 
+            color="primary"
+            class="file-button"
+            (click)="openFileDialog()">
+            <mat-icon>{{ selectedFile ? 'check_circle' : 'attach_file' }}</mat-icon>
+            <span>{{ selectedFile ? selectedFile.name : 'Sélectionner un fichier' }}</span>
+          </button>
+          <div class="file-info" *ngIf="selectedFile">
+            <mat-icon>info</mat-icon>
+            <span>Taille: {{ (selectedFile.size / 1024 / 1024).toFixed(2) }} MB</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button type="button" (click)="cancel()" [disabled]="isLoading" class="cancel-button">
+      Annuler
+    </button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="isLoading || !selectedFile" class="submit-button">
+      <mat-icon *ngIf="!isLoading">cloud_upload</mat-icon>
+      <mat-spinner *ngIf="isLoading" [diameter]="20" class="button-spinner"></mat-spinner>
+      <span>Uploader</span>
+    </button>
+  </mat-dialog-actions>
+</form>

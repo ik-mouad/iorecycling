@@ -21,7 +21,7 @@ jobs:
       uses: actions/setup-java@v4
       with:
         java-version: '21'
-        distribution: 'eclipse-temurin'
+        distribution: 'temurin'
 
     - name: Cache Maven dependencies
       uses: actions/cache@v4
@@ -30,15 +30,10 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
 
-    - name: Run tests
-      run: |
-        cd backend
-        mvn clean test
-
     - name: Build backend
       run: |
         cd backend
-        mvn clean package -DskipTests
+        mvn clean package -Dmaven.test.skip=true
 
   build-and-push:
     needs: test

@@ -1,0 +1,129 @@
+<div class="mes-demandes-container">
+  <!-- Header Premium -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1 class="page-title">Mes demandes</h1>
+        <p class="page-description">Suivez l'état de vos demandes d'enlèvements</p>
+      </div>
+      <div class="header-actions">
+        <button mat-raised-button color="primary" class="primary-button" (click)="createDemande()">
+          <mat-icon>add</mat-icon>
+          <span>Nouvelle demande</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Card -->
+  <div class="table-card">
+    <div class="table-wrapper">
+      <table mat-table [dataSource]="demandes" class="premium-table">
+        
+        <!-- Numéro -->
+        <ng-container matColumnDef="numeroDemande">
+          <th mat-header-cell *matHeaderCellDef class="table-header">Numéro</th>
+          <td mat-cell *matCellDef="let demande" class="table-cell">
+            <span class="badge badge-ice">{{ demande.numeroDemande }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Date souhaitée -->
+        <ng-container matColumnDef="dateSouhaitee">
+          <th mat-header-cell *matHeaderCellDef class="table-header">Date souhaitée</th>
+          <td mat-cell *matCellDef="let demande" class="table-cell">
+            <div class="date-text">
+              {{ demande.dateSouhaitee | date:'dd/MM/yyyy' }}
+              <span *ngIf="demande.heureSouhaitee" class="time-text"> à {{ demande.heureSouhaitee }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Site -->
+        <ng-container matColumnDef="siteNom">
+          <th mat-header-cell *matHeaderCellDef class="table-header">Site</th>
+          <td mat-cell *matCellDef="let demande" class="table-cell">
+            <div class="site-text">📍 {{ demande.siteNom }}</div>
+          </td>
+        </ng-container>
+
+        <!-- Quantité estimée -->
+        <ng-container matColumnDef="quantiteEstimee">
+          <th mat-header-cell *matHeaderCellDef class="table-header">Quantité</th>
+          <td mat-cell *matCellDef="let demande" class="table-cell">
+            <span class="badge badge-weight" *ngIf="demande.quantiteEstimee">~{{ demande.quantiteEstimee }} kg</span>
+            <span class="no-data" *ngIf="!demande.quantiteEstimee">-</span>
+          </td>
+        </ng-container>
+
+        <!-- Statut -->
+        <ng-container matColumnDef="statut">
+          <th mat-header-cell *matHeaderCellDef class="table-header">Statut</th>
+          <td mat-cell *matCellDef="let demande" class="table-cell">
+            <span class="badge" [ngClass]="'badge-statut-' + getStatutClass(demande.statut)">
+              {{ getStatutLabel(demande.statut) }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Date création -->
+        <ng-container matColumnDef="dateCreation">
+          <th mat-header-cell *matHeaderCellDef class="table-header">Créée le</th>
+          <td mat-cell *matCellDef="let demande" class="table-cell">
+            <div class="date-text">{{ demande.dateCreation | date:'dd/MM/yyyy HH:mm' }}</div>
+          </td>
+        </ng-container>
+
+        <!-- Actions -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="table-header table-header-actions">Actions</th>
+          <td mat-cell *matCellDef="let demande" class="table-cell table-cell-actions">
+            <button 
+              mat-icon-button 
+              color="warn" 
+              class="action-button action-cancel"
+              (click)="annulerDemande(demande)"
+              *ngIf="canAnnuler(demande)"
+              matTooltip="Annuler">
+              <mat-icon>cancel</mat-icon>
+            </button>
+            <span class="no-actions" *ngIf="!canAnnuler(demande)">-</span>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns" class="table-header-row"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" class="table-row"></tr>
+      </table>
+    </div>
+
+    <!-- Pagination Premium -->
+    <div class="pagination-wrapper">
+      <div class="pagination-left">
+        <mat-form-field appearance="outline" class="page-size-field">
+          <mat-label>Par page</mat-label>
+          <mat-select [value]="pageSize" (selectionChange)="onPageSizeChange($event)">
+            <mat-option [value]="10">10</mat-option>
+            <mat-option [value]="20">20</mat-option>
+            <mat-option [value]="50">50</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="pagination-right">
+        <span class="pagination-info">
+          {{ getDisplayedRange() }} de {{ totalElements }}
+        </span>
+        <button mat-icon-button [disabled]="pageIndex === 0" (click)="previousPage()" class="pagination-button">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <button mat-icon-button [disabled]="pageIndex >= getTotalPages() - 1" (click)="nextPage()" class="pagination-button">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div *ngIf="loading" class="loading-overlay">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+</div>

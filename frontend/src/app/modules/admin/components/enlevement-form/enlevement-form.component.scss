@@ -1,0 +1,588 @@
+/* ============================================
+   PREMIUM DESIGN SYSTEM - Enlevement Form
+   ============================================ */
+
+// Design Tokens
+$gray-50: #f9fafb;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-300: #d1d5db;
+$gray-400: #9ca3af;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-700: #374151;
+$gray-900: #0a0a0a;
+
+$blue-50: #f0f9ff;
+$blue-100: #e0f2fe;
+$blue-500: #3b82f6;
+$blue-600: #2563eb;
+$blue-700: #1d4ed8;
+
+$green-50: #f0fdf4;
+$green-500: #10b981;
+$green-600: #059669;
+
+$amber-50: #fffbeb;
+$amber-100: #fef3c7;
+$amber-500: #f59e0b;
+$amber-600: #d97706;
+
+$red-50: #fef2f2;
+$red-500: #ef4444;
+$red-600: #dc2626;
+
+$white: #ffffff;
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+// Container
+.enlevement-form-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px;
+  background: $gray-50;
+  min-height: 100vh;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================
+// HEADER PREMIUM
+// ============================================
+.page-header {
+  margin-bottom: 48px;
+
+  .header-content {
+    .header-left {
+      .page-title {
+        margin: 0 0 8px 0;
+        font-size: 32px;
+        font-weight: 700;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        color: $gray-900;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+      }
+
+      .page-description {
+        margin: 0;
+        font-size: 15px;
+        color: $gray-500;
+        line-height: 1.5;
+        font-weight: 400;
+      }
+    }
+  }
+}
+
+// ============================================
+// STEPPER PREMIUM
+// ============================================
+.stepper-wrapper {
+  background: $white;
+  border-radius: 12px;
+  border: 1px solid $gray-200;
+  box-shadow: $shadow-sm;
+  padding: 24px;
+  overflow: hidden;
+
+  ::ng-deep {
+    .mat-stepper-horizontal-line {
+      border-top-color: $gray-200;
+    }
+
+    .mat-step-header {
+      .mat-step-icon-selected {
+        background-color: $blue-600;
+      }
+
+      .mat-step-icon-state-edit {
+        background-color: $blue-500;
+      }
+    }
+  }
+}
+
+// ============================================
+// FORM CARD
+// ============================================
+.form-card {
+  background: $gray-50;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  .form-field {
+    width: 100%;
+    margin: 0;
+
+    ::ng-deep {
+      .mat-mdc-form-field-subscript-wrapper {
+        margin-top: 4px;
+      }
+
+      .mat-mdc-text-field-wrapper {
+        height: 56px;
+      }
+    }
+  }
+}
+
+// ============================================
+// ITEM CARDS
+// ============================================
+.item-card {
+  background: $white;
+  border-radius: 8px;
+  border: 1px solid $gray-200;
+  border-left: 4px solid $blue-500;
+  box-shadow: $shadow-sm;
+  margin-bottom: 16px;
+  overflow: hidden;
+  transition: all 0.15s ease;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+
+  .item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: $gray-50;
+    border-bottom: 1px solid $gray-200;
+
+    .item-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: $gray-900;
+    }
+
+    .delete-item-btn {
+      width: 36px;
+      height: 36px;
+      color: $red-500;
+
+      &:hover {
+        background: $red-50;
+      }
+    }
+  }
+
+  .item-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .item-row-first {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .item-row {
+    display: grid;
+    grid-template-columns: 1.1fr 0.8fr 0.7fr 0.9fr 0.9fr 1fr;
+    gap: 12px;
+    align-items: start;
+
+    @media (max-width: 1024px) {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .field-sous-type-empty {
+      display: none;
+    }
+
+    .field-montant {
+      text-align: right;
+      padding: 8px 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 56px;
+      
+      strong {
+        display: block;
+        font-size: 11px;
+        color: $gray-500;
+        margin-bottom: 4px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .montant-value {
+        font-size: 16px;
+        font-weight: 700;
+        color: $blue-600;
+        font-family: 'Inter', sans-serif;
+      }
+    }
+
+    mat-form-field {
+      margin: 0;
+
+      ::ng-deep {
+        .mat-mdc-text-field-wrapper {
+          height: 56px;
+        }
+
+        .mat-mdc-form-field-subscript-wrapper {
+          margin-top: 2px;
+        }
+      }
+    }
+
+    .field-sous-type,
+    .field-quantite,
+    .field-unite,
+    .field-prix {
+      ::ng-deep {
+        .mat-mdc-form-field {
+          font-size: 14px;
+        }
+
+        .mat-mdc-select-value {
+          font-size: 14px;
+        }
+
+        .mat-mdc-text-field-input-control input {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+}
+
+.add-item-btn {
+  width: 100%;
+  height: 44px;
+  margin: 16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+  border-color: $blue-500;
+  color: $blue-600;
+
+  &:hover {
+    background: $blue-50;
+    transform: translateY(-1px);
+    box-shadow: $shadow-sm;
+  }
+}
+
+// ============================================
+// RECAP CARD
+// ============================================
+.recap-card {
+  background: $white;
+  border-radius: 12px;
+  border: 1px solid $gray-200;
+  box-shadow: $shadow-sm;
+  padding: 32px;
+  margin-bottom: 24px;
+
+  .recap-section {
+    margin-bottom: 32px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .recap-title {
+      font-size: 18px;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      color: $gray-900;
+      margin: 0 0 20px 0;
+      padding-bottom: 12px;
+      border-bottom: 2px solid $gray-200;
+    }
+
+    .recap-info {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      .info-item {
+        display: flex;
+        gap: 12px;
+
+        .info-label {
+          font-weight: 600;
+          color: $gray-600;
+          min-width: 120px;
+        }
+
+        .info-value {
+          color: $gray-900;
+        }
+      }
+    }
+
+    .recap-table-wrapper {
+      overflow-x: auto;
+      margin-top: 16px;
+    }
+
+    .recap-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid $gray-200;
+
+      th, td {
+        text-align: left;
+        padding: 12px 16px;
+        border-bottom: 1px solid $gray-100;
+      }
+
+      th {
+        background: $gray-50;
+        font-weight: 600;
+        color: $gray-700;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      tbody tr {
+        transition: background-color 0.15s ease;
+
+        &.type-recyclable {
+          background-color: $green-50;
+        }
+
+        &.type-banal {
+          background-color: $gray-50;
+        }
+
+        &.type-a_detruire {
+          background-color: $red-50;
+        }
+
+        &:hover {
+          background-color: $gray-100;
+        }
+
+        &:last-child td {
+          border-bottom: none;
+        }
+      }
+    }
+
+    &.recap-totaux {
+      background: $gray-50;
+      padding: 24px;
+      border-radius: 8px;
+      border: 1px solid $gray-200;
+
+      .totaux-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+
+        @media (max-width: 768px) {
+          grid-template-columns: 1fr;
+        }
+
+        .totaux-item {
+          padding: 20px;
+          background: $white;
+          border-radius: 8px;
+          border-left: 4px solid $gray-400;
+          box-shadow: $shadow-sm;
+          transition: all 0.15s ease;
+
+          &:hover {
+            box-shadow: $shadow-md;
+            transform: translateY(-2px);
+          }
+
+          .totaux-label {
+            display: block;
+            font-size: 12px;
+            color: $gray-500;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+
+          .totaux-value {
+            display: block;
+            font-size: 24px;
+            color: $gray-900;
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+          }
+
+          &.totaux-success {
+            border-left-color: $green-500;
+
+            .totaux-value {
+              color: $green-600;
+            }
+          }
+
+          &.totaux-danger {
+            border-left-color: $red-500;
+
+            .totaux-value {
+              color: $red-600;
+            }
+          }
+
+          &.totaux-primary {
+            border-left-color: $blue-500;
+
+            .totaux-value {
+              color: $blue-600;
+              font-size: 28px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// ============================================
+// STEP ACTIONS
+// ============================================
+.step-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid $gray-200;
+  gap: 12px;
+
+  .cancel-button,
+  .prev-button {
+    height: 44px;
+    padding: 0 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    color: $gray-600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s ease;
+
+    &:hover:not(:disabled) {
+      background: $gray-100;
+      color: $gray-900;
+    }
+  }
+
+  .next-button,
+  .submit-button {
+    height: 44px;
+    padding: 0 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    background: $blue-600;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s ease;
+    box-shadow: $shadow-sm;
+
+    &:hover:not(:disabled) {
+      background: $blue-700;
+      box-shadow: $shadow-md;
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .button-spinner {
+      ::ng-deep circle {
+        stroke: white;
+      }
+    }
+  }
+}
+
+// ============================================
+// RESPONSIVE
+// ============================================
+@media (max-width: 1024px) {
+  .enlevement-form-container {
+    padding: 24px;
+  }
+
+  .page-header {
+    margin-bottom: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .enlevement-form-container {
+    padding: 16px;
+  }
+
+  .page-header {
+    .header-left {
+      .page-title {
+        font-size: 24px;
+      }
+
+      .page-description {
+        font-size: 14px;
+      }
+    }
+  }
+
+  .stepper-wrapper {
+    padding: 16px;
+  }
+
+  .step-actions {
+    flex-direction: column-reverse;
+    gap: 12px;
+
+    .cancel-button,
+    .prev-button,
+    .next-button,
+    .submit-button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}

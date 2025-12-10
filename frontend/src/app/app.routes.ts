@@ -1,21 +1,30 @@
 import { Routes } from '@angular/router';
+import { LoginComponent } from './components/login/login.component';
 import { authGuard } from './auth/auth.guard';
-import { roleGuard } from './auth/role.guard';
+import { adminGuard, clientGuard } from './auth/role.guard';
 
+/**
+ * Routes principales de l'application
+ */
 export const routes: Routes = [
   {
     path: '',
-    loadComponent: () => import('./components/login/login.component').then(m => m.LoginComponent)
+    component: LoginComponent
   },
   {
-    path: 'client',
-    loadComponent: () => import('./components/client-dashboard/client-dashboard.component').then(m => m.ClientDashboardComponent),
-    canActivate: [authGuard]
+    path: 'login',
+    redirectTo: '',
+    pathMatch: 'full'
   },
   {
     path: 'admin',
-    loadComponent: () => import('./components/admin-clients/admin-clients.component').then(m => m.AdminClientsComponent),
-    canActivate: [authGuard, roleGuard('ADMIN')]
+    canActivate: [authGuard, adminGuard],
+    loadChildren: () => import('./modules/admin/admin.routes').then(m => m.adminRoutes)
+  },
+  {
+    path: 'client',
+    canActivate: [authGuard, clientGuard],
+    loadChildren: () => import('./modules/client/client.routes').then(m => m.clientRoutes)
   },
   {
     path: '**',

@@ -1,7 +1,7 @@
 import { AuthConfig } from 'angular-oauth2-oidc';
 
 export const authConfig: AuthConfig = {
-  issuer: window.location.origin + '/auth/realms/iorecycling',
+  issuer: `${window.location.origin}/auth/realms/iorecycling`,
   clientId: 'frontend',
   redirectUri: window.location.origin + '/',
   responseType: 'code',

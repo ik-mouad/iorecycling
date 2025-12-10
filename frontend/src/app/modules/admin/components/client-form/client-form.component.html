@@ -1,0 +1,65 @@
+<div class="client-form">
+  <h2 mat-dialog-title class="dialog-title">
+    <mat-icon>{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
+    <span>{{ isEditMode ? 'Modifier le client' : 'Nouveau client' }}</span>
+  </h2>
+
+  <mat-dialog-content class="dialog-content">
+    <form [formGroup]="clientForm" (ngSubmit)="onSubmit()">
+      <div class="form-fields">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Nom du client *</mat-label>
+          <input matInput 
+                 formControlName="name"
+                 placeholder="Ex: Entreprise ABC">
+          <mat-icon matPrefix>business</mat-icon>
+          <mat-error *ngIf="clientForm.get('name')?.hasError('required')">
+            {{ getErrorMessage('name') }}
+          </mat-error>
+          <mat-error *ngIf="clientForm.get('name')?.hasError('minlength')">
+            {{ getErrorMessage('name') }}
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Code client *</mat-label>
+          <input matInput 
+                 formControlName="code"
+                 placeholder="Ex: ABC001"
+                 maxlength="10">
+          <mat-icon matPrefix>badge</mat-icon>
+          <mat-hint align="end">{{ clientForm.get('code')?.value?.length || 0 }}/10</mat-hint>
+          <mat-error *ngIf="clientForm.get('code')?.hasError('required')">
+            {{ getErrorMessage('code') }}
+          </mat-error>
+          <mat-error *ngIf="clientForm.get('code')?.hasError('minlength')">
+            {{ getErrorMessage('code') }}
+          </mat-error>
+          <mat-error *ngIf="clientForm.get('code')?.hasError('maxlength')">
+            {{ getErrorMessage('code') }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button 
+            type="button" 
+            (click)="onCancel()"
+            [disabled]="isLoading"
+            class="cancel-button">
+      Annuler
+    </button>
+    <button mat-raised-button 
+            color="primary" 
+            type="submit"
+            (click)="onSubmit()"
+            [disabled]="clientForm.invalid || isLoading"
+            class="submit-button">
+      <mat-spinner *ngIf="isLoading" diameter="20" class="button-spinner"></mat-spinner>
+      <mat-icon *ngIf="!isLoading">{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+      <span>{{ isEditMode ? 'Modifier' : 'Créer' }}</span>
+    </button>
+  </mat-dialog-actions>
+</div>

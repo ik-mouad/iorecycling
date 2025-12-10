@@ -1,0 +1,18 @@
+{
+  "rootUrl": "http://localhost:88",
+  "baseUrl": "/",
+  "adminUrl": "http://localhost:88/",
+  "redirectUris": [
+    "http://localhost:88/*",
+    "http://127.0.0.1:88/*"
+  ],
+  "webOrigins": [
+    "http://localhost:88",
+    "http://127.0.0.1:88"
+  ],
+  "publicClient": true,
+  "standardFlowEnabled": true,
+  "directAccessGrantsEnabled": true,
+  "serviceAccountsEnabled": false
+}
+

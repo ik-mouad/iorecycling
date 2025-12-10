@@ -1,0 +1,160 @@
+/* ============================================
+   PREMIUM DESIGN SYSTEM - Admin Documents
+   ============================================ */
+
+// Design Tokens
+$gray-50: #f9fafb;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-300: #d1d5db;
+$gray-400: #9ca3af;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-700: #374151;
+$gray-900: #0a0a0a;
+
+$blue-50: #f0f9ff;
+$blue-500: #3b82f6;
+$blue-600: #2563eb;
+
+$white: #ffffff;
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+
+// Container
+.admin-documents-container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 32px;
+  background: $gray-50;
+  min-height: 100vh;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================
+// HEADER PREMIUM
+// ============================================
+.page-header {
+  margin-bottom: 48px;
+
+  .header-content {
+    .header-left {
+      .page-title {
+        margin: 0 0 8px 0;
+        font-size: 32px;
+        font-weight: 700;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        color: $gray-900;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+      }
+
+      .page-description {
+        margin: 0;
+        font-size: 15px;
+        color: $gray-500;
+        line-height: 1.5;
+        font-weight: 400;
+      }
+    }
+  }
+}
+
+// ============================================
+// COMING SOON CARD
+// ============================================
+.coming-soon-card {
+  background: $white;
+  border-radius: 12px;
+  border: 1px solid $gray-200;
+  box-shadow: $shadow-sm;
+  padding: 80px 48px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+
+  .coming-soon-icon {
+    font-size: 80px;
+    width: 80px;
+    height: 80px;
+    color: $gray-300;
+  }
+
+  .coming-soon-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    color: $gray-900;
+  }
+
+  .coming-soon-description {
+    margin: 0;
+    font-size: 16px;
+    color: $gray-600;
+    line-height: 1.6;
+    max-width: 600px;
+  }
+}
+
+// ============================================
+// RESPONSIVE
+// ============================================
+@media (max-width: 1024px) {
+  .admin-documents-container {
+    padding: 24px;
+  }
+
+  .page-header {
+    margin-bottom: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-documents-container {
+    padding: 16px;
+  }
+
+  .page-header {
+    .header-left {
+      .page-title {
+        font-size: 24px;
+      }
+
+      .page-description {
+        font-size: 14px;
+      }
+    }
+  }
+
+  .coming-soon-card {
+    padding: 48px 24px;
+
+    .coming-soon-icon {
+      font-size: 64px;
+      width: 64px;
+      height: 64px;
+    }
+
+    .coming-soon-title {
+      font-size: 20px;
+    }
+
+    .coming-soon-description {
+      font-size: 14px;
+    }
+  }
+}
