@@ -21,6 +21,8 @@ public class PickupItemDTO {
     private String typeDechet;  // VALORISABLE, BANAL, A_ELIMINER
     private String sousType;
     private BigDecimal quantiteKg;
+    private String uniteMesure;  // kg, L, m³, unité, etc.
+    private String etat;  // vrac, compacté, broyé, Palettisé, autre
     private BigDecimal prixUnitaireMad;
     private BigDecimal montantMad;
 }

@@ -13,6 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatMenuModule } from '@angular/material/menu';
 import { AdminClientService, Client, Site } from '../../../../services/admin-client.service';
 import { ClientFormComponent } from '../client-form/client-form.component';
 
@@ -33,7 +34,8 @@ import { ClientFormComponent } from '../client-form/client-form.component';
     MatIconModule,
     MatChipsModule,
     MatTooltipModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatMenuModule
   ],
   providers: [
     AdminClientService
@@ -118,12 +120,6 @@ export class AdminClientsComponent implements OnInit {
     return sites ? sites.length : 0;
   }
 
-  getSitesNames(sites: Site[]): string {
-    if (!sites || sites.length === 0) {
-      return 'Aucun site';
-    }
-    return sites.map(site => site.name).join(', ');
-  }
 
   formatDate(dateString: string): string {
     return new Date(dateString).toLocaleDateString('fr-FR');

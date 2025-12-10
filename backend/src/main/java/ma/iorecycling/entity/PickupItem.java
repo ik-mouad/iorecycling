@@ -49,6 +49,14 @@ public class PickupItem {
     @Column(name = "quantite_kg", nullable = false, precision = 10, scale = 3)
     private BigDecimal quantiteKg;
     
+    @Size(max = 20, message = "L'unité de mesure ne peut pas dépasser 20 caractères")
+    @Column(name = "unite_mesure", length = 20)
+    private String uniteMesure;  // kg, L, m³, unité, etc.
+    
+    @Size(max = 20, message = "L'état ne peut pas dépasser 20 caractères")
+    @Column(name = "etat", length = 20)
+    private String etat;  // vrac, compacté, broyé, Palettisé, autre
+    
     @NotNull(message = "Le prix unitaire est obligatoire")
     @PositiveOrZero(message = "Le prix unitaire doit être positif ou zéro")
     @Column(name = "prix_unitaire_mad", nullable = false, precision = 10, scale = 3)
@@ -78,6 +86,10 @@ public class PickupItem {
     public void validateAndCalculate() {
         if (TypeDechet.VALORISABLE.equals(typeDechet) && (sousType == null || sousType.trim().isEmpty())) {
             throw new IllegalStateException("Le sous-type est obligatoire pour les déchets VALORISABLE");
+        }
+        
+        if (TypeDechet.A_ELIMINER.equals(typeDechet) && (sousType == null || sousType.trim().isEmpty())) {
+            throw new IllegalStateException("Le sous-type est obligatoire pour les déchets A_ELIMINER (dangereux ou non dangereux)");
         }
         
         if (quantiteKg != null && prixUnitaireMad != null) {

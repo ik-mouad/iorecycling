@@ -95,7 +95,12 @@ public class EnlevementService {
     private PickupItem createPickupItem(Enlevement enlevement, CreatePickupItemRequest request) {
         PickupItem.TypeDechet typeDechet;
         try {
-            typeDechet = PickupItem.TypeDechet.valueOf(request.getTypeDechet().toUpperCase());
+            // Mapping entre frontend (A_DETRUIRE) et backend (A_ELIMINER)
+            String typeDechetStr = request.getTypeDechet().toUpperCase();
+            if ("A_DETRUIRE".equals(typeDechetStr)) {
+                typeDechetStr = "A_ELIMINER";
+            }
+            typeDechet = PickupItem.TypeDechet.valueOf(typeDechetStr);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Type de déchet invalide : " + request.getTypeDechet());
         }
@@ -105,6 +110,10 @@ public class EnlevementService {
                 .typeDechet(typeDechet)
                 .sousType(request.getSousType())
                 .quantiteKg(request.getQuantiteKg())
+                .uniteMesure(request.getUniteMesure() != null && !request.getUniteMesure().trim().isEmpty() 
+                        ? request.getUniteMesure() 
+                        : "kg")
+                .etat(request.getEtat())
                 .prixUnitaireMad(request.getPrixUnitaireMad())
                 .build();
     }

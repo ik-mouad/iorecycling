@@ -13,10 +13,10 @@ export interface Enlevement {
   observation?: string;
   items: PickupItem[];
   poidsTotal: number;
-  budgetValorisation: number;
+  budgetRecyclage: number;
   budgetTraitement: number;
   bilanNet: number;
-  tauxValorisation: number;
+  tauxRecyclage: number;
   documents?: DocumentInfo[];
   bsdiPresent?: boolean;
   pvPresent?: boolean;
@@ -39,24 +39,28 @@ export interface PickupItem {
   typeDechet: TypeDechet;
   sousType?: string;
   quantiteKg: number;
+  uniteMesure?: string; // kg, L, m³, unité, etc.
+  etat?: string; // vrac, compacté, broyé, Palettisé, autre
   prixUnitaireMad: number;
   montantMad: number;
 }
 
 export interface CreatePickupItemRequest {
-  typeDechet: string; // 'VALORISABLE', 'BANAL', 'A_ELIMINER'
+  typeDechet: string; // 'RECYCLABLE', 'BANAL', 'A_DETRUIRE'
   sousType?: string;
   quantiteKg: number;
+  uniteMesure?: string; // kg, L, m³, unité, etc. (optionnel, par défaut "kg")
+  etat?: string; // vrac, compacté, broyé, Palettisé, autre (optionnel)
   prixUnitaireMad: number;
 }
 
 export enum TypeDechet {
-  VALORISABLE = 'VALORISABLE',
+  RECYCLABLE = 'RECYCLABLE',
   BANAL = 'BANAL',
-  A_ELIMINER = 'A_ELIMINER'
+  A_DETRUIRE = 'A_DETRUIRE'
 }
 
-export enum SousTypeValorisable {
+export enum SousTypeRecyclable {
   CARTON = 'CARTON',
   PLASTIQUE_PET = 'PLASTIQUE_PET',
   PLASTIQUE_PEHD = 'PLASTIQUE_PEHD',

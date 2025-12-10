@@ -27,7 +27,7 @@ public class EnlevementMapper {
                 .map(PickupItem::getQuantiteKg)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         
-        BigDecimal budgetValorisation = enlevement.getItems().stream()
+        BigDecimal budgetRecyclage = enlevement.getItems().stream()
                 .filter(item -> TypeDechet.VALORISABLE.equals(item.getTypeDechet()))
                 .map(PickupItem::getMontantMad)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -38,15 +38,15 @@ public class EnlevementMapper {
                 .map(PickupItem::getMontantMad)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         
-        BigDecimal bilanNet = budgetValorisation.subtract(budgetTraitement);
+        BigDecimal bilanNet = budgetRecyclage.subtract(budgetTraitement);
         
-        BigDecimal poidsValorisable = enlevement.getItems().stream()
+        BigDecimal poidsRecyclable = enlevement.getItems().stream()
                 .filter(item -> TypeDechet.VALORISABLE.equals(item.getTypeDechet()))
                 .map(PickupItem::getQuantiteKg)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         
-        Double tauxValorisation = poidsTotal.compareTo(BigDecimal.ZERO) > 0 
-                ? poidsValorisable.divide(poidsTotal, 4, RoundingMode.HALF_UP)
+        Double tauxRecyclage = poidsTotal.compareTo(BigDecimal.ZERO) > 0 
+                ? poidsRecyclable.divide(poidsTotal, 4, RoundingMode.HALF_UP)
                     .multiply(BigDecimal.valueOf(100)).doubleValue()
                 : 0.0;
         
@@ -63,10 +63,10 @@ public class EnlevementMapper {
                         .map(this::toItemDTO)
                         .collect(Collectors.toList()))
                 .poidsTotal(poidsTotal)
-                .budgetValorisation(budgetValorisation)
+                .budgetRecyclage(budgetRecyclage)
                 .budgetTraitement(budgetTraitement)
                 .bilanNet(bilanNet)
-                .tauxValorisation(tauxValorisation)
+                .tauxRecyclage(tauxRecyclage)
                 .createdBy(enlevement.getCreatedBy())
                 .createdAt(enlevement.getCreatedAt())
                 .updatedAt(enlevement.getUpdatedAt())
@@ -74,12 +74,20 @@ public class EnlevementMapper {
     }
     
     private PickupItemDTO toItemDTO(PickupItem item) {
+        // Mapping entre backend (A_ELIMINER) et frontend (A_DETRUIRE)
+        String typeDechet = item.getTypeDechet().name();
+        if ("A_ELIMINER".equals(typeDechet)) {
+            typeDechet = "A_DETRUIRE";
+        }
+        
         return PickupItemDTO.builder()
                 .id(item.getId())
                 .enlevementId(item.getEnlevement().getId())
-                .typeDechet(item.getTypeDechet().name())
+                .typeDechet(typeDechet)
                 .sousType(item.getSousType())
                 .quantiteKg(item.getQuantiteKg())
+                .uniteMesure(item.getUniteMesure() != null ? item.getUniteMesure() : "kg")
+                .etat(item.getEtat())
                 .prixUnitaireMad(item.getPrixUnitaireMad())
                 .montantMad(item.getMontantMad())
                 .build();

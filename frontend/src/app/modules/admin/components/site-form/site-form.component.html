@@ -1,21 +1,24 @@
-<h2 mat-dialog-title>
-  {{ isEditMode ? 'Modifier un site' : 'Ajouter un site' }}
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon>{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
+  <span>{{ isEditMode ? 'Modifier un site' : 'Ajouter un site' }}</span>
 </h2>
 
 <form [formGroup]="siteForm" (ngSubmit)="submit()" class="site-form">
-  <mat-dialog-content>
+  <mat-dialog-content class="dialog-content">
     <div class="form-grid">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Nom du site</mat-label>
-        <input matInput formControlName="name" />
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Nom du site *</mat-label>
+        <input matInput formControlName="name" placeholder="Ex: Siège social" />
+        <mat-icon matPrefix>location_on</mat-icon>
         <mat-error *ngIf="siteForm.get('name')?.invalid">
           {{ getErrorMessage('name') }}
         </mat-error>
       </mat-form-field>
 
-      <mat-form-field appearance="outline" class="full-width">
+      <mat-form-field appearance="outline" class="form-field">
         <mat-label>Adresse</mat-label>
-        <input matInput formControlName="adresse" />
+        <input matInput formControlName="adresse" placeholder="Ex: 123 Rue Example, Casablanca" />
+        <mat-icon matPrefix>home</mat-icon>
         <mat-error *ngIf="siteForm.get('adresse')?.invalid">
           {{ getErrorMessage('adresse') }}
         </mat-error>
@@ -23,15 +26,14 @@
     </div>
   </mat-dialog-content>
 
-  <mat-dialog-actions align="end">
-    <button mat-button type="button" (click)="cancel()" [disabled]="isLoading">
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button type="button" (click)="cancel()" [disabled]="isLoading" class="cancel-button">
       Annuler
     </button>
-    <button mat-raised-button color="primary" type="submit" [disabled]="isLoading">
+    <button mat-raised-button color="primary" type="submit" [disabled]="isLoading" class="submit-button">
       <mat-icon *ngIf="!isLoading">{{ isEditMode ? 'save' : 'add' }}</mat-icon>
-      <mat-spinner *ngIf="isLoading" [diameter]="20"></mat-spinner>
+      <mat-spinner *ngIf="isLoading" [diameter]="20" class="button-spinner"></mat-spinner>
       <span>{{ isEditMode ? 'Enregistrer' : 'Créer' }}</span>
     </button>
   </mat-dialog-actions>
 </form>
-

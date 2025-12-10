@@ -9,6 +9,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { PlanningService } from '../../../../services/planning.service';
 import { PlanningEnlevement, StatutPlanning } from '../../../../models/planning.model';
 
@@ -28,7 +29,8 @@ import { PlanningEnlevement, StatutPlanning } from '../../../../models/planning.
     MatChipsModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
-    MatDialogModule
+    MatDialogModule,
+    MatTooltipModule
   ],
   templateUrl: './planning-calendar.component.html',
   styleUrls: ['./planning-calendar.component.scss']

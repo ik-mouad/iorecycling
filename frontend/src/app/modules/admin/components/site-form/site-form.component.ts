@@ -82,7 +82,8 @@ export class SiteFormComponent implements OnInit {
         },
         error: (error) => {
           console.error('Erreur modification site:', error);
-          this.snackBar.open('Erreur lors de la modification', 'Fermer', { duration: 3000 });
+          const errorMessage = error.error?.message || error.message || 'Erreur lors de la modification';
+          this.snackBar.open(errorMessage, 'Fermer', { duration: 5000 });
           this.isLoading = false;
         }
       });
@@ -94,7 +95,8 @@ export class SiteFormComponent implements OnInit {
         },
         error: (error) => {
           console.error('Erreur création site:', error);
-          this.snackBar.open('Erreur lors de la création', 'Fermer', { duration: 3000 });
+          const errorMessage = error.error?.message || error.message || 'Erreur lors de la création';
+          this.snackBar.open(errorMessage, 'Fermer', { duration: 5000 });
           this.isLoading = false;
         }
       });

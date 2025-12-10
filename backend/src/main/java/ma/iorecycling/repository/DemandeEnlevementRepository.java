@@ -45,5 +45,11 @@ public interface DemandeEnlevementRepository extends JpaRepository<DemandeEnleve
     @Query("SELECT d FROM DemandeEnlevement d WHERE d.statut IN :statuts " +
            "ORDER BY d.dateCreation DESC")
     Page<DemandeEnlevement> findByStatutIn(@Param("statuts") List<StatutDemande> statuts, Pageable pageable);
+    
+    /**
+     * Compte les demandes créées dans une année donnée
+     */
+    @Query("SELECT COUNT(d) FROM DemandeEnlevement d WHERE EXTRACT(YEAR FROM d.dateCreation) = :year")
+    long countByYear(@Param("year") int year);
 }
 

@@ -9,6 +9,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuModule } from '@angular/material/menu';
 import { RecurrenceService } from '../../../../services/recurrence.service';
 import { Recurrence, TypeRecurrence } from '../../../../models/planning.model';
 import { RecurrenceFormComponent, RecurrenceFormData } from '../recurrence-form/recurrence-form.component';
@@ -29,7 +30,8 @@ import { RecurrenceFormComponent, RecurrenceFormData } from '../recurrence-form/
     MatDialogModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatMenuModule
   ],
   templateUrl: './recurrences-list.component.html',
   styleUrls: ['./recurrences-list.component.scss']

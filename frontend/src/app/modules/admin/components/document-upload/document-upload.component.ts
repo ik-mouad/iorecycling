@@ -52,7 +52,8 @@ export class DocumentUploadComponent implements OnInit, AfterViewInit {
   // Types de documents selon le contexte
   documentTypesEnlevement = [
     { value: 'BSDI', label: 'BSDI (Bordereau de Suivi des Déchets Industriels)' },
-    { value: 'PV_DESTRUCTION', label: 'PV de Destruction' }
+    { value: 'PV_DESTRUCTION', label: 'PV de Destruction' },
+    { value: 'AUTRE', label: 'Autre' }
   ];
 
   documentTypesMensuel = [

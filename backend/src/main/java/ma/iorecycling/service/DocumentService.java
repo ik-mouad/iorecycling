@@ -209,10 +209,10 @@ public class DocumentService {
         Enlevement enlevement = enlevementRepository.findById(enlevementId)
                 .orElseThrow(() -> new IllegalArgumentException("Enlèvement non trouvé"));
         
-        boolean hasAEliminer = enlevement.getItems().stream()
+        boolean hasAELiminer = enlevement.getItems().stream()
                 .anyMatch(item -> item.getTypeDechet().name().equals("A_ELIMINER"));
         
-        if (!hasAEliminer) {
+        if (!hasAELiminer) {
             return true; // Pas de documents obligatoires
         }
         

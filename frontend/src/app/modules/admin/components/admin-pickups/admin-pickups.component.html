@@ -1,21 +1,24 @@
-<div class="admin-pickups">
+<div class="admin-pickups-container">
+  <!-- Header Premium -->
   <div class="page-header">
     <div class="header-content">
-      <h2 class="page-title">
-        <mat-icon>local_shipping</mat-icon>
-        Gestion des Enlèvements
-      </h2>
-      <button mat-raised-button color="primary" (click)="openPickupForm()">
-        <mat-icon>add</mat-icon>
-        Nouvel Enlèvement
-      </button>
+      <div class="header-left">
+        <h1 class="page-title">Gestion des Enlèvements</h1>
+        <p class="page-description">Consultez et gérez tous les enlèvements</p>
+      </div>
+      <div class="header-actions">
+        <button mat-raised-button color="primary" class="primary-button" (click)="openPickupForm()">
+          <mat-icon>add</mat-icon>
+          <span>Nouvel Enlèvement</span>
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- Filters -->
-  <div class="filters-section">
+  <!-- Filters Card -->
+  <div class="filters-card">
     <div class="filters-grid">
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" class="filter-field">
         <mat-label>Client</mat-label>
         <mat-select [(ngModel)]="filters.clientId" (selectionChange)="applyFilters()">
           <mat-option [value]="null">Tous les clients</mat-option>
@@ -23,9 +26,10 @@
             {{ client.name }}
           </mat-option>
         </mat-select>
+        <mat-icon matPrefix>business</mat-icon>
       </mat-form-field>
 
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" class="filter-field">
         <mat-label>Type</mat-label>
         <mat-select [(ngModel)]="filters.type" (selectionChange)="applyFilters()">
           <mat-option [value]="null">Tous les types</mat-option>
@@ -33,105 +37,131 @@
           <mat-option value="BANAL">Banal</mat-option>
           <mat-option value="DANGEREUX">Dangereux</mat-option>
         </mat-select>
+        <mat-icon matPrefix>category</mat-icon>
       </mat-form-field>
 
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" class="filter-field">
         <mat-label>Date de début</mat-label>
         <input matInput type="date" [(ngModel)]="filters.dateFrom" (change)="applyFilters()">
+        <mat-icon matPrefix>event</mat-icon>
       </mat-form-field>
 
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" class="filter-field">
         <mat-label>Date de fin</mat-label>
         <input matInput type="date" [(ngModel)]="filters.dateTo" (change)="applyFilters()">
+        <mat-icon matPrefix>event</mat-icon>
       </mat-form-field>
 
-      <button mat-button (click)="clearFilters()">
+      <button mat-button class="clear-button" (click)="clearFilters()">
         <mat-icon>clear</mat-icon>
-        Effacer
+        <span>Effacer</span>
       </button>
     </div>
   </div>
 
-  <!-- Loading -->
+  <!-- Loading State -->
   <div *ngIf="isLoading" class="loading-container">
-    <mat-spinner diameter="40"></mat-spinner>
-    <p>Chargement des enlèvements...</p>
+    <mat-spinner diameter="50"></mat-spinner>
+    <p class="loading-text">Chargement des enlèvements...</p>
   </div>
 
-  <!-- Table -->
-  <div *ngIf="!isLoading" class="table-container">
-    <table mat-table [dataSource]="dataSource" class="pickups-table">
-      
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef>ID</th>
-        <td mat-cell *matCellDef="let pickup">{{ pickup.id }}</td>
-      </ng-container>
+  <!-- Table Card -->
+  <div *ngIf="!isLoading" class="table-card">
+    <div class="table-wrapper">
+      <table mat-table [dataSource]="dataSource" class="premium-table">
+        
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef class="table-header">ID</th>
+          <td mat-cell *matCellDef="let pickup" class="table-cell">{{ pickup.id }}</td>
+        </ng-container>
 
-      <ng-container matColumnDef="date">
-        <th mat-header-cell *matHeaderCellDef>Date</th>
-        <td mat-cell *matCellDef="let pickup">{{ formatDate(pickup.date) }}</td>
-      </ng-container>
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef class="table-header">Date</th>
+          <td mat-cell *matCellDef="let pickup" class="table-cell">
+            <div class="date-info">
+              <mat-icon>calendar_today</mat-icon>
+              <span>{{ formatDate(pickup.date) }}</span>
+            </div>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="type">
-        <th mat-header-cell *matHeaderCellDef>Type</th>
-        <td mat-cell *matCellDef="let pickup">
-          <mat-chip [color]="getTypeColor(pickup.type)">
-            <mat-icon>{{ getTypeIcon(pickup.type) }}</mat-icon>
-            {{ pickup.type }}
-          </mat-chip>
-        </td>
-      </ng-container>
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef class="table-header">Type</th>
+          <td mat-cell *matCellDef="let pickup" class="table-cell">
+            <span class="badge" [ngClass]="'badge-type-' + pickup.type.toLowerCase()">
+              <mat-icon>{{ getTypeIcon(pickup.type) }}</mat-icon>
+              {{ pickup.type }}
+            </span>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="tonnage">
-        <th mat-header-cell *matHeaderCellDef>Tonnage</th>
-        <td mat-cell *matCellDef="let pickup">{{ formatTonnage(pickup.tonnageKg) }} t</td>
-      </ng-container>
+        <ng-container matColumnDef="tonnage">
+          <th mat-header-cell *matHeaderCellDef class="table-header">Tonnage</th>
+          <td mat-cell *matCellDef="let pickup" class="table-cell">
+            <span class="badge badge-tonnage">{{ formatTonnage(pickup.tonnageKg) }} t</span>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="site">
-        <th mat-header-cell *matHeaderCellDef>Site</th>
-        <td mat-cell *matCellDef="let pickup">{{ pickup.site }}</td>
-      </ng-container>
+        <ng-container matColumnDef="site">
+          <th mat-header-cell *matHeaderCellDef class="table-header">Site</th>
+          <td mat-cell *matCellDef="let pickup" class="table-cell">
+            <div class="site-info">
+              <mat-icon>location_on</mat-icon>
+              <span>{{ pickup.site }}</span>
+            </div>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="client">
-        <th mat-header-cell *matHeaderCellDef>Client</th>
-        <td mat-cell *matCellDef="let pickup">{{ pickup.client }}</td>
-      </ng-container>
+        <ng-container matColumnDef="client">
+          <th mat-header-cell *matHeaderCellDef class="table-header">Client</th>
+          <td mat-cell *matCellDef="let pickup" class="table-cell">
+            <strong>{{ pickup.client }}</strong>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef>Actions</th>
-        <td mat-cell *matCellDef="let pickup">
-          <div class="actions">
-            <button mat-icon-button (click)="openPickupForm(pickup)" matTooltip="Modifier">
-              <mat-icon>edit</mat-icon>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="table-header text-right">Actions</th>
+          <td mat-cell *matCellDef="let pickup" class="table-cell text-right">
+            <button mat-icon-button [matMenuTriggerFor]="rowMenu" class="action-button">
+              <mat-icon>more_horiz</mat-icon>
             </button>
-            <button mat-icon-button color="warn" (click)="deletePickup(pickup)" matTooltip="Supprimer">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-        </td>
-      </ng-container>
+            <mat-menu #rowMenu="matMenu">
+              <button mat-menu-item (click)="openPickupForm(pickup)">
+                <mat-icon>edit</mat-icon>
+                <span>Modifier</span>
+              </button>
+              <button mat-menu-item (click)="deletePickup(pickup)" class="delete-action">
+                <mat-icon>delete</mat-icon>
+                <span>Supprimer</span>
+              </button>
+            </mat-menu>
+          </td>
+        </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns" class="table-header-row"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" class="table-row"></tr>
+      </table>
+    </div>
 
+    <!-- Paginator -->
     <mat-paginator 
       [length]="totalElements"
       [pageSize]="filters.size || 20"
       [pageSizeOptions]="[10, 20, 50]"
       (page)="onPageChange($event)"
-      showFirstLastButtons>
+      showFirstLastButtons
+      class="premium-paginator">
     </mat-paginator>
   </div>
 
   <!-- Empty State -->
   <div *ngIf="!isLoading && dataSource.data.length === 0" class="empty-state">
-    <mat-icon>local_shipping</mat-icon>
-    <h3>Aucun enlèvement trouvé</h3>
-    <p>Commencez par créer votre premier enlèvement.</p>
-    <button mat-raised-button color="primary" (click)="openPickupForm()">
+    <mat-icon class="empty-icon">local_shipping</mat-icon>
+    <h3 class="empty-title">Aucun enlèvement trouvé</h3>
+    <p class="empty-description">Commencez par créer votre premier enlèvement.</p>
+    <button mat-raised-button color="primary" class="primary-button" (click)="openPickupForm()">
       <mat-icon>add</mat-icon>
-      Créer un enlèvement
+      <span>Créer un enlèvement</span>
     </button>
   </div>
 </div>

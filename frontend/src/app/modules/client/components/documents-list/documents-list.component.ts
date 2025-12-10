@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { DocumentService } from '../../../../services/document.service';
 import { DocumentInfo } from '../../../../models/enlevement.model';
 
@@ -24,7 +25,8 @@ import { DocumentInfo } from '../../../../models/enlevement.model';
     MatButtonModule,
     MatIconModule,
     MatTableModule,
-    MatChipsModule
+    MatChipsModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './documents-list.component.html',
   styleUrls: ['./documents-list.component.scss']
@@ -79,7 +81,7 @@ export class DocumentsListComponent implements OnInit {
     const labels: any = {
       'BSDI': '📄 BSDI',
       'PV_DESTRUCTION': '📄 PV Destruction',
-      'ATTESTATION_VALORISATION': '📜 Attestation Valorisation',
+      'ATTESTATION_VALORISATION': '📜 Attestation Recyclage',
       'ATTESTATION_ELIMINATION': '📜 Attestation Élimination',
       'FACTURE': '🧾 Facture'
     };

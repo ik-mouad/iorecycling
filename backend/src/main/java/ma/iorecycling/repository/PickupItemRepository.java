@@ -53,14 +53,14 @@ public interface PickupItemRepository extends JpaRepository<PickupItem, Long> {
             @Param("dateFin") LocalDate dateFin);
     
     /**
-     * Calcule le budget de valorisation (VALORISABLE uniquement)
+     * Calcule le budget de recyclage (VALORISABLE uniquement)
      */
     @Query("SELECT COALESCE(SUM(i.montantMad), 0) " +
            "FROM PickupItem i JOIN i.enlevement e " +
            "WHERE e.societe.id = :societeId " +
            "AND e.dateEnlevement BETWEEN :dateDebut AND :dateFin " +
            "AND i.typeDechet = 'VALORISABLE'")
-    BigDecimal calculateBudgetValorisation(
+    BigDecimal calculateBudgetRecyclage(
             @Param("societeId") Long societeId,
             @Param("dateDebut") LocalDate dateDebut,
             @Param("dateFin") LocalDate dateFin);
@@ -88,7 +88,7 @@ public interface PickupItemRepository extends JpaRepository<PickupItem, Long> {
            "AND i.typeDechet = 'VALORISABLE' " +
            "GROUP BY i.sousType " +
            "ORDER BY SUM(i.quantiteKg) DESC")
-    List<Object[]> getDetailValorisableBySousType(
+    List<Object[]> getDetailRecyclableBySousType(
             @Param("societeId") Long societeId,
             @Param("dateDebut") LocalDate dateDebut,
             @Param("dateFin") LocalDate dateFin);

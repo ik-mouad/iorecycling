@@ -55,7 +55,7 @@ export class ClientUserFormComponent implements OnInit {
       posteOccupe: ['', [Validators.maxLength(100)]],
       email: ['', [Validators.required, Validators.email]],
       telephone: ['', [Validators.maxLength(20)]],
-      password: [''],
+      password: ['', []],
       temporaryPassword: [true]
     });
 

@@ -11,11 +11,12 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Router, ActivatedRoute } from '@angular/router';
 import { EnlevementService } from '../../../../services/enlevement.service';
 import { SocieteService } from '../../../../services/societe.service';
 import { SiteService } from '../../../../services/site.service';
-import { CreateEnlevementRequest, TypeDechet, SousTypeValorisable } from '../../../../models/enlevement.model';
+import { CreateEnlevementRequest, TypeDechet, SousTypeRecyclable } from '../../../../models/enlevement.model';
 import { Societe, Site } from '../../../../models/societe.model';
 
 /**
@@ -39,7 +40,8 @@ import { Societe, Site } from '../../../../models/societe.model';
     MatCardModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './enlevement-form.component.html',
   styleUrls: ['./enlevement-form.component.scss']
@@ -53,10 +55,11 @@ export class EnlevementFormComponent implements OnInit {
   sites: Site[] = [];
   sitesLoading = false;
   loading = false;
+  societePredefinie: number | null = null;
 
   // Enums pour les selects
   typesDechet = Object.values(TypeDechet);
-  sousTypesValorisable = Object.values(SousTypeValorisable);
+  sousTypesRecyclable = Object.values(SousTypeRecyclable);
 
   constructor(
     private fb: FormBuilder,
@@ -64,10 +67,18 @@ export class EnlevementFormComponent implements OnInit {
     private societeService: SocieteService,
     private siteService: SiteService,
     private router: Router,
+    private route: ActivatedRoute,
     private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
+    // Vérifier si une société est passée en paramètre
+    this.route.queryParams.subscribe(params => {
+      if (params['societeId']) {
+        this.societePredefinie = +params['societeId'];
+      }
+    });
+    
     this.initForms();
     this.loadSocietes();
   }
@@ -103,13 +114,15 @@ export class EnlevementFormComponent implements OnInit {
       typeDechet: ['VALORISABLE', Validators.required],
       sousType: [''],
       quantiteKg: [0, [Validators.required, Validators.min(0)]],
+      uniteMesure: ['kg'], // Par défaut "kg"
+      etat: [''], // État du déchet
       prixUnitaireMad: [0, [Validators.required, Validators.min(0)]]
     });
 
-    // Observer les changements de typeDechet pour rendre sousType obligatoire si VALORISABLE
+    // Observer les changements de typeDechet pour rendre sousType obligatoire si VALORISABLE ou A_DETRUIRE
     itemForm.get('typeDechet')?.valueChanges.subscribe(type => {
       const sousTypeControl = itemForm.get('sousType');
-      if (type === 'VALORISABLE') {
+      if (type === 'VALORISABLE' || type === 'A_DETRUIRE') {
         sousTypeControl?.setValidators([Validators.required]);
         sousTypeControl?.updateValueAndValidity();
       } else {
@@ -136,6 +149,17 @@ export class EnlevementFormComponent implements OnInit {
     this.societeService.getAllSocietes(0, 100).subscribe({
       next: (page) => {
         this.societes = page.content;
+        
+        // Si une société est pré-définie, la pré-remplir et désactiver le champ
+        if (this.societePredefinie) {
+          const societeControl = this.step1Form.get('societeId');
+          if (societeControl) {
+            societeControl.setValue(this.societePredefinie);
+            societeControl.disable();
+            // Charger les sites de cette société
+            this.loadSites(this.societePredefinie);
+          }
+        }
       },
       error: (error) => {
         console.error('Erreur chargement sociétés:', error);
@@ -160,7 +184,16 @@ export class EnlevementFormComponent implements OnInit {
         this.sites = sites;
         this.sitesLoading = false;
         if (sites.length === 1) {
-          this.step1Form.get('siteId')?.setValue(sites[0].id);
+          // Sélectionner automatiquement le site s'il n'y en a qu'un
+          const siteControl = this.step1Form.get('siteId');
+          if (siteControl) {
+            siteControl.setValue(sites[0].id);
+            siteControl.markAsTouched();
+            siteControl.updateValueAndValidity();
+          }
+        } else if (sites.length > 1 && !this.step1Form.get('siteId')?.value) {
+          // Réinitialiser le site si plusieurs sites disponibles et aucun sélectionné
+          this.step1Form.get('siteId')?.setValue('');
         }
       },
       error: (error) => {
@@ -178,32 +211,32 @@ export class EnlevementFormComponent implements OnInit {
   calculateTotaux(): any {
     const items = this.itemsFormArray.value;
     
-    let budgetValorisation = 0;
+    let budgetRecyclage = 0;
     let budgetTraitement = 0;
     let poidsTotal = 0;
-    let poidsValorisable = 0;
+    let poidsRecyclable = 0;
 
     items.forEach((item: any) => {
       const montant = this.calculateMontant(item);
       poidsTotal += item.quantiteKg || 0;
 
-      if (item.typeDechet === 'VALORISABLE') {
-        budgetValorisation += montant;
-        poidsValorisable += item.quantiteKg || 0;
+      if (item.typeDechet === 'RECYCLABLE') {
+        budgetRecyclage += montant;
+        poidsRecyclable += item.quantiteKg || 0;
       } else {
         budgetTraitement += montant;
       }
     });
 
-    const bilanNet = budgetValorisation - budgetTraitement;
-    const tauxValorisation = poidsTotal > 0 ? (poidsValorisable / poidsTotal) * 100 : 0;
+    const bilanNet = budgetRecyclage - budgetTraitement;
+    const tauxRecyclage = poidsTotal > 0 ? (poidsRecyclable / poidsTotal) * 100 : 0;
 
     return {
       poidsTotal,
-      budgetValorisation,
+      budgetRecyclage,
       budgetTraitement,
       bilanNet,
-      tauxValorisation
+      tauxRecyclage
     };
   }
 
@@ -215,20 +248,43 @@ export class EnlevementFormComponent implements OnInit {
 
     this.loading = true;
 
-    const dateEnlevement = this.step1Form.value.dateEnlevement;
+    // Utiliser getRawValue() pour récupérer toutes les valeurs, y compris celles des champs désactivés
+    const formValue = this.step1Form.getRawValue();
+
+    // Réactiver les champs désactivés pour la validation
+    const societeControl = this.step1Form.get('societeId');
+    if (societeControl?.disabled) {
+      societeControl.enable();
+    }
+
+    const siteControl = this.step1Form.get('siteId');
+    if (siteControl?.disabled) {
+      siteControl.enable();
+    }
+
+    const dateEnlevement = formValue.dateEnlevement;
     const formattedDate = dateEnlevement instanceof Date 
       ? dateEnlevement.toISOString().split('T')[0]
       : dateEnlevement;
 
+    // Vérifier que siteId est bien défini
+    if (!formValue.siteId) {
+      this.snackBar.open('Veuillez sélectionner un site', 'Fermer', { duration: 3000 });
+      this.loading = false;
+      return;
+    }
+
     const request: CreateEnlevementRequest = {
       dateEnlevement: formattedDate,
-      siteId: this.step1Form.value.siteId,
-      societeId: this.step1Form.value.societeId,
-      observation: this.step1Form.value.observation,
+      siteId: formValue.siteId,
+      societeId: formValue.societeId,
+      observation: formValue.observation,
       items: this.itemsFormArray.value.map((item: any) => ({
         typeDechet: item.typeDechet,
         sousType: item.sousType || null,
         quantiteKg: item.quantiteKg,
+        uniteMesure: item.uniteMesure || 'kg',
+        etat: item.etat || null,
         prixUnitaireMad: item.prixUnitaireMad
       }))
     };
@@ -264,9 +320,9 @@ export class EnlevementFormComponent implements OnInit {
 
   getTypeDechetLabel(type: string): string {
     switch (type) {
-      case 'VALORISABLE': return '🔄 Valorisable';
+      case 'RECYCLABLE': return '🔄 Recyclable';
       case 'BANAL': return '🗑️ Banal';
-      case 'A_ELIMINER': return '☣️ A éliminer';
+      case 'A_DETRUIRE': return '☣️ A détruire';
       default: return type;
     }
   }

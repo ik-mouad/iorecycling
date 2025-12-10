@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ma.iorecycling.dto.CreateSiteRequest;
+import ma.iorecycling.dto.CreateSiteForSocieteRequest;
 import ma.iorecycling.dto.SiteDTO;
 import ma.iorecycling.service.SiteService;
 import org.springframework.http.HttpStatus;
@@ -133,15 +134,12 @@ class SocietesSitesController {
     @Operation(summary = "Ajouter un site à une société", description = "Crée un nouveau site pour une société")
     public ResponseEntity<SiteDTO> createSiteForSociete(
             @PathVariable Long societeId,
-            @Valid @RequestBody CreateSiteRequest request) {
+            @Valid @RequestBody CreateSiteForSocieteRequest request) {
         
         log.info("POST /api/admin/societes/{}/sites", societeId);
         
-        // Forcer le societeId depuis l'URL
-        request.setSocieteId(societeId);
-        
         try {
-            SiteDTO site = siteService.createSite(request);
+            SiteDTO site = siteService.createSiteForSociete(societeId, request);
             return ResponseEntity.status(HttpStatus.CREATED).body(site);
         } catch (IllegalArgumentException e) {
             log.error("Erreur création site : {}", e.getMessage());

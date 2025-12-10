@@ -71,14 +71,14 @@ import { AuthService } from '../../auth/auth.service';
       justify-content: space-between;
       max-width: 1280px;
       margin: 0 auto;
-      padding: 0 var(--spacing-xl);
+      padding: 0 var(--spacing-6);
       width: 100%;
     }
 
     .logo {
       display: flex;
       align-items: center;
-      gap: var(--spacing-sm);
+      gap: var(--spacing-2);
       font-family: 'Inter', sans-serif;
       font-size: 1.5rem;
       font-weight: 700;
@@ -100,7 +100,7 @@ import { AuthService } from '../../auth/auth.service';
     .user-menu {
       display: flex;
       align-items: center;
-      gap: var(--spacing-md);
+      gap: var(--spacing-4);
     }
 
     .user-name {
@@ -111,22 +111,22 @@ import { AuthService } from '../../auth/auth.service';
 
     .main-content {
       flex: 1;
-      padding: var(--spacing-xl) 0;
+      padding: var(--spacing-8) 0;
     }
 
     .container {
       max-width: 1280px;
       margin: 0 auto;
-      padding: 0 var(--spacing-xl);
+      padding: 0 var(--spacing-6);
     }
 
     @media (max-width: 767px) {
       .topbar-content {
-        padding: 0 var(--spacing-lg);
+        padding: 0 var(--spacing-4);
       }
 
       .container {
-        padding: 0 var(--spacing-lg);
+        padding: 0 var(--spacing-4);
       }
 
       .user-name {

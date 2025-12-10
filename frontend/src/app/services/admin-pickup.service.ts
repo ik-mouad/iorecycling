@@ -27,7 +27,7 @@ export interface Pickup {
   tonnageKg: number;
   site: string;
   documents: Document[];
-  kgValorisables?: number;
+  kgRecyclables?: number;
   kgBanals?: number;
   kgDangereux?: number;
   items?: PickupItem[];
@@ -38,7 +38,7 @@ export interface CreatePickupRequest {
   date: string;
   type: 'RECYCLABLE' | 'BANAL' | 'DANGEREUX';
   siteId?: number;
-  kgValorisables?: number;
+  kgRecyclables?: number;
   kgBanals?: number;
   kgDangereux?: number;
   items?: PickupItem[];

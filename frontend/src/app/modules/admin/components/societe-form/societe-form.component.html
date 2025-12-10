@@ -1,72 +1,82 @@
 <div class="societe-form-container">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>
-        {{ isEditMode ? 'Modifier la société' : 'Nouvelle société' }}
-      </mat-card-title>
-    </mat-card-header>
+  <!-- Header Premium -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1 class="page-title">{{ isEditMode ? 'Modifier la société' : 'Nouvelle société' }}</h1>
+        <p class="page-description">{{ isEditMode ? 'Modifiez les informations de la société' : 'Créez une nouvelle société cliente' }}</p>
+      </div>
+    </div>
+  </div>
 
-    <mat-card-content>
-      <form [formGroup]="societeForm" (ngSubmit)="onSubmit()">
-        
-        <!-- Raison Sociale -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Raison Sociale *</mat-label>
-          <input matInput formControlName="raisonSociale" placeholder="YAZAKI MOROCCO KENITRA">
-          <mat-error *ngIf="societeForm.get('raisonSociale')?.invalid">
-            {{ getErrorMessage('raisonSociale') }}
-          </mat-error>
-        </mat-form-field>
+  <!-- Form Card Premium -->
+  <div class="form-card">
+    <form [formGroup]="societeForm" (ngSubmit)="onSubmit()">
+      
+      <!-- Raison Sociale -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Raison Sociale *</mat-label>
+        <input matInput formControlName="raisonSociale" placeholder="YAZAKI MOROCCO KENITRA">
+        <mat-icon matPrefix>business</mat-icon>
+        <mat-error *ngIf="societeForm.get('raisonSociale')?.invalid">
+          {{ getErrorMessage('raisonSociale') }}
+        </mat-error>
+      </mat-form-field>
 
-        <!-- ICE -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>ICE (15 chiffres) *</mat-label>
-          <input matInput formControlName="ice" placeholder="002345678901234" maxlength="15">
-          <mat-hint *ngIf="isEditMode">L'ICE n'est pas modifiable</mat-hint>
-          <mat-error *ngIf="societeForm.get('ice')?.invalid">
-            {{ getErrorMessage('ice') }}
-          </mat-error>
-        </mat-form-field>
+      <!-- ICE -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>ICE (15 chiffres) *</mat-label>
+        <input matInput formControlName="ice" placeholder="002345678901234" maxlength="15">
+        <mat-icon matPrefix>badge</mat-icon>
+        <mat-hint *ngIf="isEditMode">L'ICE n'est pas modifiable</mat-hint>
+        <mat-error *ngIf="societeForm.get('ice')?.invalid">
+          {{ getErrorMessage('ice') }}
+        </mat-error>
+      </mat-form-field>
 
-        <!-- Email -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Email *</mat-label>
-          <input matInput type="email" formControlName="email" placeholder="contact@entreprise.ma">
-          <mat-error *ngIf="societeForm.get('email')?.invalid">
-            {{ getErrorMessage('email') }}
-          </mat-error>
-        </mat-form-field>
+      <!-- Email -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Email *</mat-label>
+        <input matInput type="email" formControlName="email" placeholder="contact@entreprise.ma">
+        <mat-icon matPrefix>email</mat-icon>
+        <mat-error *ngIf="societeForm.get('email')?.invalid">
+          {{ getErrorMessage('email') }}
+        </mat-error>
+      </mat-form-field>
 
-        <!-- Téléphone -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Téléphone</mat-label>
-          <input matInput formControlName="telephone" placeholder="0537123456">
-          <mat-error *ngIf="societeForm.get('telephone')?.invalid">
-            {{ getErrorMessage('telephone') }}
-          </mat-error>
-        </mat-form-field>
+      <!-- Téléphone -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Téléphone</mat-label>
+        <input matInput formControlName="telephone" placeholder="0537123456">
+        <mat-icon matPrefix>phone</mat-icon>
+        <mat-error *ngIf="societeForm.get('telephone')?.invalid">
+          {{ getErrorMessage('telephone') }}
+        </mat-error>
+      </mat-form-field>
 
-        <!-- Commentaire -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Commentaire</mat-label>
-          <textarea 
-            matInput 
-            formControlName="commentaire" 
-            rows="4"
-            placeholder="Type de contrat, particularités, fréquence de collecte...">
-          </textarea>
-        </mat-form-field>
+      <!-- Commentaire -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Commentaire</mat-label>
+        <textarea 
+          matInput 
+          formControlName="commentaire" 
+          rows="4"
+          placeholder="Type de contrat, particularités, fréquence de collecte...">
+        </textarea>
+        <mat-icon matPrefix>notes</mat-icon>
+      </mat-form-field>
 
-        <!-- Boutons -->
-        <div class="form-actions">
-          <button mat-button type="button" (click)="cancel()" [disabled]="loading">
-            Annuler
-          </button>
-          <button mat-raised-button color="primary" type="submit" [disabled]="societeForm.invalid || loading">
-            {{ isEditMode ? 'Enregistrer' : 'Créer' }}
-          </button>
-        </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button mat-button type="button" (click)="cancel()" [disabled]="loading" class="cancel-button">
+          Annuler
+        </button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="societeForm.invalid || loading" class="submit-button">
+          <mat-spinner *ngIf="loading" diameter="20" class="button-spinner"></mat-spinner>
+          <span *ngIf="!loading">{{ isEditMode ? 'Enregistrer' : 'Créer' }}</span>
+          <span *ngIf="loading">Enregistrement...</span>
+        </button>
+      </div>
+    </form>
+  </div>
 </div>

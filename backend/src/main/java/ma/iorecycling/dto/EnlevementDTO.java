@@ -38,10 +38,10 @@ public class EnlevementDTO {
     
     // Calculs automatiques
     private BigDecimal poidsTotal;
-    private BigDecimal budgetValorisation;
+    private BigDecimal budgetRecyclage;
     private BigDecimal budgetTraitement;
     private BigDecimal bilanNet;
-    private Double tauxValorisation;
+    private Double tauxRecyclage;
     
     // Documents
     private List<DocumentDTO> documents;

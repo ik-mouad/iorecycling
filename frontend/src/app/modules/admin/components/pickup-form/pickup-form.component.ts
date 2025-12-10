@@ -58,7 +58,7 @@ export class PickupFormComponent implements OnInit {
       date: ['', Validators.required],
       type: ['BANAL', Validators.required],
       siteId: [''],
-      kgValorisables: [0, [Validators.min(0)]],
+      kgRecyclables: [0, [Validators.min(0)]],
       kgBanals: [0, [Validators.min(0)]],
       kgDangereux: [0, [Validators.min(0)]],
       items: this.fb.array([])
@@ -72,7 +72,7 @@ export class PickupFormComponent implements OnInit {
         date: this.data.pickup.date,
         type: this.data.pickup.type,
         siteId: this.data.pickup.siteId,
-        kgValorisables: this.data.pickup.kgValorisables || 0,
+        kgRecyclables: this.data.pickup.kgRecyclables || 0,
         kgBanals: this.data.pickup.kgBanals || 0,
         kgDangereux: this.data.pickup.kgDangereux || 0
       });

@@ -8,6 +8,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { DashboardService } from '../../../../services/dashboard.service';
 import { DashboardKpis } from '../../../../models/dashboard.model';
@@ -21,8 +22,8 @@ Chart.register(...registerables);
  * - KPI 1 : Date du prochain enlèvement
  * - KPI 2 : Quantités par type de déchet
  * - KPI 3 : Nombre total d'enlèvements
- * - KPI 4 : Budget valorisation
- * - KPI 5 : Budget traitement (A ELIMINER)
+ * - KPI 4 : Budget recyclage
+ * - KPI 5 : Budget traitement (A DETRUIRE)
  */
 @Component({
   selector: 'app-client-dashboard-kpis',
@@ -37,7 +38,8 @@ Chart.register(...registerables);
     MatNativeDateModule,
     MatInputModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './client-dashboard-kpis.component.html',
   styleUrls: ['./client-dashboard-kpis.component.scss']
@@ -127,17 +129,17 @@ export class ClientDashboardKpisComponent implements OnInit {
     const config: ChartConfiguration = {
       type: 'pie',
       data: {
-        labels: ['Valorisable', 'Banal', 'A éliminer'],
+        labels: ['Recyclable', 'Banal', 'A détruire'],
         datasets: [{
           data: [
-            this.kpis.quantites.valorisable,
+            this.kpis.quantites.recyclable,
             this.kpis.quantites.banal,
-            this.kpis.quantites.aEliminer
+            this.kpis.quantites.aDetruire
           ],
           backgroundColor: [
-            '#4caf50', // Vert pour valorisable
+            '#4caf50', // Vert pour recyclable
             '#9e9e9e', // Gris pour banal
-            '#f44336'  // Rouge pour A éliminer
+            '#f44336'  // Rouge pour A détruire
           ],
           borderWidth: 2,
           borderColor: '#fff'

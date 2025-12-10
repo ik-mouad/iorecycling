@@ -28,6 +28,10 @@ public class CreatePickupItemRequest {
     @PositiveOrZero(message = "La quantité doit être positive ou zéro")
     private BigDecimal quantiteKg;
     
+    private String uniteMesure;  // kg, L, m³, unité, etc. (optionnel, par défaut "kg")
+    
+    private String etat;  // vrac, compacté, broyé, Palettisé, autre (optionnel)
+    
     @NotNull(message = "Le prix unitaire est obligatoire")
     @PositiveOrZero(message = "Le prix unitaire doit être positif ou zéro")
     private BigDecimal prixUnitaireMad;

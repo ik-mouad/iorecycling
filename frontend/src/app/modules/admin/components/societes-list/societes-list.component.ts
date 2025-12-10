@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,6 +9,10 @@ import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
 import { Router } from '@angular/router';
 import { SocieteService } from '../../../../services/societe.service';
 import { Societe } from '../../../../models/societe.model';
@@ -21,6 +26,7 @@ import { Societe } from '../../../../models/societe.model';
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     MatTableModule,
     MatButtonModule,
     MatIconModule,
@@ -28,7 +34,11 @@ import { Societe } from '../../../../models/societe.model';
     MatDialogModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatMenuModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule
   ],
   templateUrl: './societes-list.component.html',
   styleUrls: ['./societes-list.component.scss']
@@ -36,6 +46,10 @@ import { Societe } from '../../../../models/societe.model';
 export class SocietesListComponent implements OnInit {
   societes: Societe[] = [];
   displayedColumns: string[] = ['raisonSociale', 'ice', 'email', 'telephone', 'nbSites', 'nbEnlevements', 'actions'];
+  
+  // Search & Filters
+  searchQuery = '';
+  selectedStatus = '';
   
   // Pagination
   totalElements = 0;
@@ -88,5 +102,47 @@ export class SocietesListComponent implements OnInit {
 
   viewSociete(societe: Societe): void {
     this.router.navigate(['/admin/societes', societe.id]);
+  }
+
+  onSearchChange(): void {
+    // Debounce search - reload after 300ms of no typing
+    // For now, simple implementation
+    this.pageIndex = 0;
+    this.loadSocietes();
+  }
+
+  onFilterChange(): void {
+    this.pageIndex = 0;
+    this.loadSocietes();
+  }
+
+  onPageSizeChange(event: any): void {
+    this.pageSize = event.value;
+    this.pageIndex = 0;
+    this.loadSocietes();
+  }
+
+  previousPage(): void {
+    if (this.pageIndex > 0) {
+      this.pageIndex--;
+      this.loadSocietes();
+    }
+  }
+
+  nextPage(): void {
+    if (this.pageIndex < this.getTotalPages() - 1) {
+      this.pageIndex++;
+      this.loadSocietes();
+    }
+  }
+
+  getTotalPages(): number {
+    return Math.ceil(this.totalElements / this.pageSize);
+  }
+
+  getDisplayedRange(): string {
+    const start = this.pageIndex * this.pageSize + 1;
+    const end = Math.min((this.pageIndex + 1) * this.pageSize, this.totalElements);
+    return `${start} - ${end}`;
   }
 }

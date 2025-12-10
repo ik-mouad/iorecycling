@@ -1,102 +1,131 @@
 <div class="recurrences-list-container">
-  <div class="header">
-    <h1>Gestion des Récurrences</h1>
-    <button mat-raised-button color="primary" (click)="addRecurrence()">
-      <mat-icon>add</mat-icon>
-      Nouvelle récurrence
-    </button>
+  <!-- Header Premium -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1 class="page-title">Gestion des Récurrences</h1>
+        <p class="page-description">Planifiez et gérez les enlèvements récurrents</p>
+      </div>
+      <div class="header-actions">
+        <button mat-raised-button color="primary" class="primary-button" (click)="addRecurrence()">
+          <mat-icon>add</mat-icon>
+          <span>Nouvelle récurrence</span>
+        </button>
+      </div>
+    </div>
   </div>
 
-  <mat-card class="recurrences-card">
-    <mat-card-header>
-      <mat-card-title>Récurrences actives</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div *ngIf="loading" class="loading-overlay">
-        <mat-spinner></mat-spinner>
-      </div>
+  <!-- Table Card -->
+  <div class="table-card">
+    <div *ngIf="loading" class="loading-overlay">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
 
-      <table mat-table [dataSource]="recurrences" class="mat-elevation-z2" *ngIf="!loading && recurrences.length > 0">
+    <div *ngIf="!loading && recurrences.length > 0" class="table-wrapper">
+      <table mat-table [dataSource]="recurrences" class="premium-table">
         <ng-container matColumnDef="societeNom">
-          <th mat-header-cell *matHeaderCellDef>Société</th>
-          <td mat-cell *matCellDef="let recurrence">{{ recurrence.societeNom }}</td>
+          <th mat-header-cell *matHeaderCellDef class="table-header">Société</th>
+          <td mat-cell *matCellDef="let recurrence" class="table-cell">
+            <strong>{{ recurrence.societeNom }}</strong>
+          </td>
         </ng-container>
 
         <ng-container matColumnDef="siteNom">
-          <th mat-header-cell *matHeaderCellDef>Site</th>
-          <td mat-cell *matCellDef="let recurrence">
-            <small>📍 {{ recurrence.siteNom }}</small>
+          <th mat-header-cell *matHeaderCellDef class="table-header">Site</th>
+          <td mat-cell *matCellDef="let recurrence" class="table-cell">
+            <div class="site-info">
+              <mat-icon class="site-icon">location_on</mat-icon>
+              <span>{{ recurrence.siteNom }}</span>
+            </div>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="typeRecurrence">
-          <th mat-header-cell *matHeaderCellDef>Type</th>
-          <td mat-cell *matCellDef="let recurrence">
-            <mat-chip>{{ getTypeRecurrenceLabel(recurrence.typeRecurrence) }}</mat-chip>
+          <th mat-header-cell *matHeaderCellDef class="table-header">Type</th>
+          <td mat-cell *matCellDef="let recurrence" class="table-cell">
+            <span class="badge badge-type">{{ getTypeRecurrenceLabel(recurrence.typeRecurrence) }}</span>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="details">
-          <th mat-header-cell *matHeaderCellDef>Détails</th>
-          <td mat-cell *matCellDef="let recurrence">
-            <small>{{ getRecurrenceDetails(recurrence) }}</small>
-            <small *ngIf="recurrence.heurePrevue"> à {{ recurrence.heurePrevue }}</small>
+          <th mat-header-cell *matHeaderCellDef class="table-header">Détails</th>
+          <td mat-cell *matCellDef="let recurrence" class="table-cell">
+            <div class="details-info">
+              <span>{{ getRecurrenceDetails(recurrence) }}</span>
+              <span *ngIf="recurrence.heurePrevue" class="heure-info">
+                <mat-icon>schedule</mat-icon>
+                {{ recurrence.heurePrevue }}
+              </span>
+            </div>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="periode">
-          <th mat-header-cell *matHeaderCellDef>Période</th>
-          <td mat-cell *matCellDef="let recurrence">
-            <small>
-              Du {{ recurrence.dateDebut | date:'dd/MM/yyyy' }}
-              <span *ngIf="recurrence.dateFin"> au {{ recurrence.dateFin | date:'dd/MM/yyyy' }}</span>
-              <span *ngIf="!recurrence.dateFin"> (sans fin)</span>
-            </small>
+          <th mat-header-cell *matHeaderCellDef class="table-header">Période</th>
+          <td mat-cell *matCellDef="let recurrence" class="table-cell">
+            <div class="periode-info">
+              <mat-icon>calendar_today</mat-icon>
+              <span>
+                Du {{ recurrence.dateDebut | date:'dd/MM/yyyy' }}
+                <span *ngIf="recurrence.dateFin"> au {{ recurrence.dateFin | date:'dd/MM/yyyy' }}</span>
+                <span *ngIf="!recurrence.dateFin" class="sans-fin"> (sans fin)</span>
+              </span>
+            </div>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="active">
-          <th mat-header-cell *matHeaderCellDef>Statut</th>
-          <td mat-cell *matCellDef="let recurrence">
-            <mat-chip [ngClass]="recurrence.active ? 'chip-active' : 'chip-inactive'">
+          <th mat-header-cell *matHeaderCellDef class="table-header">Statut</th>
+          <td mat-cell *matCellDef="let recurrence" class="table-cell">
+            <span class="badge" [ngClass]="recurrence.active ? 'badge-success' : 'badge-danger'">
               {{ recurrence.active ? 'Active' : 'Inactive' }}
-            </mat-chip>
+            </span>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>Actions</th>
-          <td mat-cell *matCellDef="let recurrence">
+          <th mat-header-cell *matHeaderCellDef class="table-header text-right">Actions</th>
+          <td mat-cell *matCellDef="let recurrence" class="table-cell text-right">
             <button 
               mat-icon-button 
-              color="warn" 
-              (click)="desactiverRecurrence(recurrence)"
-              *ngIf="recurrence.active"
-              matTooltip="Désactiver">
-              <mat-icon>block</mat-icon>
+              [matMenuTriggerFor]="rowMenu"
+              class="action-button">
+              <mat-icon>more_horiz</mat-icon>
             </button>
-            <button 
-              mat-icon-button 
-              color="warn" 
-              (click)="supprimerRecurrence(recurrence)"
-              matTooltip="Supprimer">
-              <mat-icon>delete</mat-icon>
-            </button>
+            <mat-menu #rowMenu="matMenu">
+              <button 
+                mat-menu-item 
+                (click)="desactiverRecurrence(recurrence)"
+                *ngIf="recurrence.active"
+                class="disable-action">
+                <mat-icon>block</mat-icon>
+                <span>Désactiver</span>
+              </button>
+              <button 
+                mat-menu-item 
+                (click)="supprimerRecurrence(recurrence)"
+                class="delete-action">
+                <mat-icon>delete</mat-icon>
+                <span>Supprimer</span>
+              </button>
+            </mat-menu>
           </td>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns" class="table-header-row"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" class="table-row"></tr>
       </table>
+    </div>
 
-      <div class="empty-state" *ngIf="!loading && recurrences.length === 0">
-        <mat-icon>schedule</mat-icon>
-        <p>Aucune récurrence active</p>
-        <button mat-raised-button color="primary" (click)="addRecurrence()">
-          Créer la première récurrence
-        </button>
-      </div>
-    </mat-card-content>
-  </mat-card>
+    <!-- Empty State -->
+    <div *ngIf="!loading && recurrences.length === 0" class="empty-state">
+      <mat-icon class="empty-icon">schedule</mat-icon>
+      <h3 class="empty-title">Aucune récurrence active</h3>
+      <p class="empty-description">Créez votre première récurrence pour planifier des enlèvements automatiques</p>
+      <button mat-raised-button color="primary" class="primary-button" (click)="addRecurrence()">
+        <mat-icon>add</mat-icon>
+        <span>Créer la première récurrence</span>
+      </button>
+    </div>
+  </div>
 </div>
-

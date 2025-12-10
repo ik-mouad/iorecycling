@@ -1,79 +1,104 @@
 <div class="demande-form-container">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Demander un enlèvement</mat-card-title>
-    </mat-card-header>
+  <!-- Header Premium -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1 class="page-title">Demander un enlèvement</h1>
+        <p class="page-description">Remplissez ce formulaire pour demander un enlèvement ponctuel</p>
+      </div>
+    </div>
+  </div>
 
-    <mat-card-content>
-      <p class="info-message">
-        💡 Remplissez ce formulaire pour demander un enlèvement ponctuel.
-        Vous serez notifié dès que votre demande sera traitée.
-      </p>
+  <!-- Info Message -->
+  <div class="info-message">
+    <mat-icon class="info-icon">info</mat-icon>
+    <div class="info-text">
+      <strong>Vous serez notifié</strong> dès que votre demande sera traitée par notre équipe.
+    </div>
+  </div>
 
-      <form [formGroup]="demandeForm" (ngSubmit)="onSubmit()">
-        
-        <!-- Date souhaitée -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Date souhaitée *</mat-label>
-          <input matInput [matDatepicker]="picker" formControlName="dateSouhaitee">
-          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-datepicker #picker></mat-datepicker>
-          <mat-hint>Date à laquelle vous souhaitez l'enlèvement</mat-hint>
-        </mat-form-field>
+  <!-- Form Card Premium -->
+  <div class="form-card">
+    <form [formGroup]="demandeForm" (ngSubmit)="onSubmit()">
+      
+      <!-- Date souhaitée -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Date souhaitée *</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="dateSouhaitee">
+        <mat-icon matPrefix>event</mat-icon>
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-hint>Date à laquelle vous souhaitez l'enlèvement</mat-hint>
+        <mat-error *ngIf="demandeForm.get('dateSouhaitee')?.hasError('required')">
+          La date est obligatoire
+        </mat-error>
+      </mat-form-field>
 
-        <!-- Heure souhaitée -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Heure souhaitée (optionnel)</mat-label>
-          <input matInput formControlName="heureSouhaitee" placeholder="Ex: 09h00 - 11h00">
-          <mat-hint>Plage horaire souhaitée</mat-hint>
-        </mat-form-field>
+      <!-- Heure souhaitée -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Heure souhaitée (optionnel)</mat-label>
+        <input matInput formControlName="heureSouhaitee" placeholder="Ex: 09h00 - 11h00">
+        <mat-icon matPrefix>schedule</mat-icon>
+        <mat-hint>Plage horaire souhaitée</mat-hint>
+      </mat-form-field>
 
-        <!-- Site -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Site *</mat-label>
-          <mat-select formControlName="siteId">
-            <mat-option *ngFor="let site of sites" [value]="site.id">
-              {{ site.name }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+      <!-- Site -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Site *</mat-label>
+        <mat-select formControlName="siteId">
+          <mat-option *ngFor="let site of sites" [value]="site.id">
+            {{ site.name }}
+          </mat-option>
+        </mat-select>
+        <mat-icon matPrefix>location_on</mat-icon>
+        <mat-error *ngIf="demandeForm.get('siteId')?.hasError('required')">
+          Le site est obligatoire
+        </mat-error>
+      </mat-form-field>
 
-        <!-- Type de déchets estimé -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Type de déchets estimé</mat-label>
-          <input matInput formControlName="typeDechetEstime" placeholder="Ex: Carton et plastique">
-          <mat-hint>Type de déchets à collecter</mat-hint>
-        </mat-form-field>
+      <!-- Type de déchets estimé -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Type de déchets estimé</mat-label>
+        <input matInput formControlName="typeDechetEstime" placeholder="Ex: Carton et plastique">
+        <mat-icon matPrefix>category</mat-icon>
+        <mat-hint>Type de déchets à collecter</mat-hint>
+      </mat-form-field>
 
-        <!-- Quantité estimée -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Quantité estimée (kg)</mat-label>
-          <input matInput type="number" formControlName="quantiteEstimee" placeholder="Ex: 200">
-          <mat-hint>Estimation du poids total</mat-hint>
-        </mat-form-field>
+      <!-- Quantité estimée -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Quantité estimée (kg)</mat-label>
+        <input matInput type="number" formControlName="quantiteEstimee" placeholder="Ex: 200">
+        <mat-icon matPrefix>scale</mat-icon>
+        <mat-hint>Estimation du poids total</mat-hint>
+        <mat-error *ngIf="demandeForm.get('quantiteEstimee')?.hasError('min')">
+          La quantité doit être positive
+        </mat-error>
+      </mat-form-field>
 
-        <!-- Commentaire -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Commentaire</mat-label>
-          <textarea 
-            matInput 
-            formControlName="commentaire" 
-            rows="4"
-            placeholder="Informations complémentaires...">
-          </textarea>
-        </mat-form-field>
+      <!-- Commentaire -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Commentaire</mat-label>
+        <textarea 
+          matInput 
+          formControlName="commentaire" 
+          rows="4"
+          placeholder="Informations complémentaires...">
+        </textarea>
+        <mat-icon matPrefix>notes</mat-icon>
+      </mat-form-field>
 
-        <!-- Boutons -->
-        <div class="form-actions">
-          <button mat-button type="button" (click)="cancel()" [disabled]="loading">
-            Annuler
-          </button>
-          <button mat-raised-button color="primary" type="submit" [disabled]="demandeForm.invalid || loading">
-            {{ loading ? 'Envoi en cours...' : 'Envoyer la demande' }}
-          </button>
-        </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button mat-button type="button" (click)="cancel()" [disabled]="loading" class="cancel-button">
+          Annuler
+        </button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="demandeForm.invalid || loading" class="submit-button">
+          <mat-spinner *ngIf="loading" diameter="20" class="button-spinner"></mat-spinner>
+          <mat-icon *ngIf="!loading">send</mat-icon>
+          <span *ngIf="!loading">Envoyer la demande</span>
+          <span *ngIf="loading">Envoi en cours...</span>
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
-

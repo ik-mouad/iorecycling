@@ -7,12 +7,12 @@ export interface DashboardKpis {
   quantites: QuantitesParType;
   nombreEnlevements: number;
   moyenneParSemaine: number;
-  budgetValorisation: number;
+  budgetRecyclage: number;
   budgetTraitement: number;
-  evolutionValorisationPct?: number;
+  evolutionRecyclagePct?: number;
   evolutionTraitementPct?: number;
   bilanNet: number;
-  tauxValorisation: number;
+  tauxRecyclage: number;
   dateDebut: string;
   dateFin: string;
 }
@@ -25,14 +25,14 @@ export interface ProchainEnlevement {
 }
 
 export interface QuantitesParType {
-  valorisable: number;
+  recyclable: number;
   banal: number;
-  aEliminer: number;
+  aDetruire: number;
   total: number;
-  pourcentageValorisable: number;
+  pourcentageRecyclable: number;
   pourcentageBanal: number;
-  pourcentageAEliminer: number;
-  detailValorisable?: { [sousType: string]: number };
+  pourcentageADetruire: number;
+  detailRecyclable?: { [sousType: string]: number };
 }
 
 export interface PeriodeFilter {

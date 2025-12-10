@@ -202,7 +202,8 @@ export class SocieteDetailComponent implements OnInit {
     }
 
     const dialogRef = this.dialog.open(ClientUserFormComponent, {
-      width: '520px',
+      width: '800px',
+      maxWidth: '90vw',
       data: {
         societeId: this.societe.id
       }
@@ -223,7 +224,8 @@ export class SocieteDetailComponent implements OnInit {
     }
 
     const dialogRef = this.dialog.open(ClientUserFormComponent, {
-      width: '520px',
+      width: '800px',
+      maxWidth: '90vw',
       data: {
         societeId: this.societe.id,
         user
@@ -276,7 +278,13 @@ export class SocieteDetailComponent implements OnInit {
   }
 
   createEnlevement(): void {
-    this.router.navigate(['/admin/enlevements/new']);
+    if (this.societe) {
+      this.router.navigate(['/admin/enlevements/new'], {
+        queryParams: { societeId: this.societe.id }
+      });
+    } else {
+      this.router.navigate(['/admin/enlevements/new']);
+    }
   }
 
   backToList(): void {

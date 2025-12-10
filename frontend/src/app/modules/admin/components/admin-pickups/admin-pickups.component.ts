@@ -14,6 +14,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatMenuModule } from '@angular/material/menu';
 import { AdminPickupService, Pickup, PickupFilters } from '../../../../services/admin-pickup.service';
 import { AdminClientService, Client } from '../../../../services/admin-client.service';
 import { PickupFormComponent } from '../pickup-form/pickup-form.component';
@@ -36,7 +37,8 @@ import { PickupFormComponent } from '../pickup-form/pickup-form.component';
     MatSelectModule,
     MatChipsModule,
     MatTooltipModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatMenuModule
   ],
   providers: [
     AdminPickupService,

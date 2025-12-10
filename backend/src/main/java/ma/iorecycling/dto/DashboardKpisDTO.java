@@ -28,17 +28,17 @@ public class DashboardKpisDTO {
     private Long nombreEnlevements;
     private Double moyenneParSemaine;
     
-    // KPI 4 : Budget valorisation
-    private BigDecimal budgetValorisation;
-    private Double evolutionValorisationPct;
+    // KPI 4 : Budget recyclage
+    private BigDecimal budgetRecyclage;
+    private Double evolutionRecyclagePct;
     
-    // KPI 5 : Budget traitement (A ELIMINER)
+    // KPI 5 : Budget traitement (A DETRUIRE)
     private BigDecimal budgetTraitement;
     private Double evolutionTraitementPct;
     
     // Bilan global
     private BigDecimal bilanNet;
-    private Double tauxValorisation;
+    private Double tauxRecyclage;
     
     // Période analysée
     private LocalDate dateDebut;
@@ -60,17 +60,17 @@ public class DashboardKpisDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class QuantitesParTypeDTO {
-        private BigDecimal valorisable;
+        private BigDecimal recyclable;
         private BigDecimal banal;
-        private BigDecimal aEliminer;
+        private BigDecimal aDetruire;
         private BigDecimal total;
         
-        private Double pourcentageValorisable;
+        private Double pourcentageRecyclable;
         private Double pourcentageBanal;
-        private Double pourcentageAEliminer;
+        private Double pourcentageADetruire;
         
         // Détail par sous-type pour VALORISABLE
-        private Map<String, BigDecimal> detailValorisable;
+        private Map<String, BigDecimal> detailRecyclable;
     }
 }
 

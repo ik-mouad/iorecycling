@@ -1,89 +1,122 @@
 <div class="enlevements-list-container">
-  <div class="header">
-    <h1>Mes Enlèvements</h1>
+  <!-- Header Premium -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1 class="page-title">Mes enlèvements</h1>
+        <p class="page-description">Consultez l'historique de vos enlèvements et leurs détails</p>
+      </div>
+    </div>
   </div>
 
-  <mat-card class="enlevements-card">
-    <mat-card-content>
-      <div *ngIf="loading" class="loading-overlay">
-        <mat-spinner></mat-spinner>
-      </div>
-
-      <table mat-table [dataSource]="enlevements" class="mat-elevation-z2" *ngIf="!loading && enlevements.length > 0">
+  <!-- Table Card -->
+  <div class="table-card">
+    <div class="table-wrapper">
+      <table mat-table [dataSource]="enlevements" class="premium-table" *ngIf="!loading && enlevements.length > 0">
+        
+        <!-- Numéro -->
         <ng-container matColumnDef="numeroEnlevement">
-          <th mat-header-cell *matHeaderCellDef>Numéro</th>
-          <td mat-cell *matCellDef="let enlevement">
-            <code class="numero">{{ enlevement.numeroEnlevement }}</code>
+          <th mat-header-cell *matHeaderCellDef class="table-header">Numéro</th>
+          <td mat-cell *matCellDef="let enlevement" class="table-cell">
+            <span class="badge badge-ice">{{ enlevement.numeroEnlevement }}</span>
           </td>
         </ng-container>
 
+        <!-- Date -->
         <ng-container matColumnDef="dateEnlevement">
-          <th mat-header-cell *matHeaderCellDef>Date</th>
-          <td mat-cell *matCellDef="let enlevement">
-            {{ enlevement.dateEnlevement | date:'dd/MM/yyyy' }}
+          <th mat-header-cell *matHeaderCellDef class="table-header">Date</th>
+          <td mat-cell *matCellDef="let enlevement" class="table-cell">
+            <div class="date-text">{{ enlevement.dateEnlevement | date:'dd/MM/yyyy' }}</div>
           </td>
         </ng-container>
 
+        <!-- Site -->
         <ng-container matColumnDef="siteNom">
-          <th mat-header-cell *matHeaderCellDef>Site</th>
-          <td mat-cell *matCellDef="let enlevement">
-            <small>📍 {{ enlevement.siteNom }}</small>
+          <th mat-header-cell *matHeaderCellDef class="table-header">Site</th>
+          <td mat-cell *matCellDef="let enlevement" class="table-cell">
+            <div class="site-text">📍 {{ enlevement.siteNom }}</div>
           </td>
         </ng-container>
 
+        <!-- Poids total -->
         <ng-container matColumnDef="poidsTotal">
-          <th mat-header-cell *matHeaderCellDef>Poids total</th>
-          <td mat-cell *matCellDef="let enlevement">
-            <span class="badge">{{ enlevement.poidsTotal | number:'1.1-1' }} kg</span>
+          <th mat-header-cell *matHeaderCellDef class="table-header">Poids total</th>
+          <td mat-cell *matCellDef="let enlevement" class="table-cell">
+            <span class="badge badge-weight">{{ enlevement.poidsTotal | number:'1.1-1' }} kg</span>
           </td>
         </ng-container>
 
+        <!-- Bilan net -->
         <ng-container matColumnDef="bilanNet">
-          <th mat-header-cell *matHeaderCellDef>Bilan net</th>
-          <td mat-cell *matCellDef="let enlevement">
+          <th mat-header-cell *matHeaderCellDef class="table-header">Bilan net</th>
+          <td mat-cell *matCellDef="let enlevement" class="table-cell">
             <span class="bilan" [ngClass]="getBilanClass(enlevement.bilanNet)">
               {{ enlevement.bilanNet > 0 ? '+' : '' }}{{ enlevement.bilanNet | number:'1.2-2' }} MAD
             </span>
           </td>
         </ng-container>
 
-        <ng-container matColumnDef="tauxValorisation">
-          <th mat-header-cell *matHeaderCellDef>Taux valorisation</th>
-          <td mat-cell *matCellDef="let enlevement">
-            <mat-chip [ngClass]="getTauxClass(enlevement.tauxValorisation)">
-              {{ enlevement.tauxValorisation | number:'1.0-0' }}%
-            </mat-chip>
+        <!-- Taux recyclage -->
+        <ng-container matColumnDef="tauxRecyclage">
+          <th mat-header-cell *matHeaderCellDef class="table-header">Taux recyclage</th>
+          <td mat-cell *matCellDef="let enlevement" class="table-cell">
+            <span class="badge" [ngClass]="'badge-taux-' + getTauxClass(enlevement.tauxRecyclage)">
+              {{ enlevement.tauxRecyclage | number:'1.0-0' }}%
+            </span>
           </td>
         </ng-container>
 
+        <!-- Actions -->
         <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>Actions</th>
-          <td mat-cell *matCellDef="let enlevement">
-            <button mat-raised-button color="primary" (click)="viewEnlevement(enlevement)">
+          <th mat-header-cell *matHeaderCellDef class="table-header table-header-actions">Actions</th>
+          <td mat-cell *matCellDef="let enlevement" class="table-cell table-cell-actions">
+            <button mat-raised-button color="primary" class="action-button action-view" (click)="viewEnlevement(enlevement)">
               <mat-icon>visibility</mat-icon>
-              Voir détails
+              <span>Voir détails</span>
             </button>
           </td>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns" class="table-header-row"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" class="table-row"></tr>
       </table>
+    </div>
 
-      <div class="empty-state" *ngIf="!loading && enlevements.length === 0">
-        <mat-icon>inventory_2</mat-icon>
-        <p>Aucun enlèvement enregistré</p>
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!loading && enlevements.length === 0">
+      <mat-icon class="empty-icon">inventory_2</mat-icon>
+      <h3 class="empty-title">Aucun enlèvement enregistré</h3>
+      <p class="empty-description">Vos enlèvements apparaîtront ici après validation</p>
+    </div>
+
+    <!-- Pagination Premium -->
+    <div class="pagination-wrapper" *ngIf="!loading && totalElements > 0">
+      <div class="pagination-left">
+        <mat-form-field appearance="outline" class="page-size-field">
+          <mat-label>Par page</mat-label>
+          <mat-select [value]="pageSize" (selectionChange)="onPageSizeChange($event)">
+            <mat-option [value]="10">10</mat-option>
+            <mat-option [value]="20">20</mat-option>
+            <mat-option [value]="50">50</mat-option>
+          </mat-select>
+        </mat-form-field>
       </div>
+      <div class="pagination-right">
+        <span class="pagination-info">
+          {{ getDisplayedRange() }} de {{ totalElements }}
+        </span>
+        <button mat-icon-button [disabled]="pageIndex === 0" (click)="previousPage()" class="pagination-button">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <button mat-icon-button [disabled]="pageIndex >= getTotalPages() - 1" (click)="nextPage()" class="pagination-button">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
 
-      <mat-paginator
-        *ngIf="!loading && totalElements > 0"
-        [length]="totalElements"
-        [pageSize]="pageSize"
-        [pageIndex]="pageIndex"
-        [pageSizeOptions]="[10, 20, 50]"
-        (page)="onPageChange($event)">
-      </mat-paginator>
-    </mat-card-content>
-  </mat-card>
+  <!-- Loading Overlay -->
+  <div *ngIf="loading" class="loading-overlay">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
 </div>
-

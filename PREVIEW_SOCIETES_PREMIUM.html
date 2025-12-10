@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sociétés - IORecycling Premium</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    body {
+      background: #f9fafb;
+      margin: 0;
+      padding: 0;
+    }
+
+    .material-icons {
+      font-family: 'Material Icons';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      display: inline-block;
+      line-height: 1;
+      text-transform: none;
+      letter-spacing: normal;
+      word-wrap: normal;
+      white-space: nowrap;
+      direction: ltr;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.3s ease-out;
+    }
+  </style>
+</head>
+<body>
+  <div class="max-w-[1600px] mx-auto px-8 py-8 fade-in">
+    
+    <!-- Header Premium -->
+    <div class="mb-12">
+      <div class="flex justify-between items-start gap-6">
+        <div class="flex-1">
+          <h1 class="text-[32px] font-bold text-[#0a0a0a] leading-tight mb-2 tracking-tight">
+            Sociétés
+          </h1>
+          <p class="text-[15px] text-[#6b7280] leading-relaxed">
+            Gérez toutes vos organisations partenaires
+          </p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="h-11 px-5 rounded-lg font-medium text-sm flex items-center gap-2 bg-[#2563eb] text-white shadow-sm hover:bg-[#1d4ed8] hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+            <span class="material-icons text-[20px]">add</span>
+            <span>Nouvelle société</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search & Filters Card -->
+    <div class="bg-white rounded-xl border border-[#e5e7eb] shadow-sm mb-6 p-5">
+      <div class="flex gap-3 items-center">
+        <div class="flex-1 relative">
+          <span class="material-icons absolute left-[14px] top-1/2 -translate-y-1/2 text-[#9ca3af] text-[20px] pointer-events-none">search</span>
+          <input 
+            type="text" 
+            placeholder="Rechercher par nom, email ou numéro..."
+            class="w-full h-11 pl-[44px] pr-4 border border-[#e5e7eb] rounded-lg text-sm text-[#0a0a0a] focus:outline-none focus:border-[#3b82f6] focus:ring-2 focus:ring-[#3b82f6]/10 transition-all"
+          >
+        </div>
+        <select class="w-[200px] h-11 px-3 border border-[#e5e7eb] rounded-lg text-sm text-[#374151] bg-white focus:outline-none focus:border-[#3b82f6] focus:ring-2 focus:ring-[#3b82f6]/10">
+          <option>Tous les statuts</option>
+          <option>Actives</option>
+          <option>Inactives</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="bg-white rounded-xl border border-[#e5e7eb] shadow-sm overflow-hidden">
+      
+      <!-- Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse">
+          <!-- Header -->
+          <thead>
+            <tr class="bg-[#f9fafb]">
+              <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-[#4b5563] border-b border-[#e5e7eb] whitespace-nowrap">
+                Raison Sociale
+              </th>
+              <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-[#4b5563] border-b border-[#e5e7eb] whitespace-nowrap">
+                ICE
+              </th>
+              <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-[#4b5563] border-b border-[#e5e7eb] whitespace-nowrap">
+                Email
+              </th>
+              <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-[#4b5563] border-b border-[#e5e7eb] whitespace-nowrap">
+                Téléphone
+              </th>
+              <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-[#4b5563] border-b border-[#e5e7eb] whitespace-nowrap">
+                Sites
+              </th>
+              <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-[#4b5563] border-b border-[#e5e7eb] whitespace-nowrap">
+                Enlèvements
+              </th>
+              <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-[#4b5563] border-b border-[#e5e7eb] w-20">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          
+          <!-- Body -->
+          <tbody>
+            <!-- Row 1 -->
+            <tr class="border-b border-[#f3f4f6] hover:bg-[#f9fafb] transition-colors duration-150">
+              <td class="px-6 py-5">
+                <div class="text-[15px] font-semibold text-[#0a0a0a] leading-snug">
+                  CHU HASSAN II FES
+                </div>
+              </td>
+              <td class="px-6 py-5">
+                <span class="inline-flex items-center px-3 py-1 rounded-md text-[13px] font-semibold bg-[#f0f9ff] text-[#0369a1] font-mono">
+                  00234567890123
+                </span>
+              </td>
+              <td class="px-6 py-5">
+                <div class="text-sm text-[#6b7280] leading-relaxed">
+                  dechets@chu-fes.ma
+                </div>
+              </td>
+              <td class="px-6 py-5">
+                <div class="text-sm text-[#6b7280] leading-relaxed">
+                  0535123456
+                </div>
+              </td>
+              <td class="px-6 py-5">
+                <span class="inline-flex items-center px-3 py-1 rounded-md text-[13px] font-medium bg-[#f3f4f6] text-[#374151]">
+                  1
+                </span>
+              </td>
+              <td class="px-6 py-5">
+                <span class="inline-flex items-center px-3 py-1 rounded-md text-[13px] font-medium bg-[#fef3c7] text-[#92400e]">
+                  3
+                </span>
+              </td>
+              <td class="px-6 py-5 text-right">
+                <button class="w-9 h-9 rounded-md text-[#6b7280] hover:bg-[#f3f4f6] hover:text-[#374151] transition-all duration-150 flex items-center justify-center">
+                  <span class="material-icons text-[20px]">more_vert</span>
+                </button>
+              </td>
+            </tr>
+            
+            <!-- Row 2 -->
+            <tr class="border-b border-[#f3f4f6] hover:bg-[#f9fafb] transition-colors duration-150">
+              <td class="px-6 py-5">
+                <div class="text-[15px] font-semibold text-[#0a0a0a] leading-snug">
+                  MARJANE TANGER
+                </div>
+              </td>
+              <td class="px-6 py-5">
+                <span class="inline-flex items-center px-3 py-1 rounded-md text-[13px] font-semibold bg-[#f0f9ff] text-[#0369a1] font-mono">
+                  00234567890235
+                </span>
+              </td>
+              <td class="px-6 py-5">
+                <div class="text-sm text-[#6b7280] leading-relaxed">
+                  environnement@marjane.ma
+                </div>
+              </td>
+              <td class="px-6 py-5">
+                <div class="text-sm text-[#6b7280] leading-relaxed">
+                  0539123456
+                </div>
+              </td>
+              <td class="px-6 py-5">
+                <span class="inline-flex items-center px-3 py-1 rounded-md text-[13px] font-medium bg-[#f3f4f6] text-[#374151]">
+                  1
+                </span>
+              </td>
+              <td class="px-6 py-5">
+                <span class="inline-flex items-center px-3 py-1 rounded-md text-[13px] font-medium bg-[#fef3c7] text-[#92400e]">
+                  1
+                </span>
+              </td>
+              <td class="px-6 py-5 text-right">
+                <button class="w-9 h-9 rounded-md text-[#6b7280] hover:bg-[#f3f4f6] hover:text-[#374151] transition-all duration-150 flex items-center justify-center">
+                  <span class="material-icons text-[20px]">more_vert</span>
+                </button>
+              </td>
+            </tr>
+            
+            <!-- Row 3 -->
+            <tr class="border-b border-[#f3f4f6] hover:bg-[#f9fafb] transition-colors duration-150">
+              <td class="px-6 py-5">
+                <div class="text-[15px] font-semibold text-[#0a0a0a] leading-snug">
+                  YAZAKI MOROCCO KENITRA
+                </div>
+              </td>
+              <td class="px-6 py-5">
+                <span class="inline-flex items-center px-3 py-1 rounded-md text-[13px] font-semibold bg-[#f0f9ff] text-[#0369a1] font-mono">
+                  00234567890234
+                </span>
+              </td>
+              <td class="px-6 py-5">
+                <div class="text-sm text-[#6b7280] leading-relaxed">
+                  contact@yazaki.ma
+                </div>
+              </td>
+              <td class="px-6 py-5">
+                <div class="text-sm text-[#6b7280] leading-relaxed">
+                  0537123456
+                </div>
+              </td>
+              <td class="px-6 py-5">
+                <span class="inline-flex items-center px-3 py-1 rounded-md text-[13px] font-medium bg-[#f3f4f6] text-[#374151]">
+                  2
+                </span>
+              </td>
+              <td class="px-6 py-5">
+                <span class="inline-flex items-center px-3 py-1 rounded-md text-[13px] font-medium bg-[#fef3c7] text-[#92400e]">
+                  3
+                </span>
+              </td>
+              <td class="px-6 py-5 text-right">
+                <button class="w-9 h-9 rounded-md text-[#6b7280] hover:bg-[#f3f4f6] hover:text-[#374151] transition-all duration-150 flex items-center justify-center">
+                  <span class="material-icons text-[20px]">more_vert</span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Premium -->
+      <div class="flex justify-between items-center px-6 py-5 border-t border-[#f3f4f6] bg-[#f9fafb]">
+        <div class="flex items-center">
+          <select class="w-[120px] h-9 px-3 border border-[#e5e7eb] rounded-md text-sm text-[#374151] bg-white focus:outline-none focus:border-[#3b82f6] focus:ring-2 focus:ring-[#3b82f6]/10">
+            <option>20</option>
+            <option>10</option>
+            <option>50</option>
+          </select>
+          <span class="ml-2 text-xs text-[#6b7280]">par page</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-[#4b5563] font-medium mr-2">
+            1 - 3 de 3
+          </span>
+          <button class="w-9 h-9 rounded-md text-[#9ca3af] cursor-not-allowed flex items-center justify-center" disabled>
+            <span class="material-icons text-[20px]">chevron_left</span>
+          </button>
+          <button class="w-9 h-9 rounded-md text-[#9ca3af] cursor-not-allowed flex items-center justify-center" disabled>
+            <span class="material-icons text-[20px]">chevron_right</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
+

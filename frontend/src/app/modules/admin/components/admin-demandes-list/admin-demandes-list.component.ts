@@ -106,12 +106,12 @@ export class AdminDemandesListComponent implements OnInit {
 
   getStatutClass(statut: string): string {
     const classes: { [key: string]: string } = {
-      'EN_ATTENTE': 'statut-en-attente',
-      'VALIDEE': 'statut-validee',
-      'PLANIFIEE': 'statut-planifiee',
-      'REALISEE': 'statut-realisee',
-      'REFUSEE': 'statut-refusee',
-      'ANNULEE': 'statut-annulee'
+      'EN_ATTENTE': 'en-attente',
+      'VALIDEE': 'validee',
+      'PLANIFIEE': 'planifiee',
+      'REALISEE': 'realisee',
+      'REFUSEE': 'refusee',
+      'ANNULEE': 'annulee'
     };
     return classes[statut] || '';
   }

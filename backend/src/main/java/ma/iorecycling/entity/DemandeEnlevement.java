@@ -109,13 +109,6 @@ public class DemandeEnlevement {
         }
     }
     
-    @PrePersist
-    public void generateNumeroDemande() {
-        if (numeroDemande == null) {
-            // Format: DEM-YYYY-NNNNNN
-            numeroDemande = "DEM-" + java.time.Year.now().getValue() + "-" + 
-                String.format("%06d", id != null ? id : 0);
-        }
-    }
+    // Le numéro sera généré dans le service après l'insertion
 }
 

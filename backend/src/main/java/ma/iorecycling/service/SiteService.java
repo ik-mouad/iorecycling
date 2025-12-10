@@ -3,6 +3,7 @@ package ma.iorecycling.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ma.iorecycling.dto.CreateSiteRequest;
+import ma.iorecycling.dto.CreateSiteForSocieteRequest;
 import ma.iorecycling.dto.SiteDTO;
 import ma.iorecycling.entity.Site;
 import ma.iorecycling.entity.Societe;
@@ -35,6 +36,28 @@ public class SiteService {
         // Vérifier que la société existe
         Societe societe = societeRepository.findById(request.getSocieteId())
                 .orElseThrow(() -> new IllegalArgumentException("Société non trouvée"));
+        
+        Site site = Site.builder()
+                .societe(societe)
+                .name(request.getName())
+                .adresse(request.getAdresse())
+                .build();
+        
+        Site savedSite = siteRepository.save(site);
+        
+        log.info("Site créé avec succès : ID {}", savedSite.getId());
+        return toDTO(savedSite);
+    }
+    
+    /**
+     * Crée un nouveau site pour une société (avec societeId depuis l'URL)
+     */
+    public SiteDTO createSiteForSociete(Long societeId, CreateSiteForSocieteRequest request) {
+        log.info("Création d'un nouveau site '{}' pour société {}", request.getName(), societeId);
+        
+        // Vérifier que la société existe
+        Societe societe = societeRepository.findById(societeId)
+                .orElseThrow(() -> new IllegalArgumentException("Société non trouvée avec l'ID : " + societeId));
         
         Site site = Site.builder()
                 .societe(societe)

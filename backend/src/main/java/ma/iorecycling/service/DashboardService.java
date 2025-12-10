@@ -54,8 +54,8 @@ public class DashboardService {
         double nombreSemaines = nombreJours / 7.0;
         double moyenneParSemaine = nombreSemaines > 0 ? nombreEnlevements / nombreSemaines : 0;
         
-        // KPI 4 : Budget valorisation
-        BigDecimal budgetValorisation = pickupItemRepository.calculateBudgetValorisation(
+        // KPI 4 : Budget recyclage
+        BigDecimal budgetRecyclage = pickupItemRepository.calculateBudgetRecyclage(
                 societeId, dateDebut, dateFin);
         
         // KPI 5 : Budget traitement (A ELIMINER = BANAL + A_ELIMINER)
@@ -63,12 +63,12 @@ public class DashboardService {
                 societeId, dateDebut, dateFin);
         
         // Bilan net
-        BigDecimal bilanNet = budgetValorisation.subtract(budgetTraitement);
+        BigDecimal bilanNet = budgetRecyclage.subtract(budgetTraitement);
         
-        // Taux de valorisation
+        // Taux de recyclage
         BigDecimal poidsTotal = quantites.getTotal();
-        Double tauxValorisation = poidsTotal.compareTo(BigDecimal.ZERO) > 0
-                ? quantites.getValorisable().divide(poidsTotal, 4, RoundingMode.HALF_UP)
+        Double tauxRecyclage = poidsTotal.compareTo(BigDecimal.ZERO) > 0
+                ? quantites.getRecyclable().divide(poidsTotal, 4, RoundingMode.HALF_UP)
                     .multiply(BigDecimal.valueOf(100)).doubleValue()
                 : 0.0;
         
@@ -77,10 +77,10 @@ public class DashboardService {
                 .quantites(quantites)
                 .nombreEnlevements(nombreEnlevements)
                 .moyenneParSemaine(Math.round(moyenneParSemaine * 10) / 10.0)
-                .budgetValorisation(budgetValorisation)
+                .budgetRecyclage(budgetRecyclage)
                 .budgetTraitement(budgetTraitement)
                 .bilanNet(bilanNet)
-                .tauxValorisation(Math.round(tauxValorisation * 10) / 10.0)
+                .tauxRecyclage(Math.round(tauxRecyclage * 10) / 10.0)
                 .dateDebut(dateDebut)
                 .dateFin(dateFin)
                 .build();
@@ -111,56 +111,56 @@ public class DashboardService {
         List<Object[]> results = pickupItemRepository.sumQuantiteByTypeForSocieteAndPeriod(
                 societeId, dateDebut, dateFin);
         
-        BigDecimal valorisable = BigDecimal.ZERO;
+        BigDecimal recyclable = BigDecimal.ZERO;
         BigDecimal banal = BigDecimal.ZERO;
-        BigDecimal aEliminer = BigDecimal.ZERO;
+        BigDecimal aDetruire = BigDecimal.ZERO;
         
         for (Object[] result : results) {
             TypeDechet type = (TypeDechet) result[0];
             BigDecimal quantite = (BigDecimal) result[1];
             
             switch (type) {
-                case VALORISABLE -> valorisable = quantite;
+                case VALORISABLE -> recyclable = quantite;
                 case BANAL -> banal = quantite;
-                case A_ELIMINER -> aEliminer = quantite;
+                case A_ELIMINER -> aDetruire = quantite;
             }
         }
         
-        BigDecimal total = valorisable.add(banal).add(aEliminer);
+        BigDecimal total = recyclable.add(banal).add(aDetruire);
         
         // Calcul des pourcentages
-        Double pctValorisable = total.compareTo(BigDecimal.ZERO) > 0
-                ? valorisable.divide(total, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).doubleValue()
+        Double pctRecyclable = total.compareTo(BigDecimal.ZERO) > 0
+                ? recyclable.divide(total, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).doubleValue()
                 : 0.0;
         
         Double pctBanal = total.compareTo(BigDecimal.ZERO) > 0
                 ? banal.divide(total, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).doubleValue()
                 : 0.0;
         
-        Double pctAEliminer = total.compareTo(BigDecimal.ZERO) > 0
-                ? aEliminer.divide(total, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).doubleValue()
+        Double pctADetruire = total.compareTo(BigDecimal.ZERO) > 0
+                ? aDetruire.divide(total, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).doubleValue()
                 : 0.0;
         
         // Détail par sous-type pour VALORISABLE
-        Map<String, BigDecimal> detailValorisable = new HashMap<>();
-        List<Object[]> detailResults = pickupItemRepository.getDetailValorisableBySousType(
+        Map<String, BigDecimal> detailRecyclable = new HashMap<>();
+        List<Object[]> detailResults = pickupItemRepository.getDetailRecyclableBySousType(
                 societeId, dateDebut, dateFin);
         
         for (Object[] result : detailResults) {
             String sousType = (String) result[0];
             BigDecimal quantite = (BigDecimal) result[1];
-            detailValorisable.put(sousType, quantite);
+            detailRecyclable.put(sousType, quantite);
         }
         
         return QuantitesParTypeDTO.builder()
-                .valorisable(valorisable)
+                .recyclable(recyclable)
                 .banal(banal)
-                .aEliminer(aEliminer)
+                .aDetruire(aDetruire)
                 .total(total)
-                .pourcentageValorisable(Math.round(pctValorisable * 10) / 10.0)
+                .pourcentageRecyclable(Math.round(pctRecyclable * 10) / 10.0)
                 .pourcentageBanal(Math.round(pctBanal * 10) / 10.0)
-                .pourcentageAEliminer(Math.round(pctAEliminer * 10) / 10.0)
-                .detailValorisable(detailValorisable)
+                .pourcentageADetruire(Math.round(pctADetruire * 10) / 10.0)
+                .detailRecyclable(detailRecyclable)
                 .build();
     }
 }

@@ -64,6 +64,13 @@ public class DemandeEnlevementService {
         
         DemandeEnlevement savedDemande = demandeRepository.save(demande);
         
+        // Générer le numéro de demande après l'insertion pour avoir l'ID
+        if (savedDemande.getNumeroDemande() == null) {
+            String numeroDemande = generateNumeroDemande(savedDemande.getId());
+            savedDemande.setNumeroDemande(numeroDemande);
+            savedDemande = demandeRepository.save(savedDemande);
+        }
+        
         log.info("Demande créée avec succès : {}", savedDemande.getNumeroDemande());
         return toDTO(savedDemande);
     }
@@ -171,6 +178,17 @@ public class DemandeEnlevementService {
         DemandeEnlevement savedDemande = demandeRepository.save(demande);
         
         return toDTO(savedDemande);
+    }
+    
+    /**
+     * Génère un numéro de demande unique au format DEM-YYYY-NNNNNN
+     */
+    private String generateNumeroDemande(Long demandeId) {
+        int currentYear = java.time.Year.now().getValue();
+        
+        // Utiliser directement l'ID de la demande pour garantir l'unicité
+        // L'ID est unique et séquentiel
+        return "DEM-" + currentYear + "-" + String.format("%06d", demandeId);
     }
     
     private DemandeEnlevementDTO toDTO(DemandeEnlevement demande) {

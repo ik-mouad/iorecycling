@@ -51,7 +51,7 @@ export class ClientDashboardComponent implements OnInit {
 
   // KPIs
   pickupsCount = 0;
-  valorisablesTonnage = 0;
+  recyclablesTonnage = 0;
   banalsTonnage = 0;
   dangereuxTonnage = 0;
   totalRevenue = 0;
@@ -131,7 +131,7 @@ export class ClientDashboardComponent implements OnInit {
     // Simulation de données - à remplacer par des appels API réels
     setTimeout(() => {
       this.pickupsCount = 42;
-      this.valorisablesTonnage = 15.5;
+        this.recyclablesTonnage = 15.5;
       this.banalsTonnage = 8.2;
       this.dangereuxTonnage = 2.1;
       this.totalRevenue = 12500;
@@ -197,7 +197,7 @@ export class ClientDashboardComponent implements OnInit {
   }
 
   /**
-   * Charge le rapport des valorisables
+   * Charge le rapport des recyclables
    */
   loadValuablesReport(): void {
     this.dashboardService.getValuablesReport().subscribe({
@@ -205,7 +205,7 @@ export class ClientDashboardComponent implements OnInit {
         this.valorizationReport = report;
       },
       error: (error) => {
-        console.error('Erreur lors du chargement du rapport valorisables:', error);
+        console.error('Erreur lors du chargement du rapport recyclables:', error);
       }
     });
   }
@@ -288,7 +288,7 @@ export class ClientDashboardComponent implements OnInit {
     this.selectedFilter = filter;
     this.loadPickups();
     
-    // Afficher les détails valorisables si filtre "recyclables"
+    // Afficher les détails recyclables si filtre "recyclables"
     this.showValorizationDetails = filter === 'recyclables';
   }
 

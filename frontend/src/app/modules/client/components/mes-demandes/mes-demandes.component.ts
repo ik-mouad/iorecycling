@@ -9,6 +9,10 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
 import { DemandeService } from '../../../../services/demande.service';
 import { DemandeEnlevement, STATUT_LABELS } from '../../../../models/demande.model';
 
@@ -27,7 +31,11 @@ import { DemandeEnlevement, STATUT_LABELS } from '../../../../models/demande.mod
     MatPaginatorModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule,
+    MatMenuModule
   ],
   templateUrl: './mes-demandes.component.html',
   styleUrls: ['./mes-demandes.component.scss']
@@ -98,18 +106,48 @@ export class MesDemandesComponent implements OnInit {
 
   getStatutClass(statut: string): string {
     const classes: any = {
-      'EN_ATTENTE': 'statut-attente',
-      'VALIDEE': 'statut-validee',
-      'PLANIFIEE': 'statut-planifiee',
-      'REALISEE': 'statut-realisee',
-      'REFUSEE': 'statut-refusee',
-      'ANNULEE': 'statut-annulee'
+      'EN_ATTENTE': 'attente',
+      'VALIDEE': 'validee',
+      'PLANIFIEE': 'planifiee',
+      'REALISEE': 'realisee',
+      'REFUSEE': 'refusee',
+      'ANNULEE': 'annulee'
     };
     return classes[statut] || '';
   }
 
   canAnnuler(demande: DemandeEnlevement): boolean {
     return demande.statut === 'EN_ATTENTE' || demande.statut === 'VALIDEE';
+  }
+
+  onPageSizeChange(event: any): void {
+    this.pageSize = event.value;
+    this.pageIndex = 0;
+    this.loadDemandes();
+  }
+
+  previousPage(): void {
+    if (this.pageIndex > 0) {
+      this.pageIndex--;
+      this.loadDemandes();
+    }
+  }
+
+  nextPage(): void {
+    if (this.pageIndex < this.getTotalPages() - 1) {
+      this.pageIndex++;
+      this.loadDemandes();
+    }
+  }
+
+  getTotalPages(): number {
+    return Math.ceil(this.totalElements / this.pageSize);
+  }
+
+  getDisplayedRange(): string {
+    const start = this.pageIndex * this.pageSize + 1;
+    const end = Math.min((this.pageIndex + 1) * this.pageSize, this.totalElements);
+    return `${start} - ${end}`;
   }
 }
 

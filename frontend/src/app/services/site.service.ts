@@ -44,7 +44,11 @@ export class SiteService {
    * Crée un nouveau site pour une société
    */
   createSite(societeId: number, site: Partial<Site>): Observable<Site> {
-    return this.http.post<Site>(`${this.adminApiUrl}/societes/${societeId}/sites`, site);
+    const requestBody = {
+      name: site.name,
+      adresse: site.adresse
+    };
+    return this.http.post<Site>(`${this.adminApiUrl}/societes/${societeId}/sites`, requestBody);
   }
 
   /**

@@ -38,7 +38,7 @@ export class ClientEnlevementDetailComponent implements OnInit {
   documents: DocumentInfo[] = [];
   loading = false;
   loadingDocuments = false;
-  displayedColumns = ['typeDechet', 'sousType', 'quantiteKg', 'prixUnitaireMad', 'montant'];
+  displayedColumns = ['typeDechet', 'sousType', 'quantiteKg', 'etat', 'prixUnitaireMad', 'montant'];
 
   constructor(
     private route: ActivatedRoute,
@@ -101,17 +101,17 @@ export class ClientEnlevementDetailComponent implements OnInit {
   }
 
   getTauxClass(taux: number): string {
-    if (taux >= 85) return 'taux-excellent';
-    if (taux >= 70) return 'taux-tres-bon';
-    if (taux >= 50) return 'taux-bon';
-    if (taux >= 30) return 'taux-correct';
-    return 'taux-insuffisant';
+    if (taux >= 85) return 'excellent';
+    if (taux >= 70) return 'tres-bon';
+    if (taux >= 50) return 'bon';
+    if (taux >= 30) return 'correct';
+    return 'insuffisant';
   }
 
   getTypeDechetLabel(type: string): string {
     const labels: { [key: string]: string } = {
-      'VALORISABLE': 'Valorisable',
-      'A_ELIMINER': 'À éliminer',
+      'RECYCLABLE': 'Recyclable',
+      'A_DETRUIRE': 'À détruire',
       'BANAL': 'Banal'
     };
     return labels[type] || type;

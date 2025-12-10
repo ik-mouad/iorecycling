@@ -82,6 +82,7 @@ public class Document {
         // Documents d'enlèvement (enlevementId NOT NULL, periodeMois NULL)
         BSDI("Bordereau de Suivi des Déchets Industriels"),
         PV_DESTRUCTION("Procès-verbal de destruction"),
+        AUTRE("Autre"),
         
         // Documents mensuels (enlevementId NULL, periodeMois NOT NULL)
         ATTESTATION_VALORISATION("Attestation mensuelle de valorisation"),
@@ -99,7 +100,7 @@ public class Document {
         }
         
         public boolean isDocumentEnlevement() {
-            return this == BSDI || this == PV_DESTRUCTION;
+            return this == BSDI || this == PV_DESTRUCTION || this == AUTRE;
         }
         
         public boolean isDocumentMensuel() {

@@ -9,6 +9,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router } from '@angular/router';
 import { DemandeService } from '../../../../services/demande.service';
 import { SiteService } from '../../../../services/site.service';
@@ -32,7 +34,9 @@ import { Site } from '../../../../models/societe.model';
     MatCardModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatIconModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './demande-form.component.html',
   styleUrls: ['./demande-form.component.scss']

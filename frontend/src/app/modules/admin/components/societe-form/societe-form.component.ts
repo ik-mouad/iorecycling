@@ -6,6 +6,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SocieteService } from '../../../../services/societe.service';
 import { CreateSocieteRequest, UpdateSocieteRequest } from '../../../../models/societe.model';
@@ -23,7 +25,9 @@ import { CreateSocieteRequest, UpdateSocieteRequest } from '../../../../models/s
     MatInputModule,
     MatButtonModule,
     MatCardModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatIconModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './societe-form.component.html',
   styleUrls: ['./societe-form.component.scss']

@@ -12,6 +12,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatMenuModule } from '@angular/material/menu';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { EnlevementService } from '../../../../services/enlevement.service';
@@ -39,14 +40,15 @@ import { Societe } from '../../../../models/societe.model';
     MatChipsModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatMenuModule
   ],
   templateUrl: './enlevements-list.component.html',
   styleUrls: ['./enlevements-list.component.scss']
 })
 export class EnlevementsListComponent implements OnInit {
   enlevements: Enlevement[] = [];
-  displayedColumns: string[] = ['numeroEnlevement', 'dateEnlevement', 'societeNom', 'siteNom', 'poidsTotal', 'budgetValorisation', 'budgetTraitement', 'bilanNet', 'tauxValorisation', 'actions'];
+  displayedColumns: string[] = ['numeroEnlevement', 'dateEnlevement', 'societeNom', 'siteNom', 'poidsTotal', 'budgetRecyclage', 'budgetTraitement', 'bilanNet', 'tauxRecyclage', 'actions'];
   
   // Pagination
   totalElements = 0;
@@ -139,11 +141,41 @@ export class EnlevementsListComponent implements OnInit {
   }
 
   getTauxClass(taux: number): string {
-    if (taux >= 85) return 'taux-excellent';
-    if (taux >= 70) return 'taux-tres-bon';
-    if (taux >= 50) return 'taux-bon';
-    if (taux >= 30) return 'taux-correct';
-    return 'taux-insuffisant';
+    if (taux >= 85) return 'excellent';
+    if (taux >= 70) return 'tres-bon';
+    if (taux >= 50) return 'bon';
+    if (taux >= 30) return 'correct';
+    return 'insuffisant';
+  }
+
+  onPageSizeChange(event: any): void {
+    this.pageSize = event.value;
+    this.pageIndex = 0;
+    this.loadEnlevements();
+  }
+
+  previousPage(): void {
+    if (this.pageIndex > 0) {
+      this.pageIndex--;
+      this.loadEnlevements();
+    }
+  }
+
+  nextPage(): void {
+    if (this.pageIndex < this.getTotalPages() - 1) {
+      this.pageIndex++;
+      this.loadEnlevements();
+    }
+  }
+
+  getTotalPages(): number {
+    return Math.ceil(this.totalElements / this.pageSize);
+  }
+
+  getDisplayedRange(): string {
+    const start = this.pageIndex * this.pageSize + 1;
+    const end = Math.min((this.pageIndex + 1) * this.pageSize, this.totalElements);
+    return `${start} - ${end}`;
   }
 }
 

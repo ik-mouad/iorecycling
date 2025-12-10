@@ -9,6 +9,9 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
 import { EnlevementService } from '../../../../services/enlevement.service';
 import { Enlevement } from '../../../../models/enlevement.model';
 
@@ -27,14 +30,17 @@ import { Enlevement } from '../../../../models/enlevement.model';
     MatPaginatorModule,
     MatChipsModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule
   ],
   templateUrl: './enlevements-list.component.html',
   styleUrls: ['./enlevements-list.component.scss']
 })
 export class ClientEnlevementsListComponent implements OnInit {
   enlevements: Enlevement[] = [];
-  displayedColumns: string[] = ['numeroEnlevement', 'dateEnlevement', 'siteNom', 'poidsTotal', 'bilanNet', 'tauxValorisation', 'actions'];
+  displayedColumns: string[] = ['numeroEnlevement', 'dateEnlevement', 'siteNom', 'poidsTotal', 'bilanNet', 'tauxRecyclage', 'actions'];
   
   totalElements = 0;
   pageSize = 20;
@@ -82,11 +88,41 @@ export class ClientEnlevementsListComponent implements OnInit {
   }
 
   getTauxClass(taux: number): string {
-    if (taux >= 85) return 'taux-excellent';
-    if (taux >= 70) return 'taux-tres-bon';
-    if (taux >= 50) return 'taux-bon';
-    if (taux >= 30) return 'taux-correct';
-    return 'taux-insuffisant';
+    if (taux >= 85) return 'excellent';
+    if (taux >= 70) return 'tres-bon';
+    if (taux >= 50) return 'bon';
+    if (taux >= 30) return 'correct';
+    return 'insuffisant';
+  }
+
+  onPageSizeChange(event: any): void {
+    this.pageSize = event.value;
+    this.pageIndex = 0;
+    this.loadEnlevements();
+  }
+
+  previousPage(): void {
+    if (this.pageIndex > 0) {
+      this.pageIndex--;
+      this.loadEnlevements();
+    }
+  }
+
+  nextPage(): void {
+    if (this.pageIndex < this.getTotalPages() - 1) {
+      this.pageIndex++;
+      this.loadEnlevements();
+    }
+  }
+
+  getTotalPages(): number {
+    return Math.ceil(this.totalElements / this.pageSize);
+  }
+
+  getDisplayedRange(): string {
+    const start = this.pageIndex * this.pageSize + 1;
+    const end = Math.min((this.pageIndex + 1) * this.pageSize, this.totalElements);
+    return `${start} - ${end}`;
   }
 }
 
