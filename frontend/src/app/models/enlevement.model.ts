@@ -6,6 +6,9 @@ export interface Enlevement {
   id: number;
   numeroEnlevement: string;
   dateEnlevement: string; // Format ISO: "2024-11-28"
+  heureEnlevement?: string; // Format ISO: "HH:mm:ss"
+  dateDestination?: string; // Format ISO: "2024-11-28"
+  heureDestination?: string; // Format ISO: "HH:mm:ss"
   societeId: number;
   societeNom: string;
   siteId: number;
@@ -20,6 +23,15 @@ export interface Enlevement {
   documents?: DocumentInfo[];
   bsdiPresent?: boolean;
   pvPresent?: boolean;
+  camionId?: number;
+  camionMatricule?: string;
+  chauffeurNom?: string;
+  destinationId?: number;
+  destinationRaisonSociale?: string;
+  destinationSite?: string;
+  destinationTypesTraitement?: string[];
+  destinationNomInterlocuteur?: string;
+  destinationTelInterlocuteur?: string;
   createdBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
@@ -27,9 +39,15 @@ export interface Enlevement {
 
 export interface CreateEnlevementRequest {
   dateEnlevement: string;
+  heureEnlevement?: string; // Format ISO: "HH:mm:ss"
+  dateDestination?: string; // Format ISO: "2024-11-28"
+  heureDestination?: string; // Format ISO: "HH:mm:ss"
   siteId: number;
   societeId: number;
   observation?: string;
+  camionId?: number;
+  chauffeurNom?: string;
+  destinationId?: number;
   items: CreatePickupItemRequest[];
 }
 
@@ -55,9 +73,9 @@ export interface CreatePickupItemRequest {
 }
 
 export enum TypeDechet {
-  RECYCLABLE = 'RECYCLABLE',
-  BANAL = 'BANAL',
-  A_DETRUIRE = 'A_DETRUIRE'
+  RECYCLABLE = 'RECYCLABLE',   // Déchets recyclables (génère un revenu)
+  BANAL = 'BANAL',             // Déchets ordinaires (génère un coût)
+  A_DETRUIRE = 'A_DETRUIRE'    // Déchets dangereux (génère un coût élevé + documents obligatoires)
 }
 
 export enum SousTypeRecyclable {

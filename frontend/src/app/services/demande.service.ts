@@ -47,10 +47,11 @@ export class DemandeService {
   }
 
   /**
-   * Valide une demande (admin)
+   * Valide une demande (admin) avec possibilité de modifier la date/heure
    */
-  validerDemande(id: number): Observable<DemandeEnlevement> {
-    return this.http.put<DemandeEnlevement>(`${this.apiUrl}/admin/demandes/${id}/valider`, {});
+  validerDemande(id: number, request?: { dateModifiee?: string | null; heureModifiee?: string | null }): Observable<DemandeEnlevement> {
+    const body = request && (request.dateModifiee || request.heureModifiee) ? request : {};
+    return this.http.put<DemandeEnlevement>(`${this.apiUrl}/admin/demandes/${id}/valider`, body);
   }
 
   /**

@@ -13,6 +13,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { RecurrenceService } from '../../../../services/recurrence.service';
 import { Recurrence, TypeRecurrence } from '../../../../models/planning.model';
 import { RecurrenceFormComponent, RecurrenceFormData } from '../recurrence-form/recurrence-form.component';
+import { DeleteRecurrenceDialogComponent } from '../delete-recurrence-dialog/delete-recurrence-dialog.component';
 
 /**
  * Composant : Liste des récurrences
@@ -96,18 +97,31 @@ export class RecurrencesListComponent implements OnInit {
   }
 
   supprimerRecurrence(recurrence: Recurrence): void {
-    if (confirm(`Supprimer définitivement la récurrence pour ${recurrence.societeNom} ?`)) {
-      this.recurrenceService.supprimerRecurrence(recurrence.id).subscribe({
-        next: () => {
-          this.snackBar.open('Récurrence supprimée', 'Fermer', { duration: 3000 });
-          this.loadRecurrences();
-        },
-        error: (error) => {
-          console.error('Erreur suppression récurrence:', error);
-          this.snackBar.open('Erreur lors de la suppression', 'Fermer', { duration: 3000 });
-        }
-      });
-    }
+    const dialogRef = this.dialog.open(DeleteRecurrenceDialogComponent, {
+      width: '600px',
+      maxWidth: '90vw',
+      data: { recurrence }
+    });
+
+    dialogRef.afterClosed().subscribe((supprimerToutesOccurrences: boolean | null) => {
+      if (supprimerToutesOccurrences !== null) {
+        // L'utilisateur a choisi une option (true = toutes, false = futures uniquement)
+        this.recurrenceService.supprimerRecurrence(recurrence.id, supprimerToutesOccurrences).subscribe({
+          next: () => {
+            const message = supprimerToutesOccurrences 
+              ? 'Récurrence et toutes ses occurrences supprimées' 
+              : 'Récurrence supprimée (occurrences futures supprimées)';
+            this.snackBar.open(message, 'Fermer', { duration: 3000 });
+            this.loadRecurrences();
+          },
+          error: (error) => {
+            console.error('Erreur suppression récurrence:', error);
+            this.snackBar.open('Erreur lors de la suppression', 'Fermer', { duration: 3000 });
+          }
+        });
+      }
+      // Si null, l'utilisateur a annulé, on ne fait rien
+    });
   }
 
   getTypeRecurrenceLabel(type: string): string {

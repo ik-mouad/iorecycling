@@ -128,16 +128,36 @@ public class PlanningService {
     
     /**
      * Supprime un enlèvement planifié
+     * Si l'occurrence fait partie d'une récurrence, supprime également toutes les occurrences suivantes
      */
     public void supprimerPlanning(Long id) {
         log.info("Suppression planning ID {}", id);
         
-        if (!planningRepository.existsById(id)) {
-            throw new IllegalArgumentException("Planning non trouvé");
-        }
+        PlanningEnlevement planning = planningRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Planning non trouvé"));
         
-        planningRepository.deleteById(id);
-        log.info("Planning supprimé : ID {}", id);
+        // Si l'occurrence fait partie d'une récurrence, supprimer toutes les occurrences suivantes
+        if (planning.getRecurrence() != null) {
+            Long recurrenceId = planning.getRecurrence().getId();
+            LocalDate dateMin = planning.getDatePrevue();
+            
+            log.info("Suppression de toutes les occurrences suivantes de la récurrence {} à partir du {}", 
+                    recurrenceId, dateMin);
+            
+            // Trouver toutes les occurrences suivantes (date >= date de l'occurrence supprimée)
+            List<PlanningEnlevement> occurrencesSuivantes = planningRepository
+                    .findByRecurrenceIdAndDatePrevueGreaterThanEqual(recurrenceId, dateMin);
+            
+            // Supprimer toutes ces occurrences
+            planningRepository.deleteAll(occurrencesSuivantes);
+            
+            log.info("{} occurrence(s) supprimée(s) de la récurrence {}", 
+                    occurrencesSuivantes.size(), recurrenceId);
+        } else {
+            // Si ce n'est pas une récurrence, supprimer uniquement cette occurrence
+            planningRepository.deleteById(id);
+            log.info("Planning supprimé : ID {}", id);
+        }
     }
     
     private PlanningEnlevementDTO toDTO(PlanningEnlevement planning) {

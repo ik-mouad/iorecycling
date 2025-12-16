@@ -1,0 +1,119 @@
+<div class="destinations-list-container">
+  <div class="header">
+    <h1>Gestion des destinations</h1>
+    <button mat-raised-button color="primary" (click)="createDestination()">
+      <mat-icon>add</mat-icon>
+      Nouvelle destination
+    </button>
+  </div>
+
+  <!-- Recherche -->
+  <mat-card class="search-card">
+    <div class="search-row">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Rechercher</mat-label>
+        <input matInput [(ngModel)]="searchQuery" (keyup.enter)="search()" placeholder="Raison sociale, site...">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+      <button mat-button (click)="search()">
+        <mat-icon>search</mat-icon>
+        Rechercher
+      </button>
+      <button mat-button (click)="clearSearch()" *ngIf="searchQuery">
+        <mat-icon>clear</mat-icon>
+        Effacer
+      </button>
+    </div>
+  </mat-card>
+
+  <!-- Table -->
+  <mat-card>
+    <div class="table-container">
+      <table mat-table [dataSource]="destinations" class="destinations-table">
+        <!-- Colonne Raison sociale -->
+        <ng-container matColumnDef="raisonSociale">
+          <th mat-header-cell *matHeaderCellDef>Raison sociale</th>
+          <td mat-cell *matCellDef="let destination">
+            <strong>{{ destination.raisonSociale }}</strong>
+          </td>
+        </ng-container>
+
+        <!-- Colonne Site -->
+        <ng-container matColumnDef="site">
+          <th mat-header-cell *matHeaderCellDef>Site</th>
+          <td mat-cell *matCellDef="let destination">
+            {{ destination.site }}
+          </td>
+        </ng-container>
+
+        <!-- Colonne Types de traitement -->
+        <ng-container matColumnDef="typesTraitement">
+          <th mat-header-cell *matHeaderCellDef>Types de traitement</th>
+          <td mat-cell *matCellDef="let destination">
+            <mat-chip-listbox>
+              <mat-chip *ngFor="let type of destination.typesTraitement">
+                {{ getTypeTraitementLabel(type) }}
+              </mat-chip>
+            </mat-chip-listbox>
+          </td>
+        </ng-container>
+
+        <!-- Colonne Interlocuteur -->
+        <ng-container matColumnDef="nomInterlocuteur">
+          <th mat-header-cell *matHeaderCellDef>Interlocuteur</th>
+          <td mat-cell *matCellDef="let destination">
+            {{ destination.nomInterlocuteur || 'N/A' }}
+          </td>
+        </ng-container>
+
+        <!-- Colonne Téléphone -->
+        <ng-container matColumnDef="telInterlocuteur">
+          <th mat-header-cell *matHeaderCellDef>Téléphone</th>
+          <td mat-cell *matCellDef="let destination">
+            {{ destination.telInterlocuteur || 'N/A' }}
+          </td>
+        </ng-container>
+
+        <!-- Colonne Actions -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let destination">
+            <button mat-icon-button [matMenuTriggerFor]="menu" matTooltip="Actions">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="editDestination(destination)">
+                <mat-icon>edit</mat-icon>
+                Modifier
+              </button>
+              <button mat-menu-item (click)="deleteDestination(destination)" class="delete-action">
+                <mat-icon>delete</mat-icon>
+                Supprimer
+              </button>
+            </mat-menu>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+
+      <div *ngIf="loading" class="loading-spinner">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+
+      <div *ngIf="!loading && destinations.length === 0" class="no-data">
+        <p>Aucune destination trouvée</p>
+      </div>
+    </div>
+
+    <mat-paginator
+      [length]="totalElements"
+      [pageSize]="pageSize"
+      [pageIndex]="pageIndex"
+      [pageSizeOptions]="[10, 20, 50, 100]"
+      (page)="onPageChange($event)">
+    </mat-paginator>
+  </mat-card>
+</div>
+

@@ -13,6 +13,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { DemandeService } from '../../../../services/demande.service';
 import { DemandeEnlevement, StatutDemande, STATUT_LABELS } from '../../../../models/demande.model';
+import { ValiderDemandeDialogComponent } from '../valider-demande-dialog/valider-demande-dialog.component';
 
 /**
  * Composant : Liste des demandes d'enlèvements (Admin)
@@ -70,18 +71,31 @@ export class AdminDemandesListComponent implements OnInit {
   }
 
   validerDemande(demande: DemandeEnlevement): void {
-    if (confirm(`Valider la demande "${demande.numeroDemande}" ?`)) {
-      this.demandeService.validerDemande(demande.id).subscribe({
-        next: () => {
-          this.snackBar.open('Demande validée avec succès', 'Fermer', { duration: 3000 });
-          this.loadDemandes();
-        },
-        error: (error) => {
-          console.error('Erreur validation demande:', error);
-          this.snackBar.open('Erreur lors de la validation', 'Fermer', { duration: 3000 });
-        }
-      });
-    }
+    const dialogRef = this.dialog.open(ValiderDemandeDialogComponent, {
+      width: '600px',
+      maxWidth: '90vw',
+      data: { demande }
+    });
+
+    dialogRef.afterClosed().subscribe((result: { dateModifiee?: string | null; heureModifiee?: string | null } | null) => {
+      if (result !== null) {
+        // L'utilisateur a validé (result peut être un objet avec date/heure modifiées ou un objet vide)
+        this.demandeService.validerDemande(demande.id, result).subscribe({
+          next: () => {
+            const message = (result.dateModifiee || result.heureModifiee)
+              ? 'Demande validée avec date/heure modifiées'
+              : 'Demande validée avec succès';
+            this.snackBar.open(message, 'Fermer', { duration: 3000 });
+            this.loadDemandes();
+          },
+          error: (error) => {
+            console.error('Erreur validation demande:', error);
+            this.snackBar.open('Erreur lors de la validation', 'Fermer', { duration: 3000 });
+          }
+        });
+      }
+      // Si null, l'utilisateur a annulé, on ne fait rien
+    });
   }
 
   refuserDemande(demande: DemandeEnlevement): void {

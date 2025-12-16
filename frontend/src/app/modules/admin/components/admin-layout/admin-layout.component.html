@@ -62,6 +62,20 @@
         <mat-icon>schedule</mat-icon>
         Récurrences
       </a>
+      <a mat-button 
+         routerLink="/admin/camions" 
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{exact: false}">
+        <mat-icon>local_shipping</mat-icon>
+        Flotte de camions
+      </a>
+      <a mat-button 
+         routerLink="/admin/destinations" 
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{exact: false}">
+        <mat-icon>location_on</mat-icon>
+        Destinations
+      </a>
       <a mat-stroked-button color="primary" routerLink="/admin/enlevements/new">
         <mat-icon>add_circle</mat-icon>
         Nouvel enlèvement

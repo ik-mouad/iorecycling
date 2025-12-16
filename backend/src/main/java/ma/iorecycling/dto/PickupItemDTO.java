@@ -18,7 +18,7 @@ public class PickupItemDTO {
     
     private Long id;
     private Long enlevementId;
-    private String typeDechet;  // VALORISABLE, BANAL, A_ELIMINER
+    private String typeDechet;  // RECYCLABLE, BANAL, A_DETRUIRE
     private String sousType;
     private BigDecimal quantiteKg;
     private String uniteMesure;  // kg, L, m³, unité, etc.

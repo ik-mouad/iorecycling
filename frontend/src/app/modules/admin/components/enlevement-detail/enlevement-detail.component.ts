@@ -14,6 +14,7 @@ import { EnlevementService } from '../../../../services/enlevement.service';
 import { DocumentService } from '../../../../services/document.service';
 import { Enlevement, DocumentInfo } from '../../../../models/enlevement.model';
 import { DocumentUploadComponent, DocumentUploadData } from '../document-upload/document-upload.component';
+import { TypeTraitement } from '../../../../models/destination.model';
 
 /**
  * Composant : Détail d'un enlèvement
@@ -157,6 +158,36 @@ export class EnlevementDetailComponent implements OnInit {
       'DANGEREUX': 'Dangereux'
     };
     return labels[type] || type;
+  }
+
+  getTreatmentTypeLabel(type: string): string {
+    const labels: { [key: string]: string } = {
+      [TypeTraitement.RECYCLAGE]: '♻️ Recyclage',
+      [TypeTraitement.REUTILISATION]: '🔄 Réutilisation',
+      [TypeTraitement.ENFOUISSEMENT]: '🗑️ Enfouissement',
+      [TypeTraitement.INCINERATION]: '🔥 Incinération',
+      [TypeTraitement.VALORISATION_ENERGETIQUE]: '⚡ Valorisation Énergétique',
+      [TypeTraitement.DENATURATION_DESTRUCTION]: '☣️ Dénaturation/Destruction',
+      [TypeTraitement.TRAITEMENT]: '🧪 Traitement'
+    };
+    return labels[type] || type;
+  }
+
+  formatTime(time: string | undefined): string {
+    if (!time) return '';
+    // Format HH:mm:ss ou HH:mm -> HH:mm
+    const parts = time.split(':');
+    if (parts.length >= 2) {
+      return `${parts[0]}:${parts[1]}`;
+    }
+    return time;
+  }
+
+  formatDate(date: string | undefined): string {
+    if (!date) return '';
+    // Format ISO date string -> dd/MM/yyyy
+    const d = new Date(date);
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
   }
 }
 

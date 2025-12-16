@@ -73,9 +73,9 @@ public class PickupItem {
      * Enum pour les types de déchets
      */
     public enum TypeDechet {
-        VALORISABLE,  // Déchets recyclables (génère un revenu)
+        RECYCLABLE,   // Déchets recyclables (génère un revenu)
         BANAL,        // Déchets ordinaires (génère un coût)
-        A_ELIMINER    // Déchets dangereux (génère un coût élevé + documents obligatoires)
+        A_DETRUIRE    // Déchets dangereux (génère un coût élevé + documents obligatoires)
     }
     
     /**
@@ -84,12 +84,12 @@ public class PickupItem {
     @PrePersist
     @PreUpdate
     public void validateAndCalculate() {
-        if (TypeDechet.VALORISABLE.equals(typeDechet) && (sousType == null || sousType.trim().isEmpty())) {
-            throw new IllegalStateException("Le sous-type est obligatoire pour les déchets VALORISABLE");
+        if (TypeDechet.RECYCLABLE.equals(typeDechet) && (sousType == null || sousType.trim().isEmpty())) {
+            throw new IllegalStateException("Le sous-type est obligatoire pour les déchets RECYCLABLE");
         }
         
-        if (TypeDechet.A_ELIMINER.equals(typeDechet) && (sousType == null || sousType.trim().isEmpty())) {
-            throw new IllegalStateException("Le sous-type est obligatoire pour les déchets A_ELIMINER (dangereux ou non dangereux)");
+        if (TypeDechet.A_DETRUIRE.equals(typeDechet) && (sousType == null || sousType.trim().isEmpty())) {
+            throw new IllegalStateException("Le sous-type est obligatoire pour les déchets A_DETRUIRE (dangereux ou non dangereux)");
         }
         
         if (quantiteKg != null && prixUnitaireMad != null) {

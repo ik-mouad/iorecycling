@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ma.iorecycling.dto.DemandeEnlevementDTO;
+import ma.iorecycling.dto.ValiderDemandeRequest;
 import ma.iorecycling.service.DemandeEnlevementService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,19 +41,20 @@ public class AdminDemandeController {
     }
     
     /**
-     * Valide une demande
+     * Valide une demande avec possibilité de modifier la date/heure
      */
     @PutMapping("/{id}/valider")
-    @Operation(summary = "Valider une demande", description = "Valider une demande EN_ATTENTE")
+    @Operation(summary = "Valider une demande", description = "Valider une demande EN_ATTENTE avec possibilité de modifier la date/heure")
     public ResponseEntity<DemandeEnlevementDTO> validerDemande(
             @PathVariable Long id,
+            @RequestBody(required = false) ValiderDemandeRequest request,
             @AuthenticationPrincipal Jwt jwt) {
         
         log.info("PUT /api/admin/demandes/{}/valider", id);
         
         try {
             String username = jwt != null ? jwt.getClaimAsString("preferred_username") : "admin";
-            DemandeEnlevementDTO demande = demandeService.validerDemande(id, username);
+            DemandeEnlevementDTO demande = demandeService.validerDemande(id, username, request);
             return ResponseEntity.ok(demande);
         } catch (IllegalArgumentException | IllegalStateException e) {
             log.error("Erreur validation demande : {}", e.getMessage());

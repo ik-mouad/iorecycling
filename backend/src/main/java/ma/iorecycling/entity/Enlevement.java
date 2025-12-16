@@ -12,6 +12,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +40,15 @@ public class Enlevement {
     @Column(name = "date_enlevement", nullable = false)
     private LocalDate dateEnlevement;
     
+    @Column(name = "heure_enlevement")
+    private LocalTime heureEnlevement;
+    
+    @Column(name = "date_destination")
+    private LocalDate dateDestination;
+    
+    @Column(name = "heure_destination")
+    private LocalTime heureDestination;
+    
     @NotNull(message = "Le site est obligatoire")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "site_id", nullable = false)
@@ -52,6 +62,18 @@ public class Enlevement {
     @Size(max = 1000, message = "L'observation ne peut pas dépasser 1000 caractères")
     @Column(name = "observation", columnDefinition = "TEXT")
     private String observation;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "camion_id")
+    private Camion camion;
+    
+    @Size(max = 100, message = "Le nom du chauffeur ne peut pas dépasser 100 caractères")
+    @Column(name = "chauffeur_nom", length = 100)
+    private String chauffeurNom;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "destination_id")
+    private Destination destination;
     
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

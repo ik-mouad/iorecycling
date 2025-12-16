@@ -16,8 +16,12 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { EnlevementService } from '../../../../services/enlevement.service';
 import { SocieteService } from '../../../../services/societe.service';
 import { SiteService } from '../../../../services/site.service';
+import { CamionService } from '../../../../services/camion.service';
+import { DestinationService } from '../../../../services/destination.service';
 import { CreateEnlevementRequest, TypeDechet, SousTypeRecyclable } from '../../../../models/enlevement.model';
 import { Societe, Site } from '../../../../models/societe.model';
+import { Camion } from '../../../../models/camion.model';
+import { Destination, TypeTraitement } from '../../../../models/destination.model';
 
 /**
  * Composant : Formulaire de création d'enlèvement (multi-étapes)
@@ -54,8 +58,15 @@ export class EnlevementFormComponent implements OnInit {
   societes: Societe[] = [];
   sites: Site[] = [];
   sitesLoading = false;
+  camions: Camion[] = [];
+  camionsLoading = false;
+  destinations: Destination[] = [];
+  destinationsLoading = false;
+  hasDechetsDangereux = false;
   loading = false;
   societePredefinie: number | null = null;
+  poidsTotal = 0;
+  tonnageMaxCamion: number | null = null;
 
   // Enums pour les selects
   typesDechet = Object.values(TypeDechet);
@@ -66,6 +77,8 @@ export class EnlevementFormComponent implements OnInit {
     private enlevementService: EnlevementService,
     private societeService: SocieteService,
     private siteService: SiteService,
+    private camionService: CamionService,
+    private destinationService: DestinationService,
     private router: Router,
     private route: ActivatedRoute,
     private snackBar: MatSnackBar
@@ -81,15 +94,76 @@ export class EnlevementFormComponent implements OnInit {
     
     this.initForms();
     this.loadSocietes();
+    this.loadCamions();
+    this.loadDestinations();
+  }
+
+  loadCamions(): void {
+    this.camionsLoading = true;
+    this.camionService.getActiveCamions().subscribe({
+      next: (camions) => {
+        this.camions = camions;
+        this.camionsLoading = false;
+      },
+      error: (error) => {
+        console.error('Erreur chargement camions:', error);
+        this.camionsLoading = false;
+      }
+    });
+  }
+
+  loadDestinations(): void {
+    this.destinationsLoading = true;
+    this.destinationService.getAllDestinations(0, 100).subscribe({
+      next: (page) => {
+        this.destinations = page.content;
+        this.destinationsLoading = false;
+      },
+      error: (error: any) => {
+        console.error('Erreur chargement destinations:', error);
+        this.destinationsLoading = false;
+      }
+    });
+  }
+
+  loadDestinationsPourDechetsDangereux(): void {
+    this.destinationsLoading = true;
+    const compatibleTypes: TypeTraitement[] = [
+      TypeTraitement.INCINERATION,
+      TypeTraitement.ENFOUISSEMENT,
+      TypeTraitement.DENATURATION_DESTRUCTION,
+      TypeTraitement.TRAITEMENT
+    ];
+    this.destinationService.getDestinationsByTreatmentTypes(compatibleTypes).subscribe({
+      next: (destinations: Destination[]) => {
+        this.destinations = destinations;
+        this.destinationsLoading = false;
+        // Si la destination actuellement sélectionnée n'est plus compatible, la réinitialiser
+        const currentDestinationId = this.step1Form.get('destinationId')?.value;
+        if (currentDestinationId && !destinations.some((d: Destination) => d.id === currentDestinationId)) {
+          this.step1Form.get('destinationId')?.setValue('');
+        }
+      },
+      error: (error: any) => {
+        console.error('Erreur chargement destinations compatibles:', error);
+        this.destinationsLoading = false;
+      }
+    });
   }
 
   initForms(): void {
     // Étape 1 : Informations générales
     this.step1Form = this.fb.group({
       dateEnlevement: [new Date(), Validators.required],
+      heureEnlevement: [''], // Format HH:mm
+      dateDestination: [''], // Date optionnelle
+      heureDestination: [''], // Format HH:mm
       societeId: ['', Validators.required],
       siteId: ['', Validators.required],
-      observation: ['']
+      observation: [''],
+      camionId: [''],
+      chauffeurNom: [''],
+      destinationId: ['']
     });
 
     // Étape 2 : Items
@@ -103,6 +177,63 @@ export class EnlevementFormComponent implements OnInit {
         this.loadSites(societeId);
       }
     });
+
+    // Observer les changements de camion pour vérifier le tonnage
+    this.step1Form.get('camionId')?.valueChanges.subscribe(camionId => {
+      if (camionId) {
+        const camion = this.camions.find(c => c.id === camionId);
+        this.tonnageMaxCamion = camion ? camion.tonnageMaxKg : null;
+        this.checkTonnage();
+      } else {
+        this.tonnageMaxCamion = null;
+      }
+    });
+
+    // Observer les changements dans les items pour calculer le poids total et vérifier les déchets dangereux
+    this.step2Form.get('items')?.valueChanges.subscribe(() => {
+      this.calculatePoidsTotal();
+      this.checkTonnage();
+      this.checkDechetsDangereux();
+    });
+  }
+
+  checkDechetsDangereux(): void {
+    const items = this.itemsFormArray.value;
+    this.hasDechetsDangereux = items.some((item: any) => item.typeDechet === 'A_DETRUIRE');
+    
+    // Si des déchets dangereux sont présents, charger uniquement les destinations compatibles
+    if (this.hasDechetsDangereux) {
+      this.loadDestinationsPourDechetsDangereux();
+      
+      // Rendre la destination obligatoire
+      const destinationControl = this.step1Form.get('destinationId');
+      if (destinationControl) {
+        destinationControl.setValidators([Validators.required]);
+        destinationControl.updateValueAndValidity();
+      }
+    } else {
+      // Charger toutes les destinations
+      this.loadDestinations();
+      
+      // Rendre la destination optionnelle
+      const destinationControl = this.step1Form.get('destinationId');
+      if (destinationControl) {
+        destinationControl.clearValidators();
+        destinationControl.updateValueAndValidity();
+      }
+    }
+  }
+
+  calculatePoidsTotal(): void {
+    const items = this.itemsFormArray.value;
+    this.poidsTotal = items.reduce((sum: number, item: any) => sum + (item.quantiteKg || 0), 0);
+  }
+
+  checkTonnage(): void {
+    if (this.tonnageMaxCamion && this.poidsTotal > this.tonnageMaxCamion) {
+      // Afficher un warning (non bloquant)
+      console.warn(`Attention : Le poids total (${this.poidsTotal} kg) dépasse le tonnage maximum du camion (${this.tonnageMaxCamion} kg)`);
+    }
   }
 
   get itemsFormArray(): FormArray {
@@ -111,7 +242,7 @@ export class EnlevementFormComponent implements OnInit {
 
   createItemFormGroup(): FormGroup {
     const itemForm = this.fb.group({
-      typeDechet: ['VALORISABLE', Validators.required],
+      typeDechet: ['RECYCLABLE', Validators.required],
       sousType: [''],
       quantiteKg: [0, [Validators.required, Validators.min(0)]],
       uniteMesure: ['kg'], // Par défaut "kg"
@@ -119,10 +250,10 @@ export class EnlevementFormComponent implements OnInit {
       prixUnitaireMad: [0, [Validators.required, Validators.min(0)]]
     });
 
-    // Observer les changements de typeDechet pour rendre sousType obligatoire si VALORISABLE ou A_DETRUIRE
+    // Observer les changements de typeDechet pour rendre sousType obligatoire si RECYCLABLE ou A_DETRUIRE
     itemForm.get('typeDechet')?.valueChanges.subscribe(type => {
       const sousTypeControl = itemForm.get('sousType');
-      if (type === 'VALORISABLE' || type === 'A_DETRUIRE') {
+      if (type === 'RECYCLABLE' || type === 'A_DETRUIRE') {
         sousTypeControl?.setValidators([Validators.required]);
         sousTypeControl?.updateValueAndValidity();
       } else {
@@ -267,6 +398,21 @@ export class EnlevementFormComponent implements OnInit {
       ? dateEnlevement.toISOString().split('T')[0]
       : dateEnlevement;
 
+    // Formater l'heure d'enlèvement (format HH:mm -> HH:mm:ss)
+    const heureEnlevement = formValue.heureEnlevement 
+      ? (formValue.heureEnlevement.length === 5 ? formValue.heureEnlevement + ':00' : formValue.heureEnlevement)
+      : undefined;
+
+    // Formater la date de destination
+    const dateDestination = formValue.dateDestination instanceof Date
+      ? formValue.dateDestination.toISOString().split('T')[0]
+      : formValue.dateDestination || undefined;
+
+    // Formater l'heure de destination (format HH:mm -> HH:mm:ss)
+    const heureDestination = formValue.heureDestination
+      ? (formValue.heureDestination.length === 5 ? formValue.heureDestination + ':00' : formValue.heureDestination)
+      : undefined;
+
     // Vérifier que siteId est bien défini
     if (!formValue.siteId) {
       this.snackBar.open('Veuillez sélectionner un site', 'Fermer', { duration: 3000 });
@@ -276,9 +422,15 @@ export class EnlevementFormComponent implements OnInit {
 
     const request: CreateEnlevementRequest = {
       dateEnlevement: formattedDate,
+      heureEnlevement: heureEnlevement,
+      dateDestination: dateDestination,
+      heureDestination: heureDestination,
       siteId: formValue.siteId,
       societeId: formValue.societeId,
       observation: formValue.observation,
+      camionId: formValue.camionId || undefined,
+      chauffeurNom: formValue.chauffeurNom || undefined,
+      destinationId: formValue.destinationId || undefined,
       items: this.itemsFormArray.value.map((item: any) => ({
         typeDechet: item.typeDechet,
         sousType: item.sousType || null,
@@ -316,6 +468,16 @@ export class EnlevementFormComponent implements OnInit {
 
   getSiteNom(siteId: number): string {
     return this.sites.find(s => s.id === siteId)?.name || '';
+  }
+
+  getCamionMatricule(camionId: number): string {
+    const camion = this.camions.find(c => c.id === camionId);
+    return camion ? camion.matricule : '';
+  }
+
+  getDestinationNom(destinationId: number): string {
+    const destination = this.destinations.find(d => d.id === destinationId);
+    return destination ? `${destination.raisonSociale} - ${destination.site}` : '';
   }
 
   getTypeDechetLabel(type: string): string {

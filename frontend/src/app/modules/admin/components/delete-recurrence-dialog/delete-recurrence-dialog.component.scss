@@ -1,0 +1,187 @@
+/* ============================================
+   PREMIUM DESIGN SYSTEM - Delete Recurrence Dialog
+   ============================================ */
+
+// Design Tokens
+$gray-50: #f9fafb;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-300: #d1d5db;
+$gray-400: #9ca3af;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-700: #374151;
+$gray-900: #0a0a0a;
+
+$red-50: #fef2f2;
+$red-100: #fee2e2;
+$red-500: #ef4444;
+$red-600: #dc2626;
+$red-700: #b91c1c;
+
+$white: #ffffff;
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+
+.delete-recurrence-dialog {
+  min-width: 500px;
+  max-width: 600px;
+
+  .dialog-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 24px 0;
+    padding-bottom: 20px;
+    border-bottom: 2px solid $gray-200;
+    font-size: 24px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    color: $gray-900;
+    letter-spacing: -0.02em;
+
+    mat-icon {
+      color: $red-600;
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  .dialog-content {
+    padding: 0;
+    margin-bottom: 24px;
+
+    .question {
+      margin: 0 0 16px 0;
+      font-size: 16px;
+      line-height: 1.5;
+      color: $gray-700;
+    }
+
+    .recurrence-info {
+      padding: 16px;
+      background: $gray-50;
+      border-radius: 8px;
+      border-left: 4px solid $red-500;
+      margin-top: 16px;
+
+      .info-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: $gray-500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+      }
+
+      .info-value {
+        font-size: 16px;
+        font-weight: 600;
+        color: $gray-900;
+      }
+    }
+  }
+
+  .dialog-actions {
+    padding: 20px 0 0 0;
+    margin: 0;
+    border-top: 1px solid $gray-200;
+    gap: 12px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: wrap;
+
+    .cancel-button {
+      height: 44px;
+      padding: 0 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 14px;
+      color: $gray-600;
+      transition: all 0.15s ease;
+      min-width: auto;
+
+      &:hover:not(:disabled) {
+        background: $gray-100;
+        color: $gray-900;
+      }
+    }
+
+    .delete-futures-button {
+      height: 44px;
+      padding: 0 20px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 14px;
+      color: $red-600;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+
+      &:hover:not(:disabled) {
+        background: $red-50;
+        color: $red-700;
+      }
+    }
+
+    .delete-all-button {
+      height: 44px;
+      padding: 0 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      background: $red-600;
+      color: white;
+      transition: all 0.15s ease;
+      box-shadow: $shadow-sm;
+      white-space: nowrap;
+
+      &:hover:not(:disabled) {
+        background: $red-700;
+        box-shadow: $shadow-md;
+        transform: translateY(-1px);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+// Dialog Override
+::ng-deep {
+  .mat-mdc-dialog-container {
+    .mdc-dialog__surface {
+      border-radius: 12px !important;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 600px) {
+  .delete-recurrence-dialog {
+    min-width: 100%;
+    max-width: 100%;
+
+    .dialog-title {
+      font-size: 20px;
+    }
+
+    .dialog-actions {
+      flex-direction: column-reverse;
+      gap: 12px;
+
+      .cancel-button,
+      .delete-futures-button,
+      .delete-all-button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+}
+

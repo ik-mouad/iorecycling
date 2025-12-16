@@ -28,6 +28,10 @@
         <label class="info-label">Date</label>
         <div class="info-value">{{ enlevement.dateEnlevement | date:'dd/MM/yyyy' }}</div>
       </div>
+      <div class="info-item" *ngIf="enlevement.heureEnlevement">
+        <label class="info-label">Heure</label>
+        <div class="info-value">🕐 {{ formatTime(enlevement.heureEnlevement) }}</div>
+      </div>
       <div class="info-item">
         <label class="info-label">Société</label>
         <div class="info-value">{{ enlevement.societeNom }}</div>
@@ -36,9 +40,49 @@
         <label class="info-label">Site</label>
         <div class="info-value">📍 {{ enlevement.siteNom }}</div>
       </div>
+      <div class="info-item" *ngIf="enlevement.camionMatricule">
+        <label class="info-label">Camion</label>
+        <div class="info-value">🚚 {{ enlevement.camionMatricule }}</div>
+      </div>
+      <div class="info-item" *ngIf="enlevement.chauffeurNom">
+        <label class="info-label">Chauffeur</label>
+        <div class="info-value">👨‍✈️ {{ enlevement.chauffeurNom }}</div>
+      </div>
       <div class="info-item full-width" *ngIf="enlevement.observation">
         <label class="info-label">Observation</label>
         <div class="info-value">{{ enlevement.observation }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Destination -->
+  <div class="info-card" *ngIf="enlevement.destinationId">
+    <h2 class="card-title">🏭 Destination</h2>
+    <div class="info-grid">
+      <div class="info-item">
+        <label class="info-label">Raison sociale</label>
+        <div class="info-value">
+          <strong>{{ enlevement.destinationRaisonSociale }}</strong>
+        </div>
+      </div>
+      <div class="info-item">
+        <label class="info-label">Site</label>
+        <div class="info-value">📍 {{ enlevement.destinationSite }}</div>
+      </div>
+      <div class="info-item" *ngIf="enlevement.dateDestination">
+        <label class="info-label">Date d'arrivée</label>
+        <div class="info-value">📅 {{ formatDate(enlevement.dateDestination) }}</div>
+      </div>
+      <div class="info-item" *ngIf="enlevement.heureDestination">
+        <label class="info-label">Heure d'arrivée</label>
+        <div class="info-value">🕐 {{ formatTime(enlevement.heureDestination) }}</div>
+      </div>
+      <div class="info-item" *ngIf="enlevement.destinationNomInterlocuteur">
+        <label class="info-label">Contact</label>
+        <div class="info-value">
+          {{ enlevement.destinationNomInterlocuteur }}
+          <span *ngIf="enlevement.destinationTelInterlocuteur"> - {{ enlevement.destinationTelInterlocuteur }}</span>
+        </div>
       </div>
     </div>
   </div>

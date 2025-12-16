@@ -1,0 +1,55 @@
+<div class="valider-demande-dialog">
+  <h2 mat-dialog-title class="dialog-title">
+    <mat-icon>check_circle</mat-icon>
+    Valider la demande
+  </h2>
+  
+  <mat-dialog-content class="dialog-content">
+    <div class="demande-info">
+      <div class="info-label">Demande concernée</div>
+      <div class="info-value">{{ data.demande.numeroDemande }}</div>
+      <div class="info-detail">{{ data.demande.societeNom }} - {{ data.demande.siteNom }}</div>
+    </div>
+
+    <div class="original-values">
+      <div class="info-label">Valeurs originales</div>
+      <div class="original-item">
+        <span class="label">Date souhaitée :</span>
+        <span class="value">{{ dateOriginale }}</span>
+      </div>
+      <div class="original-item">
+        <span class="label">Heure souhaitée :</span>
+        <span class="value">{{ heureOriginale }}</span>
+      </div>
+    </div>
+
+    <form [formGroup]="validationForm" class="validation-form">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Date modifiée (optionnel)</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="dateModifiee">
+        <mat-icon matPrefix>event</mat-icon>
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-hint>Laissez vide pour utiliser la date originale</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Heure modifiée (optionnel)</mat-label>
+        <input matInput formControlName="heureModifiee" placeholder="Ex: 09h00 - 11h00">
+        <mat-icon matPrefix>schedule</mat-icon>
+        <mat-hint>Laissez vide pour utiliser l'heure originale</mat-hint>
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+  
+  <mat-dialog-actions class="dialog-actions">
+    <button mat-button class="cancel-button" (click)="onCancel()">
+      Annuler
+    </button>
+    <button mat-raised-button class="validate-button" (click)="onValider()">
+      <mat-icon>check</mat-icon>
+      Valider
+    </button>
+  </mat-dialog-actions>
+</div>
+

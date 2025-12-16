@@ -53,39 +53,39 @@ public interface PickupItemRepository extends JpaRepository<PickupItem, Long> {
             @Param("dateFin") LocalDate dateFin);
     
     /**
-     * Calcule le budget de recyclage (VALORISABLE uniquement)
+     * Calcule le budget de recyclage (RECYCLABLE uniquement)
      */
     @Query("SELECT COALESCE(SUM(i.montantMad), 0) " +
            "FROM PickupItem i JOIN i.enlevement e " +
            "WHERE e.societe.id = :societeId " +
            "AND e.dateEnlevement BETWEEN :dateDebut AND :dateFin " +
-           "AND i.typeDechet = 'VALORISABLE'")
+           "AND i.typeDechet = 'RECYCLABLE'")
     BigDecimal calculateBudgetRecyclage(
             @Param("societeId") Long societeId,
             @Param("dateDebut") LocalDate dateDebut,
             @Param("dateFin") LocalDate dateFin);
     
     /**
-     * Calcule le budget A ELIMINER (BANAL + A_ELIMINER)
+     * Calcule le budget A_DETRUIRE (BANAL + A_DETRUIRE)
      */
     @Query("SELECT COALESCE(SUM(i.montantMad), 0) " +
            "FROM PickupItem i JOIN i.enlevement e " +
            "WHERE e.societe.id = :societeId " +
            "AND e.dateEnlevement BETWEEN :dateDebut AND :dateFin " +
-           "AND i.typeDechet IN ('BANAL', 'A_ELIMINER')")
+           "AND i.typeDechet IN ('BANAL', 'A_DETRUIRE')")
     BigDecimal calculateBudgetTraitement(
             @Param("societeId") Long societeId,
             @Param("dateDebut") LocalDate dateDebut,
             @Param("dateFin") LocalDate dateFin);
     
     /**
-     * Détail par sous-type pour les VALORISABLE
+     * Détail par sous-type pour les RECYCLABLE
      */
     @Query("SELECT i.sousType, SUM(i.quantiteKg), SUM(i.montantMad) " +
            "FROM PickupItem i JOIN i.enlevement e " +
            "WHERE e.societe.id = :societeId " +
            "AND e.dateEnlevement BETWEEN :dateDebut AND :dateFin " +
-           "AND i.typeDechet = 'VALORISABLE' " +
+           "AND i.typeDechet = 'RECYCLABLE' " +
            "GROUP BY i.sousType " +
            "ORDER BY SUM(i.quantiteKg) DESC")
     List<Object[]> getDetailRecyclableBySousType(

@@ -24,6 +24,13 @@
               <mat-datepicker #picker></mat-datepicker>
             </mat-form-field>
 
+            <!-- Heure d'enlèvement -->
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Heure d'enlèvement</mat-label>
+              <input matInput type="time" formControlName="heureEnlevement" placeholder="HH:mm">
+              <mat-hint>Format: HH:mm (optionnel)</mat-hint>
+            </mat-form-field>
+
             <!-- Société -->
             <mat-form-field appearance="outline" class="form-field">
               <mat-label>Société</mat-label>
@@ -59,6 +66,71 @@
               <textarea matInput formControlName="observation" rows="3" 
                 placeholder="Commentaires, remarques sur la collecte..."></textarea>
             </mat-form-field>
+
+            <!-- Camion utilisé -->
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Camion utilisé</mat-label>
+              <mat-select formControlName="camionId">
+                <mat-option [value]="null">Aucun camion</mat-option>
+                <mat-option *ngIf="camionsLoading" disabled>
+                  Chargement des camions...
+                </mat-option>
+                <mat-option *ngFor="let camion of camions" [value]="camion.id">
+                  {{ camion.matricule }} - {{ camion.typeCamion }} ({{ camion.tonnageMaxKg | number:'1.0-0' }} kg)
+                </mat-option>
+              </mat-select>
+              <mat-hint>Seuls les camions actifs sont disponibles</mat-hint>
+            </mat-form-field>
+
+            <!-- Chauffeur -->
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Nom du chauffeur</mat-label>
+              <input matInput formControlName="chauffeurNom" placeholder="Ex: Mohamed BENALI">
+            </mat-form-field>
+
+            <!-- Destination -->
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Destination {{ hasDechetsDangereux ? '*' : '' }}</mat-label>
+              <mat-select formControlName="destinationId">
+                <mat-option [value]="null">Aucune destination</mat-option>
+                <mat-option *ngIf="destinationsLoading" disabled>
+                  Chargement des destinations...
+                </mat-option>
+                <mat-option *ngFor="let destination of destinations" [value]="destination.id">
+                  {{ destination.raisonSociale }} - {{ destination.site }}
+                </mat-option>
+              </mat-select>
+              <mat-hint *ngIf="hasDechetsDangereux">
+                Obligatoire pour les déchets dangereux. Seules les destinations compatibles sont affichées.
+              </mat-hint>
+              <mat-hint *ngIf="!hasDechetsDangereux">
+                Optionnel (obligatoire si des déchets dangereux sont présents)
+              </mat-hint>
+            </mat-form-field>
+
+            <!-- Date de destination -->
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Date d'arrivée à destination</mat-label>
+              <input matInput [matDatepicker]="pickerDestination" formControlName="dateDestination">
+              <mat-datepicker-toggle matIconSuffix [for]="pickerDestination"></mat-datepicker-toggle>
+              <mat-datepicker #pickerDestination></mat-datepicker>
+              <mat-hint>Optionnel</mat-hint>
+            </mat-form-field>
+
+            <!-- Heure de destination -->
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Heure d'arrivée à destination</mat-label>
+              <input matInput type="time" formControlName="heureDestination" placeholder="HH:mm">
+              <mat-hint>Format: HH:mm (optionnel)</mat-hint>
+            </mat-form-field>
+
+            <!-- Warning tonnage -->
+            <div *ngIf="tonnageMaxCamion && poidsTotal > tonnageMaxCamion" class="tonnage-warning">
+              <mat-icon color="warn">warning</mat-icon>
+              <span>
+                Attention : Le poids total ({{ poidsTotal | number:'1.2-2' }} kg) dépasse le tonnage maximum du camion sélectionné ({{ tonnageMaxCamion | number:'1.0-0' }} kg)
+              </span>
+            </div>
           </div>
 
           <div class="step-actions">
@@ -217,6 +289,19 @@
               <div class="info-item" *ngIf="step1Form.value.observation">
                 <span class="info-label">Observation :</span>
                 <span class="info-value">{{ step1Form.value.observation }}</span>
+              </div>
+              <div class="info-item" *ngIf="step1Form.value.camionId">
+                <span class="info-label">Camion :</span>
+                <span class="info-value">
+                  🚚 {{ getCamionMatricule(step1Form.value.camionId) }}
+                  <span *ngIf="step1Form.value.chauffeurNom"> - Chauffeur: {{ step1Form.value.chauffeurNom }}</span>
+                </span>
+              </div>
+              <div class="info-item" *ngIf="step1Form.value.destinationId">
+                <span class="info-label">Destination :</span>
+                <span class="info-value">
+                  🏭 {{ getDestinationNom(step1Form.value.destinationId) }}
+                </span>
               </div>
             </div>
           </div>

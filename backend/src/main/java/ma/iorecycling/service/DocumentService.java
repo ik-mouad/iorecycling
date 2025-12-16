@@ -201,18 +201,18 @@ public class DocumentService {
     }
     
     /**
-     * Vérifie qu'un enlèvement avec A_ELIMINER a bien ses documents obligatoires
+     * Vérifie qu'un enlèvement avec A_DETRUIRE a bien ses documents obligatoires
      */
     @Transactional(readOnly = true)
     public boolean hasRequiredDocuments(Long enlevementId) {
-        // Vérifier si l'enlèvement contient des déchets A_ELIMINER
+        // Vérifier si l'enlèvement contient des déchets A_DETRUIRE
         Enlevement enlevement = enlevementRepository.findById(enlevementId)
                 .orElseThrow(() -> new IllegalArgumentException("Enlèvement non trouvé"));
         
-        boolean hasAELiminer = enlevement.getItems().stream()
-                .anyMatch(item -> item.getTypeDechet().name().equals("A_ELIMINER"));
+        boolean hasADetruire = enlevement.getItems().stream()
+                .anyMatch(item -> item.getTypeDechet().name().equals("A_DETRUIRE"));
         
-        if (!hasAELiminer) {
+        if (!hasADetruire) {
             return true; // Pas de documents obligatoires
         }
         
