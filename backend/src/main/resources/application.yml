@@ -90,14 +90,35 @@ management:
     env:
       enabled: true
 
+# Configuration OpenTelemetry - Traces uniquement (logs via Loki, métriques via Prometheus)
+opentelemetry:
+  resource:
+    attributes:
+      service.name: ${spring.application.name}
+      service.version: ${spring.application.version:0.0.1-SNAPSHOT}
+  traces:
+    exporter:
+      otlp:
+        endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://tempo:4318}
+        protocol: http/protobuf
+  instrumentation:
+    spring-webmvc:
+      enabled: true
+    spring-webflux:
+      enabled: false
+    jdbc:
+      enabled: true
+    jpa:
+      enabled: true
+
 logging:
+  config: classpath:logback-spring.xml
   level:
     ma.iorecycling: ${LOG_LEVEL:INFO}
     org.springframework.security: ${SECURITY_LOG_LEVEL:DEBUG}
     org.hibernate.SQL: ${SQL_LOG_LEVEL:WARN}
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    io.opentelemetry: WARN
+    io.grpc: WARN
 
 # Configuration Keycloak
 keycloak:

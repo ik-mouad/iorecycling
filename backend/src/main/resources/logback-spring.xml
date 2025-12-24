@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <springProperty scope="context" name="app.name" source="spring.application.name" defaultValue="iorecycling-backend"/>
+    <springProperty scope="context" name="app.env" source="spring.profiles.active" defaultValue="dev"/>
+
+    <!-- Console appender avec JSON -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"service":"${app.name}","env":"${app.env}"}</customFields>
+            <fieldNames>
+                <timestamp>@timestamp</timestamp>
+                <message>message</message>
+                <logger>logger_name</logger>
+                <level>level</level>
+                <thread>thread</thread>
+            </fieldNames>
+            <includeMdcKeyName>tenantId</includeMdcKeyName>
+            <includeMdcKeyName>userId</includeMdcKeyName>
+            <includeMdcKeyName>traceId</includeMdcKeyName>
+            <includeMdcKeyName>spanId</includeMdcKeyName>
+            <includeMdcKeyName>http_route</includeMdcKeyName>
+            <includeMdcKeyName>http_method</includeMdcKeyName>
+            <includeMdcKeyName>http_status_code</includeMdcKeyName>
+            <includeMdcKeyName>durationMs</includeMdcKeyName>
+            <includeMdcKeyName>exception_type</includeMdcKeyName>
+            <includeMdcKeyName>exception_message</includeMdcKeyName>
+        </encoder>
+    </appender>
+
+    <!-- File appender avec JSON -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/var/log/backend/app.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/var/log/backend/app.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"service":"${app.name}","env":"${app.env}"}</customFields>
+            <fieldNames>
+                <timestamp>@timestamp</timestamp>
+                <message>message</message>
+                <logger>logger_name</logger>
+                <level>level</level>
+                <thread>thread</thread>
+            </fieldNames>
+            <includeMdcKeyName>tenantId</includeMdcKeyName>
+            <includeMdcKeyName>userId</includeMdcKeyName>
+            <includeMdcKeyName>traceId</includeMdcKeyName>
+            <includeMdcKeyName>spanId</includeMdcKeyName>
+            <includeMdcKeyName>http_route</includeMdcKeyName>
+            <includeMdcKeyName>http_method</includeMdcKeyName>
+            <includeMdcKeyName>http_status_code</includeMdcKeyName>
+            <includeMdcKeyName>durationMs</includeMdcKeyName>
+            <includeMdcKeyName>exception_type</includeMdcKeyName>
+            <includeMdcKeyName>exception_message</includeMdcKeyName>
+        </encoder>
+    </appender>
+
+    <!-- Logger pour éviter les logs verbeux d'OpenTelemetry -->
+    <logger name="io.opentelemetry" level="WARN"/>
+    <logger name="io.grpc" level="WARN"/>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <logger name="ma.iorecycling" level="INFO"/>
+</configuration>
+
