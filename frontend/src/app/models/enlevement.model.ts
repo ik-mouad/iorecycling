@@ -61,6 +61,29 @@ export interface PickupItem {
   etat?: string; // vrac, compacté, broyé, Palettisé, autre
   prixUnitaireMad: number;
   montantMad: number;
+  
+  // NOUVEAUX CHAMPS - Prestation (tous types)
+  prixPrestationMad?: number;
+  montantPrestationMad?: number;
+  
+  // NOUVEAUX CHAMPS - Achat (valorisable)
+  prixAchatMad?: number;
+  montantAchatMad?: number;
+  
+  // NOUVEAUX CHAMPS - Traitement (banal)
+  prixTraitementMad?: number;
+  montantTraitementMad?: number;
+  
+  // NOUVEAUX CHAMPS - Suivi vente
+  quantiteVendueKg?: number;
+  resteAVendreKg?: number;
+  statutStock?: StatutStock;
+}
+
+export enum StatutStock {
+  NON_VENDU = 'NON_VENDU',
+  PARTIELLEMENT_VENDU = 'PARTIELLEMENT_VENDU',
+  VENDU = 'VENDU'
 }
 
 export interface CreatePickupItemRequest {
@@ -70,6 +93,15 @@ export interface CreatePickupItemRequest {
   uniteMesure?: string; // kg, L, m³, unité, etc. (optionnel, par défaut "kg")
   etat?: string; // vrac, compacté, broyé, Palettisé, autre (optionnel)
   prixUnitaireMad: number;
+  
+  // NOUVEAUX CHAMPS - Prestation (tous types)
+  prixPrestationMad?: number;
+  
+  // NOUVEAUX CHAMPS - Achat (valorisable)
+  prixAchatMad?: number;
+  
+  // NOUVEAUX CHAMPS - Traitement (banal)
+  prixTraitementMad?: number;
 }
 
 export enum TypeDechet {

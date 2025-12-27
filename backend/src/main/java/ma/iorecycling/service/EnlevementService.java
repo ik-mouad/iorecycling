@@ -40,6 +40,7 @@ public class EnlevementService {
     private final CamionRepository camionRepository;
     private final DestinationRepository destinationRepository;
     private final EnlevementMapper enlevementMapper;
+    private final TransactionGenerationService transactionGenerationService;
     
     /**
      * Crée un nouvel enlèvement avec ses items
@@ -126,6 +127,15 @@ public class EnlevementService {
         savedEnlevement = enlevementRepository.findById(savedEnlevement.getId())
                 .orElseThrow();
         
+        // Générer automatiquement les transactions comptables
+        try {
+            transactionGenerationService.generateTransactionsFromEnlevement(savedEnlevement);
+        } catch (Exception e) {
+            log.warn("Erreur lors de la génération des transactions pour l'enlèvement {}: {}", 
+                    savedEnlevement.getNumeroEnlevement(), e.getMessage());
+            // On continue même si la génération échoue (l'enlèvement est créé)
+        }
+        
         log.info("Enlèvement créé avec succès : {}", savedEnlevement.getNumeroEnlevement());
         return enlevementMapper.toDTO(savedEnlevement);
     }
@@ -156,6 +166,9 @@ public class EnlevementService {
                         : "kg")
                 .etat(request.getEtat())
                 .prixUnitaireMad(request.getPrixUnitaireMad())
+                .prixPrestationMad(request.getPrixPrestationMad())
+                .prixAchatMad(request.getPrixAchatMad())
+                .prixTraitementMad(request.getPrixTraitementMad())
                 .build();
     }
     

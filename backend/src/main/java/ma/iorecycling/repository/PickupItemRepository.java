@@ -92,4 +92,19 @@ public interface PickupItemRepository extends JpaRepository<PickupItem, Long> {
             @Param("societeId") Long societeId,
             @Param("dateDebut") LocalDate dateDebut,
             @Param("dateFin") LocalDate dateFin);
+    
+    /**
+     * Trouve les stocks disponibles à la vente (reste à vendre > 0)
+     */
+    @Query("SELECT i FROM PickupItem i " +
+           "JOIN i.enlevement e " +
+           "WHERE (:societeId IS NULL OR e.societe.id = :societeId) " +
+           "AND (:typeDechet IS NULL OR i.typeDechet = :typeDechet) " +
+           "AND (:sousType IS NULL OR i.sousType = :sousType) " +
+           "AND (i.resteAVendreKg IS NULL OR i.resteAVendreKg > 0) " +
+           "ORDER BY e.dateEnlevement DESC, i.typeDechet, i.sousType")
+    List<PickupItem> findStocksDisponibles(
+            @Param("societeId") Long societeId,
+            @Param("typeDechet") String typeDechet,
+            @Param("sousType") String sousType);
 }

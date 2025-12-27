@@ -247,7 +247,13 @@ export class EnlevementFormComponent implements OnInit {
       quantiteKg: [0, [Validators.required, Validators.min(0)]],
       uniteMesure: ['kg'], // Par défaut "kg"
       etat: [''], // État du déchet
-      prixUnitaireMad: [0, [Validators.required, Validators.min(0)]]
+      prixUnitaireMad: [0, [Validators.required, Validators.min(0)]],
+      // NOUVEAUX CHAMPS - Prestation (tous types)
+      prixPrestationMad: [0, [Validators.min(0)]],
+      // NOUVEAUX CHAMPS - Achat (valorisable)
+      prixAchatMad: [0, [Validators.min(0)]],
+      // NOUVEAUX CHAMPS - Traitement (banal)
+      prixTraitementMad: [0, [Validators.min(0)]]
     });
 
     // Observer les changements de typeDechet pour rendre sousType obligatoire si RECYCLABLE ou A_DETRUIRE
@@ -339,9 +345,24 @@ export class EnlevementFormComponent implements OnInit {
     return (item.quantiteKg || 0) * (item.prixUnitaireMad || 0);
   }
 
+  calculateMontantPrestation(item: any): number {
+    return (item.quantiteKg || 0) * (item.prixPrestationMad || 0);
+  }
+
+  calculateMontantAchat(item: any): number {
+    return (item.quantiteKg || 0) * (item.prixAchatMad || 0);
+  }
+
+  calculateMontantTraitement(item: any): number {
+    return (item.quantiteKg || 0) * (item.prixTraitementMad || 0);
+  }
+
   calculateTotaux(): any {
     const items = this.itemsFormArray.value;
     
+    let totalPrestation = 0;
+    let totalAchat = 0;
+    let totalTraitement = 0;
     let budgetRecyclage = 0;
     let budgetTraitement = 0;
     let poidsTotal = 0;
@@ -349,21 +370,31 @@ export class EnlevementFormComponent implements OnInit {
 
     items.forEach((item: any) => {
       const montant = this.calculateMontant(item);
+      const montantPrestation = this.calculateMontantPrestation(item);
+      const montantAchat = this.calculateMontantAchat(item);
+      const montantTraitement = this.calculateMontantTraitement(item);
+      
       poidsTotal += item.quantiteKg || 0;
+      totalPrestation += montantPrestation;
 
       if (item.typeDechet === 'RECYCLABLE') {
         budgetRecyclage += montant;
+        totalAchat += montantAchat;
         poidsRecyclable += item.quantiteKg || 0;
       } else {
         budgetTraitement += montant;
+        totalTraitement += montantTraitement;
       }
     });
 
-    const bilanNet = budgetRecyclage - budgetTraitement;
+    const bilanNet = totalPrestation - totalAchat - totalTraitement;
     const tauxRecyclage = poidsTotal > 0 ? (poidsRecyclable / poidsTotal) * 100 : 0;
 
     return {
       poidsTotal,
+      totalPrestation,
+      totalAchat,
+      totalTraitement,
       budgetRecyclage,
       budgetTraitement,
       bilanNet,
@@ -437,7 +468,10 @@ export class EnlevementFormComponent implements OnInit {
         quantiteKg: item.quantiteKg,
         uniteMesure: item.uniteMesure || 'kg',
         etat: item.etat || null,
-        prixUnitaireMad: item.prixUnitaireMad
+        prixUnitaireMad: item.prixUnitaireMad,
+        prixPrestationMad: item.prixPrestationMad || null,
+        prixAchatMad: item.prixAchatMad || null,
+        prixTraitementMad: item.prixTraitementMad || null
       }))
     };
 

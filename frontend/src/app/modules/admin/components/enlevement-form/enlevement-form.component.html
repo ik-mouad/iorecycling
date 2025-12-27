@@ -237,6 +237,48 @@
                     <mat-hint>Prix par {{ item.value.uniteMesure || 'kg' }}</mat-hint>
                   </mat-form-field>
 
+                  <!-- Section Financière -->
+                  <div class="financial-section" *ngIf="item.value.typeDechet">
+                    <h4 class="financial-title">💰 Financier</h4>
+                    
+                    <!-- Prix prestation (tous types) -->
+                    <mat-form-field appearance="outline" class="field-prix">
+                      <mat-label>Prix prestation (MAD/kg)</mat-label>
+                      <input matInput type="number" step="0.01" formControlName="prixPrestationMad">
+                      <mat-hint>Prestation d'enlèvement</mat-hint>
+                    </mat-form-field>
+
+                    <!-- Prix achat (si valorisable) -->
+                    <mat-form-field appearance="outline" class="field-prix" 
+                        *ngIf="item.value.typeDechet === 'RECYCLABLE'">
+                      <mat-label>Prix achat (MAD/kg)</mat-label>
+                      <input matInput type="number" step="0.01" formControlName="prixAchatMad">
+                      <mat-hint>Ce que l'entreprise paie au client</mat-hint>
+                    </mat-form-field>
+
+                    <!-- Prix traitement (si banal) -->
+                    <mat-form-field appearance="outline" class="field-prix" 
+                        *ngIf="item.value.typeDechet === 'BANAL' || item.value.typeDechet === 'A_DETRUIRE'">
+                      <mat-label>Prix traitement (MAD/kg)</mat-label>
+                      <input matInput type="number" step="0.01" formControlName="prixTraitementMad">
+                      <mat-hint>Coût de traitement</mat-hint>
+                    </mat-form-field>
+
+                    <!-- Calculs automatiques -->
+                    <div class="calculations">
+                      <div *ngIf="item.value.typeDechet === 'RECYCLABLE'">
+                        <p><strong>Montant achat :</strong> 
+                          {{ calculateMontantAchat(item.value) | number:'1.2-2' }} MAD</p>
+                      </div>
+                      <div *ngIf="item.value.typeDechet === 'BANAL' || item.value.typeDechet === 'A_DETRUIRE'">
+                        <p><strong>Montant traitement :</strong> 
+                          {{ calculateMontantTraitement(item.value) | number:'1.2-2' }} MAD</p>
+                      </div>
+                      <p><strong>Montant prestation :</strong> 
+                        {{ calculateMontantPrestation(item.value) | number:'1.2-2' }} MAD</p>
+                    </div>
+                  </div>
+
                   <!-- Montant calculé -->
                   <div class="field-montant">
                     <strong>Montant</strong>
@@ -338,19 +380,23 @@
 
           <!-- Totaux -->
           <div class="recap-section recap-totaux">
-            <h3 class="recap-title">💰 Totaux calculés</h3>
+            <h3 class="recap-title">💰 Totaux financiers</h3>
             <div class="totaux-grid">
               <div class="totaux-item">
                 <span class="totaux-label">Poids total</span>
                 <strong class="totaux-value">{{ calculateTotaux().poidsTotal | number:'1.3-3' }} kg</strong>
               </div>
               <div class="totaux-item totaux-success">
-                <span class="totaux-label">Budget recyclage</span>
-                <strong class="totaux-value">+ {{ calculateTotaux().budgetRecyclage | number:'1.2-2' }} MAD</strong>
+                <span class="totaux-label">Total prestation</span>
+                <strong class="totaux-value">+ {{ calculateTotaux().totalPrestation | number:'1.2-2' }} MAD</strong>
               </div>
-              <div class="totaux-item totaux-danger">
-                <span class="totaux-label">Budget traitement</span>
-                <strong class="totaux-value">- {{ calculateTotaux().budgetTraitement | number:'1.2-2' }} MAD</strong>
+              <div class="totaux-item totaux-warning" *ngIf="calculateTotaux().totalAchat > 0">
+                <span class="totaux-label">Total achat</span>
+                <strong class="totaux-value">- {{ calculateTotaux().totalAchat | number:'1.2-2' }} MAD</strong>
+              </div>
+              <div class="totaux-item totaux-danger" *ngIf="calculateTotaux().totalTraitement > 0">
+                <span class="totaux-label">Total traitement</span>
+                <strong class="totaux-value">- {{ calculateTotaux().totalTraitement | number:'1.2-2' }} MAD</strong>
               </div>
               <div class="totaux-item totaux-primary">
                 <span class="totaux-label">Bilan net</span>

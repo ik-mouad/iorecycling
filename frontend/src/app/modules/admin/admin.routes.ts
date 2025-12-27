@@ -15,6 +15,13 @@ import { DestinationsListComponent } from './components/destinations-list/destin
 import { DestinationFormComponent } from './components/destination-form/destination-form.component';
 import { SocietesProprietairesListComponent } from './components/societes-proprietaires-list/societes-proprietaires-list.component';
 import { SocieteProprietaireFormComponent } from './components/societe-proprietaire-form/societe-proprietaire-form.component';
+import { ComptabiliteDashboardComponent } from './components/comptabilite-dashboard/comptabilite-dashboard.component';
+import { TransactionsListComponent } from './components/transactions-list/transactions-list.component';
+import { TransactionFormComponent } from './components/transaction-form/transaction-form.component';
+import { VentesListComponent } from './components/ventes-list/ventes-list.component';
+import { VenteFormComponent } from './components/vente-form/vente-form.component';
+import { StocksDisponiblesComponent } from './components/stocks-disponibles/stocks-disponibles.component';
+import { comptableGuard } from '../../auth/comptable.guard';
 
 /**
  * Routes du module Admin
@@ -75,6 +82,41 @@ export const adminRoutes: Routes = [
           { path: '', component: SocietesProprietairesListComponent },
           { path: 'new', component: SocieteProprietaireFormComponent },
           { path: ':id/edit', component: SocieteProprietaireFormComponent }
+        ]
+      },
+      {
+        path: 'comptabilite',
+        canActivate: [comptableGuard],
+        children: [
+          {
+            path: '',
+            component: ComptabiliteDashboardComponent
+          },
+          {
+            path: 'transactions',
+            component: TransactionsListComponent
+          },
+          {
+            path: 'transactions/new',
+            component: TransactionFormComponent
+          },
+          {
+            path: 'transactions/:id',
+            component: TransactionFormComponent
+          },
+          {
+            path: 'transactions/:id/edit',
+            component: TransactionFormComponent
+          }
+        ]
+      },
+      {
+        path: 'ventes',
+        canActivate: [comptableGuard],
+        children: [
+          { path: '', component: VentesListComponent },
+          { path: 'nouvelle', component: VenteFormComponent },
+          { path: 'stocks', component: StocksDisponiblesComponent }
         ]
       },
       {

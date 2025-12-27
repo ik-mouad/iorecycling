@@ -103,6 +103,15 @@ public class EnlevementMapper {
                 .etat(item.getEtat())
                 .prixUnitaireMad(item.getPrixUnitaireMad())
                 .montantMad(item.getMontantMad())
+                .prixPrestationMad(item.getPrixPrestationMad())
+                .montantPrestationMad(item.getMontantPrestationMad())
+                .prixAchatMad(item.getPrixAchatMad())
+                .montantAchatMad(item.getMontantAchatMad())
+                .prixTraitementMad(item.getPrixTraitementMad())
+                .montantTraitementMad(item.getMontantTraitementMad())
+                .quantiteVendueKg(item.getQuantiteVendueKg())
+                .resteAVendreKg(item.getResteAVendreKg())
+                .statutStock(item.getStatutStock() != null ? item.getStatutStock().name() : null)
                 .build();
     }
 }

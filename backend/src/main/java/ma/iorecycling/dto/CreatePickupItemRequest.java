@@ -35,5 +35,14 @@ public class CreatePickupItemRequest {
     @NotNull(message = "Le prix unitaire est obligatoire")
     @PositiveOrZero(message = "Le prix unitaire doit être positif ou zéro")
     private BigDecimal prixUnitaireMad;
+    
+    // NOUVEAUX CHAMPS - Prestation (tous types)
+    private BigDecimal prixPrestationMad;
+    
+    // NOUVEAUX CHAMPS - Achat (valorisable)
+    private BigDecimal prixAchatMad;
+    
+    // NOUVEAUX CHAMPS - Traitement (banal)
+    private BigDecimal prixTraitementMad;
 }
 

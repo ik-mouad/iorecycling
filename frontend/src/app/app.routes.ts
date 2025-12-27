@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './components/login/login.component';
 import { authGuard } from './auth/auth.guard';
 import { adminGuard, clientGuard } from './auth/role.guard';
+import { comptableGuard } from './auth/comptable.guard';
 
 /**
  * Routes principales de l'application

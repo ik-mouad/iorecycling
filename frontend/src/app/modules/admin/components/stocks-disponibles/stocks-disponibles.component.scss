@@ -1,0 +1,266 @@
+/* ============================================
+   PREMIUM DESIGN SYSTEM - Stocks Disponibles
+   ============================================ */
+
+// Design Tokens
+$gray-50: #f9fafb;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-300: #d1d5db;
+$gray-400: #9ca3af;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-700: #374151;
+$gray-900: #0a0a0a;
+
+$blue-50: #f0f9ff;
+$blue-100: #e0f2fe;
+$blue-500: #3b82f6;
+$blue-600: #2563eb;
+$blue-700: #1d4ed8;
+$blue-800: #0369a1;
+
+$green-50: #f0fdf4;
+$green-500: #10b981;
+$green-600: #059669;
+
+$amber-50: #fffbeb;
+$amber-100: #fef3c7;
+$amber-500: #f59e0b;
+$amber-600: #d97706;
+$amber-700: #92400e;
+
+$red-50: #fef2f2;
+$red-500: #ef4444;
+$red-600: #dc2626;
+
+$white: #ffffff;
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+
+// Container Principal
+.stocks-disponibles {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 32px;
+  background: $gray-50;
+  min-height: 100vh;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================
+// HEADER PREMIUM
+// ============================================
+.page-header {
+  margin-bottom: 48px;
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  .header-left {
+    flex: 1;
+
+    .page-title {
+      margin: 0 0 8px 0;
+      font-size: 32px;
+      font-weight: 700;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: $gray-900;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .page-description {
+      margin: 0;
+      font-size: 15px;
+      color: $gray-500;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+  }
+}
+
+h1 {
+  margin: 0 0 8px 0;
+  font-size: 32px;
+  font-weight: 700;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: $gray-900;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.subtitle {
+  margin: 0 0 24px 0;
+  font-size: 15px;
+  color: $gray-500;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+// ============================================
+// CARD PREMIUM
+// ============================================
+mat-card {
+  background: $white;
+  border-radius: 12px;
+  border: 1px solid $gray-200;
+  box-shadow: $shadow-sm;
+  padding: 32px;
+  margin-bottom: 24px;
+}
+
+// ============================================
+// FILTERS PREMIUM
+// ============================================
+.filters-section {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-bottom: 24px;
+  border-bottom: 1px solid $gray-200;
+
+  mat-form-field {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  button {
+    height: 40px;
+    border-radius: 8px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+}
+
+// ============================================
+// TABLE PREMIUM
+// ============================================
+.table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid $gray-200;
+}
+
+.stocks-table {
+  width: 100%;
+  background: $white;
+
+  th {
+    background: $gray-50;
+    font-weight: 600;
+    color: $gray-700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 16px;
+    border-bottom: 2px solid $gray-200;
+  }
+
+  td {
+    padding: 16px;
+    border-bottom: 1px solid $gray-100;
+    color: $gray-700;
+    font-size: 14px;
+  }
+
+  tr:hover {
+    background: $gray-50;
+  }
+
+  .link-enlevement {
+    color: $blue-600;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+
+    &:hover {
+      color: $blue-700;
+      text-decoration: underline;
+    }
+  }
+
+  mat-chip {
+    font-size: 12px;
+    font-weight: 500;
+    height: 24px;
+    border-radius: 12px;
+    padding: 0 12px;
+
+    &.statut-non-vendu {
+      background-color: $amber-100;
+      color: $amber-700;
+    }
+
+    &.statut-partiellement-vendu {
+      background-color: $blue-100;
+      color: $blue-800;
+    }
+
+    &.statut-vendu {
+      background-color: $green-50;
+      color: $green-600;
+    }
+  }
+}
+
+// ============================================
+// EMPTY STATES
+// ============================================
+.no-data,
+.loading-container,
+.error-container {
+  text-align: center;
+  padding: 64px 32px;
+  color: $gray-500;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  p {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
+
+.loading-container {
+  mat-spinner {
+    margin: 0 auto 16px;
+  }
+}
+
+.error-container {
+  mat-icon {
+    color: $red-500;
+    opacity: 1;
+  }
+
+  p {
+    color: $red-600;
+  }
+}

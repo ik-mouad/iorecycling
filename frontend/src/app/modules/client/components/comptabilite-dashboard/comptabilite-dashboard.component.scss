@@ -1,0 +1,50 @@
+.comptabilite-dashboard {
+  padding: 24px;
+
+  h1 {
+    margin-bottom: 24px;
+  }
+
+  .filters {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+
+    mat-card {
+      .kpi-value {
+        font-size: 2em;
+        font-weight: bold;
+        margin: 8px 0;
+
+        &.positive {
+          color: green;
+        }
+
+        &.negative {
+          color: red;
+        }
+      }
+    }
+  }
+
+  .alertes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+
+    .alerte {
+      background-color: #fff3cd;
+      border-left: 4px solid #ffc107;
+    }
+  }
+}
+

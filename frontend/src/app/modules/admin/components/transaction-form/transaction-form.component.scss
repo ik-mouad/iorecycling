@@ -1,0 +1,50 @@
+.transaction-form {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  h1 {
+    margin-bottom: 24px;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    mat-form-field {
+      flex: 1;
+    }
+  }
+
+  .full-width {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+
+  .echeances-section {
+    margin: 24px 0;
+    padding: 16px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+
+    .echeances-list {
+      margin-top: 16px;
+
+      .echeance-item {
+        margin-bottom: 16px;
+        padding: 16px;
+        background-color: white;
+        border-radius: 4px;
+      }
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+  }
+}
+

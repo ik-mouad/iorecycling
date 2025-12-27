@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from '../../../../auth/auth.service';
 import { DemandeService } from '../../../../services/demande.service';
+import { RoleService } from '../../../../services/role.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -26,7 +27,8 @@ export class AdminLayoutComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private demandeService: DemandeService
+    private demandeService: DemandeService,
+    private roleService: RoleService
   ) {}
 
   ngOnInit(): void {
@@ -58,5 +60,9 @@ export class AdminLayoutComponent implements OnInit {
 
   getUserName(): string {
     return this.authService.getUserName();
+  }
+
+  isComptable(): boolean {
+    return this.roleService.isComptable();
   }
 }

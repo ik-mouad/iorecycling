@@ -1,4 +1,4 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpInterceptorFn, HttpResponse } from '@angular/common/http';
 import { tap } from 'rxjs';
 
 /**
@@ -62,9 +62,11 @@ export const traceInterceptor: HttpInterceptorFn = (req, next) => {
   return next(clonedReq).pipe(
     // Intercepter la réponse pour extraire traceparent et le stocker
     tap(response => {
-      const traceparentHeader = response.headers.get('traceparent');
-      if (traceparentHeader && typeof localStorage !== 'undefined') {
-        localStorage.setItem('traceparent', traceparentHeader);
+      if (response instanceof HttpResponse) {
+        const traceparentHeader = response.headers.get('traceparent');
+        if (traceparentHeader && typeof localStorage !== 'undefined') {
+          localStorage.setItem('traceparent', traceparentHeader);
+        }
       }
     })
   );

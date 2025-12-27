@@ -25,5 +25,22 @@ public class PickupItemDTO {
     private String etat;  // vrac, compacté, broyé, Palettisé, autre
     private BigDecimal prixUnitaireMad;
     private BigDecimal montantMad;
+    
+    // NOUVEAUX CHAMPS - Prestation (tous types)
+    private BigDecimal prixPrestationMad;
+    private BigDecimal montantPrestationMad;
+    
+    // NOUVEAUX CHAMPS - Achat (valorisable)
+    private BigDecimal prixAchatMad;
+    private BigDecimal montantAchatMad;
+    
+    // NOUVEAUX CHAMPS - Traitement (banal)
+    private BigDecimal prixTraitementMad;
+    private BigDecimal montantTraitementMad;
+    
+    // NOUVEAUX CHAMPS - Suivi vente
+    private BigDecimal quantiteVendueKg;
+    private BigDecimal resteAVendreKg;
+    private String statutStock; // NON_VENDU, PARTIELLEMENT_VENDU, VENDU
 }
 

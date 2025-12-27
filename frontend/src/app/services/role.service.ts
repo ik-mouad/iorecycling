@@ -32,6 +32,10 @@ export class RoleService {
     return this.hasRole('CLIENT');
   }
   
+  isComptable(): boolean {
+    return this.hasRole('COMPTABLE');
+  }
+  
   hasAnyRole(roles: string[]): boolean {
     const userRoles = this.getUserRoles();
     return roles.some(role => userRoles.includes(role));

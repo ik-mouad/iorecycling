@@ -1,0 +1,79 @@
+<div class="comptabilite-dashboard">
+  <h1>Ma Comptabilité</h1>
+  
+  <!-- Filtres -->
+  <div class="filters">
+    <mat-form-field>
+      <mat-label>Date début</mat-label>
+      <input matInput type="date" [(ngModel)]="dateDebut" (change)="loadDashboard()">
+    </mat-form-field>
+    
+    <mat-form-field>
+      <mat-label>Date fin</mat-label>
+      <input matInput type="date" [(ngModel)]="dateFin" (change)="loadDashboard()">
+    </mat-form-field>
+    
+    <mat-button-toggle-group [(ngModel)]="periode" (change)="onPeriodeChange($event.value)">
+      <mat-button-toggle value="mensuel">Mensuel</mat-button-toggle>
+      <mat-button-toggle value="trimestriel">Trimestriel</mat-button-toggle>
+      <mat-button-toggle value="annuel">Annuel</mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="error">
+    {{ error }}
+  </div>
+
+  <!-- Dashboard -->
+  <div *ngIf="dashboard && !loading" class="dashboard-content">
+    <!-- KPIs -->
+    <div class="kpis">
+      <mat-card>
+        <mat-card-title>Total Recettes</mat-card-title>
+        <mat-card-content>
+          <div class="kpi-value">{{ dashboard.totalRecettes | number:'1.2-2' }} MAD</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card>
+        <mat-card-title>Résultat Net</mat-card-title>
+        <mat-card-content>
+          <div class="kpi-value" [class.positive]="dashboard.resultatNet >= 0" [class.negative]="dashboard.resultatNet < 0">
+            {{ dashboard.resultatNet | number:'1.2-2' }} MAD
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card>
+        <mat-card-title>Montant Impayé</mat-card-title>
+        <mat-card-content>
+          <div class="kpi-value">{{ dashboard.totalImpayes | number:'1.2-2' }} MAD</div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Alertes -->
+    <div class="alertes" *ngIf="dashboard.nombreEcheancesEnRetard > 0 || dashboard.nombreTransactionsImpayees > 0">
+      <mat-card *ngIf="dashboard.nombreEcheancesEnRetard > 0" class="alerte">
+        <mat-card-title>⚠️ Échéances en retard</mat-card-title>
+        <mat-card-content>
+          {{ dashboard.nombreEcheancesEnRetard }} échéance(s) - {{ dashboard.montantEcheancesEnRetard | number:'1.2-2' }} MAD
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card *ngIf="dashboard.nombreTransactionsImpayees > 0" class="alerte">
+        <mat-card-title>⚠️ Transactions impayées</mat-card-title>
+        <mat-card-content>
+          {{ dashboard.nombreTransactionsImpayees }} transaction(s) - {{ dashboard.totalImpayes | number:'1.2-2' }} MAD
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>
+

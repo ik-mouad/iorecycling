@@ -1,0 +1,127 @@
+<div class="transaction-form">
+  <h1>{{ isEditMode ? 'Modifier la transaction' : 'Nouvelle transaction' }}</h1>
+
+  <mat-card>
+    <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
+      <div class="form-row">
+        <mat-form-field>
+          <mat-label>Type</mat-label>
+          <mat-select formControlName="type" [disabled]="isEditMode || typeFixe">
+            <mat-option value="RECETTE">Recette</mat-option>
+            <mat-option value="DEPENSE">Dépense</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Montant (MAD)</mat-label>
+          <input matInput type="number" formControlName="montant" step="0.01" min="0.01">
+          <mat-error *ngIf="transactionForm.get('montant')?.hasError('required')">
+            Le montant est obligatoire
+          </mat-error>
+          <mat-error *ngIf="transactionForm.get('montant')?.hasError('min')">
+            Le montant doit être supérieur à 0
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Date</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="dateTransaction">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field class="full-width">
+        <mat-label>Description *</mat-label>
+        <textarea matInput formControlName="description" rows="3"></textarea>
+        <mat-error *ngIf="transactionForm.get('description')?.hasError('required')">
+          La description est obligatoire
+        </mat-error>
+      </mat-form-field>
+
+      <div class="form-row">
+        <mat-form-field>
+          <mat-label>Catégorie</mat-label>
+          <input matInput formControlName="categorie" placeholder="Ex: Frais généraux, Facturation client...">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Numéro de référence</mat-label>
+          <input matInput formControlName="numeroReference" placeholder="Ex: FACT-2024-001">
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field>
+          <mat-label>Société *</mat-label>
+          <mat-select formControlName="societeId" (selectionChange)="onSocieteChange($event.value)">
+            <mat-option *ngFor="let societe of societes" [value]="societe.id">
+              {{ societe.raisonSociale }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="transactionForm.get('societeId')?.hasError('required')">
+            La société est obligatoire
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Enlèvement (optionnel)</mat-label>
+          <mat-select formControlName="enlevementId">
+            <mat-option [value]="null">Aucun</mat-option>
+            <mat-option *ngFor="let enlevement of enlevements" [value]="enlevement.id">
+              {{ enlevement.numeroEnlevement }} - {{ enlevement.dateEnlevement | date:'dd/MM/yyyy' }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field class="full-width">
+        <mat-label>Notes</mat-label>
+        <textarea matInput formControlName="notes" rows="3"></textarea>
+      </mat-form-field>
+
+      <!-- Échéances -->
+      <div class="echeances-section">
+        <mat-checkbox formControlName="hasEcheances">
+          Ajouter des échéances de paiement
+        </mat-checkbox>
+
+        <div *ngIf="transactionForm.get('hasEcheances')?.value" class="echeances-list">
+          <div *ngFor="let echeance of echeancesFormArray.controls; let i = index" class="echeance-item">
+            <div class="form-row">
+              <mat-form-field>
+                <mat-label>Montant échéance</mat-label>
+                <input matInput type="number" [formControl]="$any(echeance.get('montant'))" step="0.01" min="0.01">
+              </mat-form-field>
+
+              <mat-form-field>
+                <mat-label>Date échéance</mat-label>
+                <input matInput [matDatepicker]="echeancePicker" [formControl]="$any(echeance.get('dateEcheance'))">
+                <mat-datepicker-toggle matSuffix [for]="echeancePicker"></mat-datepicker-toggle>
+                <mat-datepicker #echeancePicker></mat-datepicker>
+              </mat-form-field>
+
+              <button mat-icon-button type="button" (click)="removeEcheance(i)" color="warn">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <button mat-button type="button" (click)="addEcheance()">
+            <mat-icon>add</mat-icon>
+            Ajouter une échéance
+          </button>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button mat-button type="button" (click)="cancel()">Annuler</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="loading || transactionForm.invalid">
+          <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+          <span *ngIf="!loading">{{ isEditMode ? 'Modifier' : 'Créer' }}</span>
+        </button>
+      </div>
+    </form>
+  </mat-card>
+</div>
+

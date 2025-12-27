@@ -13,6 +13,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Entité représentant une ligne de détail d'un enlèvement
@@ -65,9 +67,43 @@ public class PickupItem {
     @Column(name = "montant_mad", precision = 12, scale = 2)
     private BigDecimal montantMad;
     
+    // NOUVEAUX CHAMPS - Prestation (tous types)
+    @Column(name = "prix_prestation_mad", precision = 10, scale = 3)
+    private BigDecimal prixPrestationMad;
+    
+    @Column(name = "montant_prestation_mad", precision = 12, scale = 2)
+    private BigDecimal montantPrestationMad;
+    
+    // NOUVEAUX CHAMPS - Achat (valorisable)
+    @Column(name = "prix_achat_mad", precision = 10, scale = 3)
+    private BigDecimal prixAchatMad;
+    
+    @Column(name = "montant_achat_mad", precision = 12, scale = 2)
+    private BigDecimal montantAchatMad;
+    
+    // NOUVEAUX CHAMPS - Traitement (banal)
+    @Column(name = "prix_traitement_mad", precision = 10, scale = 3)
+    private BigDecimal prixTraitementMad;
+    
+    @Column(name = "montant_traitement_mad", precision = 12, scale = 2)
+    private BigDecimal montantTraitementMad;
+    
+    // NOUVEAUX CHAMPS - Suivi vente
+    @Column(name = "quantite_vendue_kg", precision = 10, scale = 3)
+    @Builder.Default
+    private BigDecimal quantiteVendueKg = BigDecimal.ZERO;
+    
+    @Column(name = "reste_a_vendre_kg", precision = 10, scale = 3)
+    private BigDecimal resteAVendreKg;
+    
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;
+    
+    // Relation vers vente_item
+    @OneToMany(mappedBy = "pickupItem", fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<VenteItem> venteItems = new ArrayList<>();
     
     /**
      * Enum pour les types de déchets
@@ -98,5 +134,52 @@ public class PickupItem {
         } else {
             montantMad = BigDecimal.ZERO;
         }
+        
+        // Calcul montant prestation
+        if (prixPrestationMad != null && quantiteKg != null) {
+            montantPrestationMad = quantiteKg.multiply(prixPrestationMad)
+                    .setScale(2, RoundingMode.HALF_UP);
+        }
+        
+        // Calcul montant achat (si valorisable)
+        if (TypeDechet.RECYCLABLE.equals(typeDechet) && prixAchatMad != null && quantiteKg != null) {
+            montantAchatMad = quantiteKg.multiply(prixAchatMad)
+                    .setScale(2, RoundingMode.HALF_UP);
+        }
+        
+        // Calcul montant traitement (si banal)
+        if ((TypeDechet.BANAL.equals(typeDechet) || TypeDechet.A_DETRUIRE.equals(typeDechet)) 
+                && prixTraitementMad != null && quantiteKg != null) {
+            montantTraitementMad = quantiteKg.multiply(prixTraitementMad)
+                    .setScale(2, RoundingMode.HALF_UP);
+        }
+        
+        // Calcul reste à vendre
+        if (quantiteKg != null) {
+            resteAVendreKg = quantiteKg.subtract(quantiteVendueKg != null ? quantiteVendueKg : BigDecimal.ZERO)
+                    .setScale(3, RoundingMode.HALF_UP);
+        }
+    }
+    
+    /**
+     * Calcule le statut du stock
+     */
+    public StatutStock getStatutStock() {
+        if (resteAVendreKg == null || resteAVendreKg.compareTo(BigDecimal.ZERO) == 0) {
+            return StatutStock.VENDU;
+        }
+        if (quantiteVendueKg == null || quantiteVendueKg.compareTo(BigDecimal.ZERO) == 0) {
+            return StatutStock.NON_VENDU;
+        }
+        return StatutStock.PARTIELLEMENT_VENDU;
+    }
+    
+    /**
+     * Enum pour le statut du stock
+     */
+    public enum StatutStock {
+        NON_VENDU,
+        PARTIELLEMENT_VENDU,
+        VENDU
     }
 }

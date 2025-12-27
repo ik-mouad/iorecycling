@@ -98,6 +98,31 @@ health: ## Vérifier la santé des services
 	@echo "Test de l'API:"
 	@curl -s http://localhost:88/api/health | jq . || echo "API non accessible"
 
+# Build V2
+build-backend: ## Build backend (Maven)
+	@echo "🔨 Build Backend V2..."
+	@cd backend && ./mvnw clean package -DskipTests
+	@echo "✅ Backend build réussi"
+
+build-frontend: ## Build frontend (Angular)
+	@echo "🔨 Build Frontend V2..."
+	@cd frontend && npm install && ng build --configuration production
+	@echo "✅ Frontend build réussi"
+
+build-v2: build-backend build-frontend ## Build complet V2 (backend + frontend)
+	@echo "✅ Build V2 complet réussi!"
+
+# Vérification V2
+verify-v2: ## Vérifier que tout est prêt pour le déploiement V2
+	@echo "🔍 Vérification pré-déploiement V2..."
+	@if [ -f "scripts/verification_pre_deploiement.sh" ]; then \
+		chmod +x scripts/verification_pre_deploiement.sh; \
+		./scripts/verification_pre_deploiement.sh; \
+	else \
+		echo "⚠️  Script de vérification non trouvé (Linux/Mac)"; \
+		echo "💡 Utiliser: .\scripts\verification_pre_deploiement.ps1 (Windows)"; \
+	fi
+
 # Installation complète
 install: ## Installation complète (Docker + Node.js + Tests)
 	@echo "📦 Installation complète d'IORecycling..."

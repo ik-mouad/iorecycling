@@ -76,9 +76,27 @@
         <mat-icon>location_on</mat-icon>
         Destinations
       </a>
-      <a mat-stroked-button color="primary" routerLink="/admin/enlevements/new">
-        <mat-icon>add_circle</mat-icon>
-        Nouvel enlèvement
+      <a mat-button 
+         *ngIf="isComptable()"
+         routerLink="/admin/comptabilite" 
+         routerLinkActive="active">
+        <mat-icon>account_balance</mat-icon>
+        Comptabilité
+      </a>
+      <a mat-button 
+         *ngIf="isComptable()"
+         routerLink="/admin/ventes" 
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{exact: false}">
+        <mat-icon>shopping_cart</mat-icon>
+        Ventes
+      </a>
+      <a mat-button 
+         *ngIf="isComptable()"
+         routerLink="/admin/ventes/stocks" 
+         routerLinkActive="active">
+        <mat-icon>inventory_2</mat-icon>
+        Stocks
       </a>
     </div>
   </nav>
