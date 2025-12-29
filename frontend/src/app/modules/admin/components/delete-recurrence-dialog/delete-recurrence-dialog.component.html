@@ -1,0 +1,30 @@
+<div class="delete-recurrence-dialog">
+  <h2 mat-dialog-title class="dialog-title">
+    <mat-icon>warning</mat-icon>
+    Supprimer la récurrence
+  </h2>
+  
+  <mat-dialog-content class="dialog-content">
+    <p class="question">
+      Que souhaitez-vous faire avec les occurrences du planning associées à cette récurrence ?
+    </p>
+    
+    <div class="recurrence-info">
+      <div class="info-label">Récurrence concernée</div>
+      <div class="info-value">{{ data.recurrence.societeNom }} - {{ data.recurrence.siteNom }}</div>
+    </div>
+  </mat-dialog-content>
+  
+  <mat-dialog-actions class="dialog-actions">
+    <button mat-button class="cancel-button" (click)="onCancel()">
+      Annuler
+    </button>
+    <button mat-button class="delete-futures-button" (click)="onDeleteFutures()">
+      Supprimer uniquement les occurrences futures
+    </button>
+    <button mat-raised-button class="delete-all-button" (click)="onDeleteAll()">
+      Supprimer toutes les occurrences
+    </button>
+  </mat-dialog-actions>
+</div>
+

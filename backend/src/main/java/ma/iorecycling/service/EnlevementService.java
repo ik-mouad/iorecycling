@@ -10,10 +10,14 @@ import ma.iorecycling.entity.PickupItem;
 import ma.iorecycling.entity.Site;
 import ma.iorecycling.entity.Societe;
 import ma.iorecycling.mapper.EnlevementMapper;
+import ma.iorecycling.repository.CamionRepository;
+import ma.iorecycling.repository.DestinationRepository;
 import ma.iorecycling.repository.EnlevementRepository;
 import ma.iorecycling.repository.PickupItemRepository;
 import ma.iorecycling.repository.SiteRepository;
 import ma.iorecycling.repository.SocieteRepository;
+import ma.iorecycling.repository.TransactionRepository;
+import ma.iorecycling.service.TransactionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -35,7 +39,12 @@ public class EnlevementService {
     private final PickupItemRepository pickupItemRepository;
     private final SocieteRepository societeRepository;
     private final SiteRepository siteRepository;
+    private final CamionRepository camionRepository;
+    private final DestinationRepository destinationRepository;
     private final EnlevementMapper enlevementMapper;
+    private final TransactionGenerationService transactionGenerationService;
+    private final TransactionService transactionService;
+    private final TransactionRepository transactionRepository;
     
     /**
      * Crée un nouvel enlèvement avec ses items
@@ -55,12 +64,53 @@ public class EnlevementService {
             throw new IllegalArgumentException("Le site ne correspond pas à la société");
         }
         
+        // Vérifier le camion si fourni
+        ma.iorecycling.entity.Camion camion = null;
+        if (request.getCamionId() != null) {
+            camion = camionRepository.findById(request.getCamionId())
+                    .orElseThrow(() -> new IllegalArgumentException("Camion non trouvé avec l'ID : " + request.getCamionId()));
+            
+            // Vérifier que le camion est actif
+            if (!camion.getActif()) {
+                throw new IllegalArgumentException("Le camion sélectionné n'est pas actif et ne peut pas être utilisé pour un enlèvement");
+            }
+        }
+        
+        // Vérifier si des items A_DETRUIRE sont présents
+        boolean hasDechetsDangereux = request.getItems().stream()
+                .anyMatch(item -> "A_DETRUIRE".equals(item.getTypeDechet()));
+        
+        // Vérifier la destination
+        ma.iorecycling.entity.Destination destination = null;
+        if (request.getDestinationId() != null) {
+            destination = destinationRepository.findById(request.getDestinationId())
+                    .orElseThrow(() -> new IllegalArgumentException("Destination non trouvée avec l'ID : " + request.getDestinationId()));
+        }
+        
+        // Règle métier : Si des déchets dangereux sont présents, la destination est obligatoire et doit être compatible
+        if (hasDechetsDangereux) {
+            if (destination == null) {
+                throw new IllegalArgumentException("Une destination est obligatoire lorsque l'enlèvement contient des déchets dangereux (A_DETRUIRE)");
+            }
+            
+            if (!destination.peutTraiterDechetsDangereux()) {
+                throw new IllegalArgumentException("La destination sélectionnée ne peut pas traiter les déchets dangereux. " +
+                        "Elle doit avoir au moins un des types de traitement suivants : INCINERATION, ENFOUISSEMENT, DENATURATION_DESTRUCTION, TRAITEMENT");
+            }
+        }
+        
         // Créer l'enlèvement
         Enlevement enlevement = Enlevement.builder()
                 .dateEnlevement(request.getDateEnlevement())
+                .heureEnlevement(request.getHeureEnlevement())
+                .dateDestination(request.getDateDestination())
+                .heureDestination(request.getHeureDestination())
                 .site(site)
                 .societe(societe)
                 .observation(request.getObservation())
+                .camion(camion)
+                .chauffeurNom(request.getChauffeurNom())
+                .destination(destination)
                 .createdBy(createdBy)
                 .build();
         
@@ -81,6 +131,15 @@ public class EnlevementService {
         savedEnlevement = enlevementRepository.findById(savedEnlevement.getId())
                 .orElseThrow();
         
+        // Générer automatiquement les transactions comptables
+        try {
+            transactionGenerationService.generateTransactionsFromEnlevement(savedEnlevement);
+        } catch (Exception e) {
+            log.warn("Erreur lors de la génération des transactions pour l'enlèvement {}: {}", 
+                    savedEnlevement.getNumeroEnlevement(), e.getMessage());
+            // On continue même si la génération échoue (l'enlèvement est créé)
+        }
+        
         log.info("Enlèvement créé avec succès : {}", savedEnlevement.getNumeroEnlevement());
         return enlevementMapper.toDTO(savedEnlevement);
     }
@@ -95,11 +154,7 @@ public class EnlevementService {
     private PickupItem createPickupItem(Enlevement enlevement, CreatePickupItemRequest request) {
         PickupItem.TypeDechet typeDechet;
         try {
-            // Mapping entre frontend (A_DETRUIRE) et backend (A_ELIMINER)
             String typeDechetStr = request.getTypeDechet().toUpperCase();
-            if ("A_DETRUIRE".equals(typeDechetStr)) {
-                typeDechetStr = "A_ELIMINER";
-            }
             typeDechet = PickupItem.TypeDechet.valueOf(typeDechetStr);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Type de déchet invalide : " + request.getTypeDechet());
@@ -115,18 +170,29 @@ public class EnlevementService {
                         : "kg")
                 .etat(request.getEtat())
                 .prixUnitaireMad(request.getPrixUnitaireMad())
+                .prixPrestationMad(request.getPrixPrestationMad())
+                .prixAchatMad(request.getPrixAchatMad())
+                .prixTraitementMad(request.getPrixTraitementMad())
                 .build();
     }
     
     /**
-     * Récupère un enlèvement par son ID
+     * Récupère un enlèvement par son ID avec ses transactions
      */
     @Transactional(readOnly = true)
     public EnlevementDTO getEnlevementById(Long id) {
         Enlevement enlevement = enlevementRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Enlèvement non trouvé avec l'ID : " + id));
         
-        return enlevementMapper.toDTO(enlevement);
+        EnlevementDTO dto = enlevementMapper.toDTO(enlevement);
+        
+        // Charger les transactions liées à cet enlèvement
+        List<ma.iorecycling.entity.Transaction> transactions = transactionRepository.findByEnlevementId(id);
+        dto.setTransactions(transactions.stream()
+                .map(transactionService::toDTO)
+                .collect(java.util.stream.Collectors.toList()));
+        
+        return dto;
     }
     
     /**
@@ -174,6 +240,27 @@ public class EnlevementService {
         
         enlevementRepository.deleteById(id);
         log.info("Enlèvement supprimé avec succès : ID {}", id);
+    }
+    
+    /**
+     * Régénère les transactions comptables pour un enlèvement existant
+     */
+    public void regenerateTransactions(Long enlevementId) {
+        log.info("Régénération des transactions pour l'enlèvement ID {}", enlevementId);
+        
+        Enlevement enlevement = enlevementRepository.findByIdWithItems(enlevementId)
+                .orElseThrow(() -> new IllegalArgumentException("Enlèvement non trouvé avec l'ID : " + enlevementId));
+        
+        // Vérifier que l'enlèvement a des items
+        if (enlevement.getItems() == null || enlevement.getItems().isEmpty()) {
+            log.warn("L'enlèvement {} n'a pas d'items, aucune transaction à générer", enlevement.getNumeroEnlevement());
+            return;
+        }
+        
+        // Générer les transactions
+        transactionGenerationService.generateTransactionsFromEnlevement(enlevement);
+        
+        log.info("Transactions régénérées avec succès pour l'enlèvement {}", enlevement.getNumeroEnlevement());
     }
 }
 

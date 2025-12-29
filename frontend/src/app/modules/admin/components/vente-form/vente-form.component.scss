@@ -1,0 +1,852 @@
+/* ============================================
+   PREMIUM DESIGN SYSTEM - Vente Form
+   ============================================ */
+
+// Design Tokens
+$gray-50: #f9fafb;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-300: #d1d5db;
+$gray-400: #9ca3af;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-700: #374151;
+$gray-900: #0a0a0a;
+
+$blue-50: #f0f9ff;
+$blue-100: #e0f2fe;
+$blue-200: #bfdbfe;
+$blue-500: #3b82f6;
+$blue-600: #2563eb;
+$blue-700: #1d4ed8;
+
+$green-50: #f0fdf4;
+$green-500: #10b981;
+$green-600: #059669;
+
+$amber-50: #fffbeb;
+$amber-100: #fef3c7;
+$amber-500: #f59e0b;
+$amber-600: #d97706;
+
+$red-50: #fef2f2;
+$red-500: #ef4444;
+$red-600: #dc2626;
+
+$white: #ffffff;
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+// Container
+.vente-form {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px;
+  background: $gray-50;
+  min-height: 100vh;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================
+// HEADER PREMIUM
+// ============================================
+h1 {
+  margin: 0 0 48px 0;
+  font-size: 32px;
+  font-weight: 700;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: $gray-900;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+// ============================================
+// STEPPER PREMIUM
+// ============================================
+mat-card {
+  background: $white;
+  border-radius: 12px;
+  border: 1px solid $gray-200;
+  box-shadow: $shadow-sm;
+  padding: 32px;
+  overflow: hidden;
+}
+
+::ng-deep {
+  .mat-step-header {
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+  }
+
+  .mat-step-header:hover {
+    background: $gray-50;
+  }
+}
+
+// ============================================
+// FORM FIELDS PREMIUM
+// ============================================
+.full-width {
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+::ng-deep {
+  .mat-form-field {
+    .mat-form-field-wrapper {
+      padding-bottom: 0;
+    }
+
+    .mat-form-field-outline {
+      border-radius: 8px;
+    }
+  }
+}
+
+// ============================================
+// ITEM CARD PREMIUM
+// ============================================
+.item-card {
+  background: $white;
+  border: 1px solid $gray-200;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  position: relative;
+  box-shadow: $shadow-sm;
+  transition: all 0.2s;
+
+  &:hover {
+    box-shadow: $shadow-md;
+    border-color: $gray-300;
+  }
+
+  h3 {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: $gray-900;
+    padding-bottom: 12px;
+    border-bottom: 2px solid $gray-100;
+  }
+
+  .stock-selection {
+    margin-bottom: 24px;
+    padding: 16px;
+    background: $blue-50;
+    border-radius: 8px;
+    border: 1px solid $blue-100;
+  }
+
+  .item-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .montant-calculé {
+    padding: 12px 16px;
+    background: $gray-50;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid $gray-200;
+    margin-top: 8px;
+
+    strong {
+      font-size: 16px;
+      font-weight: 600;
+      color: $gray-900;
+    }
+  }
+
+  button[mat-icon-button] {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    color: $red-500;
+
+    &:hover {
+      background: $red-50;
+    }
+  }
+}
+
+// ============================================
+// TOTAL SECTION PREMIUM
+// ============================================
+.total-section {
+  margin: 32px 0;
+  padding: 24px;
+  background: linear-gradient(135deg, $blue-50 0%, $blue-100 100%);
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid $blue-200;
+  box-shadow: $shadow-sm;
+
+  h3 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: $blue-700;
+    letter-spacing: -0.01em;
+  }
+}
+
+// ============================================
+// BUTTONS PREMIUM
+// ============================================
+button[mat-stroked-button] {
+  height: 40px;
+  border-radius: 8px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  padding: 0 20px;
+  margin-top: 16px;
+}
+
+// ============================================
+// STEP ACTIONS PREMIUM
+// ============================================
+.step-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid $gray-200;
+
+  button {
+    height: 44px;
+    border-radius: 8px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    padding: 0 24px;
+
+    &[mat-raised-button] {
+      box-shadow: $shadow-sm;
+
+      &:hover {
+        box-shadow: $shadow-md;
+      }
+    }
+  }
+}
+
+// ============================================
+// VIEW MODE - Détail de la vente
+// ============================================
+.vente-form.view-mode {
+  background: $gray-50;
+}
+
+.vente-detail-view {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+// Header
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  padding: 24px;
+  background: $white;
+  border-radius: 12px;
+  border: 1px solid $gray-200;
+  box-shadow: $shadow-sm;
+
+  .header-left {
+    flex: 1;
+
+    h1 {
+      margin: 0 0 16px 0;
+      font-size: 32px;
+      font-weight: 700;
+      color: $gray-900;
+    }
+
+    .vente-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+
+      .vente-number {
+        font-size: 18px;
+        font-weight: 600;
+        color: $blue-600;
+        padding: 8px 16px;
+        background: $blue-50;
+        border-radius: 8px;
+        border: 1px solid $blue-100;
+      }
+    }
+  }
+
+  .header-actions {
+    button {
+      height: 44px;
+      border-radius: 8px;
+      font-weight: 500;
+      text-transform: none;
+      padding: 0 24px;
+    }
+  }
+}
+
+// Statut chips
+::ng-deep {
+  mat-chip {
+    font-weight: 600;
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 6px;
+
+    &.statut-brouillon {
+      background: $amber-100;
+      color: $amber-600;
+    }
+
+    &.statut-validee {
+      background: $green-50;
+      color: $green-600;
+    }
+
+    &.statut-annulee {
+      background: $red-50;
+      color: $red-600;
+    }
+  }
+}
+
+// Info cards
+.info-card,
+.items-card,
+.metadata-card {
+  margin-bottom: 24px;
+  border-radius: 12px;
+  border: 1px solid $gray-200;
+  box-shadow: $shadow-sm;
+  overflow: hidden;
+
+  mat-card-header {
+    background: $gray-50;
+    padding: 20px 24px;
+    border-bottom: 1px solid $gray-200;
+
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 18px;
+      font-weight: 600;
+      color: $gray-900;
+      margin: 0;
+
+      mat-icon {
+        color: $blue-600;
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
+
+  mat-card-content {
+    padding: 24px;
+  }
+}
+
+// Info grid
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .info-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: $gray-500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .info-value {
+      font-size: 16px;
+      font-weight: 500;
+      color: $gray-900;
+    }
+  }
+}
+
+// Items table
+.items-table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid $gray-200;
+}
+
+.items-table {
+  width: 100%;
+  background: $white;
+  border-collapse: collapse;
+
+  thead {
+    background: $gray-50;
+
+    th {
+      padding: 16px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 13px;
+      color: $gray-700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 2px solid $gray-200;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid $gray-100;
+      transition: background 0.2s;
+
+      &:hover {
+        background: $gray-50;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    td {
+      padding: 16px;
+      font-size: 14px;
+      color: $gray-700;
+
+      &.number-cell {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      &.amount-cell {
+        font-weight: 600;
+        color: $blue-600;
+        font-size: 15px;
+      }
+    }
+  }
+}
+
+.type-chip {
+  background: $blue-50 !important;
+  color: $blue-600 !important;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+// Total card
+.total-card {
+  background: linear-gradient(135deg, $blue-50 0%, $blue-100 100%);
+  border: 2px solid $blue-200;
+  box-shadow: $shadow-md;
+  margin-bottom: 24px;
+
+  .total-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 32px;
+
+    .total-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 20px;
+      font-weight: 600;
+      color: $blue-700;
+
+      mat-icon {
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+        color: $blue-600;
+      }
+    }
+
+    .total-amount {
+      font-size: 36px;
+      font-weight: 700;
+      color: $blue-700;
+      letter-spacing: -0.02em;
+
+      .currency {
+        font-size: 24px;
+        font-weight: 500;
+        margin-left: 8px;
+      }
+    }
+  }
+}
+
+// Metadata grid
+.metadata-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .detail-header {
+    flex-direction: column;
+    gap: 16px;
+
+    .header-actions {
+      width: 100%;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+
+  .info-grid,
+  .metadata-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .total-content {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 16px;
+  }
+
+  .items-table-container {
+    overflow-x: scroll;
+  }
+}
+// ============================================
+// VIEW MODE - Détail de la vente
+// ============================================
+.vente-form.view-mode {
+  background: $gray-50;
+}
+
+.vente-detail-view {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+// Header
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  padding: 24px;
+  background: $white;
+  border-radius: 12px;
+  border: 1px solid $gray-200;
+  box-shadow: $shadow-sm;
+
+  .header-left {
+    flex: 1;
+
+    h1 {
+      margin: 0 0 16px 0;
+      font-size: 32px;
+      font-weight: 700;
+      color: $gray-900;
+    }
+
+    .vente-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+
+      .vente-number {
+        font-size: 18px;
+        font-weight: 600;
+        color: $blue-600;
+        padding: 8px 16px;
+        background: $blue-50;
+        border-radius: 8px;
+        border: 1px solid $blue-100;
+      }
+    }
+  }
+
+  .header-actions {
+    button {
+      height: 44px;
+      border-radius: 8px;
+      font-weight: 500;
+      text-transform: none;
+      padding: 0 24px;
+    }
+  }
+}
+
+// Statut chips
+::ng-deep {
+  mat-chip {
+    font-weight: 600;
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 6px;
+
+    &.statut-brouillon {
+      background: $amber-100;
+      color: $amber-600;
+    }
+
+    &.statut-validee {
+      background: $green-50;
+      color: $green-600;
+    }
+
+    &.statut-annulee {
+      background: $red-50;
+      color: $red-600;
+    }
+  }
+}
+
+// Info cards
+.info-card,
+.items-card,
+.metadata-card {
+  margin-bottom: 24px;
+  border-radius: 12px;
+  border: 1px solid $gray-200;
+  box-shadow: $shadow-sm;
+  overflow: hidden;
+
+  mat-card-header {
+    background: $gray-50;
+    padding: 20px 24px;
+    border-bottom: 1px solid $gray-200;
+
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 18px;
+      font-weight: 600;
+      color: $gray-900;
+      margin: 0;
+
+      mat-icon {
+        color: $blue-600;
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
+
+  mat-card-content {
+    padding: 24px;
+  }
+}
+
+// Info grid
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .info-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: $gray-500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .info-value {
+      font-size: 16px;
+      font-weight: 500;
+      color: $gray-900;
+    }
+  }
+}
+
+// Items table
+.items-table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid $gray-200;
+}
+
+.items-table {
+  width: 100%;
+  background: $white;
+  border-collapse: collapse;
+
+  thead {
+    background: $gray-50;
+
+    th {
+      padding: 16px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 13px;
+      color: $gray-700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 2px solid $gray-200;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid $gray-100;
+      transition: background 0.2s;
+
+      &:hover {
+        background: $gray-50;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    td {
+      padding: 16px;
+      font-size: 14px;
+      color: $gray-700;
+
+      &.number-cell {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      &.amount-cell {
+        font-weight: 600;
+        color: $blue-600;
+        font-size: 15px;
+      }
+    }
+  }
+}
+
+.type-chip {
+  background: $blue-50 !important;
+  color: $blue-600 !important;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+// Total card
+.total-card {
+  background: linear-gradient(135deg, $blue-50 0%, $blue-100 100%);
+  border: 2px solid $blue-200;
+  box-shadow: $shadow-md;
+  margin-bottom: 24px;
+
+  .total-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 32px;
+
+    .total-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 20px;
+      font-weight: 600;
+      color: $blue-700;
+
+      mat-icon {
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+        color: $blue-600;
+      }
+    }
+
+    .total-amount {
+      font-size: 36px;
+      font-weight: 700;
+      color: $blue-700;
+      letter-spacing: -0.02em;
+
+      .currency {
+        font-size: 24px;
+        font-weight: 500;
+        margin-left: 8px;
+      }
+    }
+  }
+}
+
+// Metadata grid
+.metadata-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .detail-header {
+    flex-direction: column;
+    gap: 16px;
+
+    .header-actions {
+      width: 100%;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+
+  .info-grid,
+  .metadata-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .total-content {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 16px;
+  }
+
+  .items-table-container {
+    overflow-x: scroll;
+  }
+}

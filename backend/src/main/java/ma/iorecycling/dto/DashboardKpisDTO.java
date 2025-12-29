@@ -69,7 +69,7 @@ public class DashboardKpisDTO {
         private Double pourcentageBanal;
         private Double pourcentageADetruire;
         
-        // Détail par sous-type pour VALORISABLE
+        // Détail par sous-type pour RECYCLABLE
         private Map<String, BigDecimal> detailRecyclable;
     }
 }

@@ -113,14 +113,38 @@ public class RecurrenceService {
     
     /**
      * Supprime une récurrence
+     * @param id ID de la récurrence à supprimer
+     * @param supprimerToutesOccurrences Si true, supprime toutes les occurrences (passées et futures), 
+     *                                   si false, supprime uniquement les occurrences futures
      */
-    public void supprimerRecurrence(Long id) {
-        log.info("Suppression récurrence ID {}", id);
+    public void supprimerRecurrence(Long id, boolean supprimerToutesOccurrences) {
+        log.info("Suppression récurrence ID {} (supprimer toutes occurrences: {})", id, supprimerToutesOccurrences);
         
+        // Vérifier que la récurrence existe
         if (!recurrenceRepository.existsById(id)) {
             throw new IllegalArgumentException("Récurrence non trouvée");
         }
         
+        // Supprimer les occurrences du planning associées
+        List<PlanningEnlevement> occurrences;
+        if (supprimerToutesOccurrences) {
+            // Supprimer toutes les occurrences (passées et futures)
+            occurrences = planningEnlevementRepository.findByRecurrenceId(id);
+            log.info("Suppression de toutes les occurrences (passées et futures) de la récurrence {}", id);
+        } else {
+            // Supprimer uniquement les occurrences futures
+            occurrences = planningEnlevementRepository.findByRecurrenceIdAndDatePrevueGreaterThanEqual(
+                    id, LocalDate.now());
+            log.info("Suppression des occurrences futures uniquement de la récurrence {}", id);
+        }
+        
+        if (!occurrences.isEmpty()) {
+            log.info("Suppression de {} occurrence(s) du planning pour la récurrence {}", 
+                    occurrences.size(), id);
+            planningEnlevementRepository.deleteAll(occurrences);
+        }
+        
+        // Supprimer la récurrence
         recurrenceRepository.deleteById(id);
         log.info("Récurrence supprimée : ID {}", id);
     }

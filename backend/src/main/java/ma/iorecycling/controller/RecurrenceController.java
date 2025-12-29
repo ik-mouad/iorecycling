@@ -88,14 +88,19 @@ public class RecurrenceController {
     
     /**
      * Supprime une récurrence
+     * @param id ID de la récurrence à supprimer
+     * @param supprimerToutesOccurrences Si true, supprime toutes les occurrences (passées et futures), 
+     *                                   si false, supprime uniquement les occurrences futures (défaut: false)
      */
     @DeleteMapping("/{id}")
-    @Operation(summary = "Supprimer récurrence", description = "Supprime une récurrence")
-    public ResponseEntity<Void> supprimerRecurrence(@PathVariable Long id) {
-        log.info("DELETE /api/admin/recurrences/{}", id);
+    @Operation(summary = "Supprimer récurrence", description = "Supprime une récurrence et optionnellement ses occurrences du planning")
+    public ResponseEntity<Void> supprimerRecurrence(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "false") boolean supprimerToutesOccurrences) {
+        log.info("DELETE /api/admin/recurrences/{} (supprimer toutes occurrences: {})", id, supprimerToutesOccurrences);
         
         try {
-            recurrenceService.supprimerRecurrence(id);
+            recurrenceService.supprimerRecurrence(id, supprimerToutesOccurrences);
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {
             log.error("Récurrence non trouvée : {}", e.getMessage());

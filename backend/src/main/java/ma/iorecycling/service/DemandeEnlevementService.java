@@ -4,11 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ma.iorecycling.dto.CreateDemandeEnlevementRequest;
 import ma.iorecycling.dto.DemandeEnlevementDTO;
+import ma.iorecycling.dto.ValiderDemandeRequest;
 import ma.iorecycling.entity.DemandeEnlevement;
 import ma.iorecycling.entity.DemandeEnlevement.StatutDemande;
+import ma.iorecycling.entity.PlanningEnlevement;
+import ma.iorecycling.entity.PlanningEnlevement.StatutPlanning;
 import ma.iorecycling.entity.Site;
 import ma.iorecycling.entity.Societe;
 import ma.iorecycling.repository.DemandeEnlevementRepository;
+import ma.iorecycling.repository.PlanningEnlevementRepository;
 import ma.iorecycling.repository.SiteRepository;
 import ma.iorecycling.repository.SocieteRepository;
 import org.springframework.data.domain.Page;
@@ -16,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +36,7 @@ public class DemandeEnlevementService {
     private final DemandeEnlevementRepository demandeRepository;
     private final SocieteRepository societeRepository;
     private final SiteRepository siteRepository;
+    private final PlanningEnlevementRepository planningEnlevementRepository;
     
     /**
      * Crée une nouvelle demande d'enlèvement
@@ -95,9 +101,12 @@ public class DemandeEnlevementService {
     }
     
     /**
-     * Valide une demande
+     * Valide une demande et crée automatiquement une entrée dans le planning
+     * @param id ID de la demande à valider
+     * @param treatedBy Utilisateur qui traite la demande
+     * @param request DTO contenant les dates/heures modifiées (optionnel)
      */
-    public DemandeEnlevementDTO validerDemande(Long id, String treatedBy) {
+    public DemandeEnlevementDTO validerDemande(Long id, String treatedBy, ValiderDemandeRequest request) {
         log.info("Validation de la demande ID {}", id);
         
         DemandeEnlevement demande = demandeRepository.findById(id)
@@ -111,6 +120,37 @@ public class DemandeEnlevementService {
         demande.setTreatedBy(treatedBy);
         
         DemandeEnlevement savedDemande = demandeRepository.save(demande);
+        
+        // Utiliser les dates/heures modifiées si fournies, sinon utiliser les originales
+        LocalDate datePlanning = (request != null && request.getDateModifiee() != null) 
+                ? request.getDateModifiee() 
+                : demande.getDateSouhaitee();
+        String heurePlanning = (request != null && request.getHeureModifiee() != null && !request.getHeureModifiee().trim().isEmpty())
+                ? request.getHeureModifiee()
+                : demande.getHeureSouhaitee();
+        
+        // Créer automatiquement une entrée dans le planning
+        String commentairePlanning = "Enlèvement planifié depuis la demande " + savedDemande.getNumeroDemande();
+        if (demande.getCommentaire() != null && !demande.getCommentaire().trim().isEmpty()) {
+            String commentaireComplet = commentairePlanning + " - " + demande.getCommentaire();
+            // Limiter à 500 caractères (limite de la colonne)
+            commentairePlanning = commentaireComplet.length() > 500 
+                    ? commentaireComplet.substring(0, 497) + "..." 
+                    : commentaireComplet;
+        }
+        
+        PlanningEnlevement planning = PlanningEnlevement.builder()
+                .datePrevue(datePlanning)
+                .heurePrevue(heurePlanning)
+                .site(demande.getSite())
+                .societe(demande.getSociete())
+                .statut(StatutPlanning.PLANIFIE)
+                .commentaire(commentairePlanning)
+                .build();
+        
+        PlanningEnlevement savedPlanning = planningEnlevementRepository.save(planning);
+        log.info("Planning créé automatiquement : ID {} pour la demande {} (date: {}, heure: {})", 
+                savedPlanning.getId(), savedDemande.getNumeroDemande(), datePlanning, heurePlanning);
         
         log.info("Demande validée : {}", savedDemande.getNumeroDemande());
         return toDTO(savedDemande);

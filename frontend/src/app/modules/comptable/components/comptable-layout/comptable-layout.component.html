@@ -1,0 +1,94 @@
+<div class="comptable-layout">
+  <!-- Header -->
+  <header class="comptable-header">
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo-section">
+          <div class="logo-icon">
+            <svg fill="none" height="40" viewBox="0 0 40 40" width="40" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 5L25 14H15L20 5Z" fill="#3B82F6"></path>
+              <path d="M28 20L36 24L28 28V20Z" fill="#10B981"></path>
+              <path d="M12 20L4 24L12 28V20Z" fill="#3B82F6"></path>
+              <circle cx="20" cy="20" r="18" stroke="#3B82F6" stroke-opacity="0.5" stroke-width="3"></circle>
+              <path d="M14 26L20 16L26 26H14Z" fill="#10B981"></path>
+            </svg>
+          </div>
+          <div class="logo-text">
+            <div class="logo-title">Comptabilité</div>
+            <div class="logo-subtitle">IORecycling</div>
+          </div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="user-profile">
+          <div class="user-info-text">
+            <p class="user-name">{{ getUserName() }}</p>
+            <p class="user-role">Admin</p>
+          </div>
+          <div class="user-avatar">{{ getUserInitials() }}</div>
+        </div>
+        <button class="menu-button" [matMenuTriggerFor]="userMenu" aria-label="Menu utilisateur">
+          <mat-icon>menu</mat-icon>
+        </button>
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Se déconnecter</span>
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="comptable-nav">
+    <div class="nav-buttons">
+      <a mat-button 
+         routerLink="/comptable/dashboard" 
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{exact: true}">
+        <mat-icon>dashboard</mat-icon>
+        <span>Dashboard</span>
+      </a>
+      <a mat-button 
+         routerLink="/comptable/transactions" 
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{exact: false}">
+        <mat-icon>list_alt</mat-icon>
+        <span>Transactions</span>
+      </a>
+      <a mat-button 
+         routerLink="/comptable/ventes" 
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{exact: false}">
+        <mat-icon>shopping_cart</mat-icon>
+        <span>Ventes</span>
+      </a>
+      <a mat-button 
+         routerLink="/comptable/stocks" 
+         routerLinkActive="active">
+        <mat-icon>inventory_2</mat-icon>
+        <span>Stocks</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Breadcrumbs -->
+  <div class="breadcrumbs-container" *ngIf="breadcrumbs.length > 0">
+    <nav class="breadcrumbs">
+      <a *ngFor="let crumb of breadcrumbs; let last = last" 
+         [routerLink]="crumb.url" 
+         [class.active]="last"
+         class="breadcrumb-item">
+        <mat-icon *ngIf="crumb.icon">{{ crumb.icon }}</mat-icon>
+        <span>{{ crumb.label }}</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <main class="comptable-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>
+

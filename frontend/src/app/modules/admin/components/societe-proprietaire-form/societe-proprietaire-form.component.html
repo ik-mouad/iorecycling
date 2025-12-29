@@ -1,0 +1,80 @@
+<div class="societe-proprietaire-form-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        {{ isEditMode ? 'Modifier la société propriétaire' : 'Nouvelle société propriétaire' }}
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="societeProprietaireForm" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Raison sociale *</mat-label>
+            <input matInput formControlName="raisonSociale" placeholder="Ex: Transport ABC S.A.">
+            <mat-error>{{ getErrorMessage('raisonSociale') }}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-section">
+          <h3>Coordonnées</h3>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Contact</mat-label>
+              <input matInput formControlName="contact" placeholder="Ex: Mohamed BENALI">
+              <mat-error>{{ getErrorMessage('contact') }}</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Téléphone</mat-label>
+              <input matInput formControlName="telephone" placeholder="Ex: +212 6XX XXX XXX">
+              <mat-error>{{ getErrorMessage('telephone') }}</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Email</mat-label>
+              <input matInput type="email" formControlName="email" placeholder="Ex: contact@example.com">
+              <mat-error>{{ getErrorMessage('email') }}</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Adresse</mat-label>
+              <textarea matInput formControlName="adresse" rows="2" placeholder="Adresse complète"></textarea>
+              <mat-error>{{ getErrorMessage('adresse') }}</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Observation</mat-label>
+            <textarea matInput formControlName="observation" rows="3" placeholder="Notes ou remarques"></textarea>
+            <mat-error>{{ getErrorMessage('observation') }}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-slide-toggle formControlName="actif">
+            Société propriétaire active (peut être utilisée pour les camions)
+          </mat-slide-toggle>
+        </div>
+
+        <div class="form-actions">
+          <button mat-button type="button" (click)="cancel()" [disabled]="loading">
+            Annuler
+          </button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="loading || societeProprietaireForm.invalid">
+            <mat-spinner *ngIf="loading" diameter="20" style="display: inline-block; margin-right: 8px;"></mat-spinner>
+            {{ isEditMode ? 'Modifier' : 'Créer' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
+

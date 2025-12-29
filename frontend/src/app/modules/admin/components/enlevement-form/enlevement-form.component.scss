@@ -141,6 +141,28 @@ $shadow-lg: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06
       }
     }
   }
+
+  .tonnage-warning {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: $amber-50;
+    border: 1px solid $amber-500;
+    border-radius: 8px;
+    color: $amber-600;
+    margin-top: 8px;
+
+    mat-icon {
+      flex-shrink: 0;
+    }
+
+    span {
+      flex: 1;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  }
 }
 
 // ============================================

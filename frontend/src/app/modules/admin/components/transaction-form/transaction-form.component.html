@@ -1,0 +1,356 @@
+<div class="transaction-form">
+  <!-- MODE CONSULTATION : Vue dédiée pour les détails -->
+  <div *ngIf="isViewMode && currentTransaction" class="transaction-detail-view">
+    <!-- Header avec informations principales -->
+    <div class="detail-header">
+      <div class="header-left">
+        <h1>💰 Détail de la Transaction</h1>
+        <div class="transaction-meta">
+          <mat-chip [class]="'statut-' + currentTransaction.statut.toLowerCase()">
+            {{ getStatutLabel(currentTransaction.statut) }}
+          </mat-chip>
+          <mat-chip [class]="currentTransaction.type === TypeTransaction.RECETTE ? 'chip-recette' : 'chip-depense'">
+            {{ getTypeLabel(currentTransaction.type) }}
+          </mat-chip>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button mat-stroked-button (click)="editTransaction()" *ngIf="basePath.startsWith('/admin')">
+          <mat-icon>edit</mat-icon>
+          Modifier
+        </button>
+        <button mat-stroked-button (click)="cancel()">
+          <mat-icon>arrow_back</mat-icon>
+          Retour à la liste
+        </button>
+      </div>
+    </div>
+
+    <!-- Informations générales -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>info</mat-icon>
+          Informations générales
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Type :</span>
+            <span class="info-value">
+              <mat-chip [class]="currentTransaction.type === TypeTransaction.RECETTE ? 'chip-recette' : 'chip-depense'">
+                {{ getTypeLabel(currentTransaction.type) }}
+              </mat-chip>
+            </span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Montant :</span>
+            <span class="info-value amount-value" [class.amount-recette]="currentTransaction.type === TypeTransaction.RECETTE" [class.amount-depense]="currentTransaction.type === TypeTransaction.DEPENSE">
+              {{ currentTransaction.type === TypeTransaction.RECETTE ? '+' : '-' }}{{ currentTransaction.montant | number:'1.2-2' }} <span class="currency">MAD</span>
+            </span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Date de transaction :</span>
+            <span class="info-value">{{ formatDate(currentTransaction.dateTransaction) }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Statut :</span>
+            <span class="info-value">
+              <mat-chip [class]="'statut-' + currentTransaction.statut.toLowerCase()">
+                {{ getStatutLabel(currentTransaction.statut) }}
+              </mat-chip>
+            </span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Description :</span>
+            <span class="info-value">{{ currentTransaction.description }}</span>
+          </div>
+          <div class="info-item" *ngIf="currentTransaction.categorie">
+            <span class="info-label">Catégorie :</span>
+            <span class="info-value">{{ currentTransaction.categorie }}</span>
+          </div>
+          <div class="info-item" *ngIf="currentTransaction.numeroReference">
+            <span class="info-label">Numéro de référence :</span>
+            <span class="info-value">{{ currentTransaction.numeroReference }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Société :</span>
+            <span class="info-value">{{ getSocieteName(currentTransaction.societeId) }}</span>
+          </div>
+          <div class="info-item" *ngIf="currentTransaction.enlevementNumero">
+            <span class="info-label">Enlèvement :</span>
+            <span class="info-value">
+              <button mat-button color="primary" (click)="viewEnlevement(currentTransaction.enlevementId!)">
+                <mat-icon>local_shipping</mat-icon>
+                {{ currentTransaction.enlevementNumero }}
+              </button>
+            </span>
+          </div>
+          <div class="info-item" *ngIf="currentTransaction.notes">
+            <span class="info-label">Notes :</span>
+            <span class="info-value">{{ currentTransaction.notes }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Informations financières -->
+    <mat-card class="financial-card" *ngIf="currentTransaction.montantPaye !== undefined || currentTransaction.montantRestant !== undefined">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>account_balance</mat-icon>
+          Informations financières
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="financial-grid">
+          <div class="financial-item">
+            <span class="financial-label">Montant total :</span>
+            <span class="financial-value">{{ currentTransaction.montant | number:'1.2-2' }} MAD</span>
+          </div>
+          <div class="financial-item" *ngIf="currentTransaction.montantPaye !== undefined">
+            <span class="financial-label">Montant payé :</span>
+            <span class="financial-value paid-value">{{ currentTransaction.montantPaye | number:'1.2-2' }} MAD</span>
+          </div>
+          <div class="financial-item" *ngIf="currentTransaction.montantRestant !== undefined">
+            <span class="financial-label">Montant restant :</span>
+            <span class="financial-value remaining-value">{{ currentTransaction.montantRestant | number:'1.2-2' }} MAD</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Paiements -->
+    <mat-card class="paiements-card" *ngIf="isViewMode && currentTransaction">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>payment</mat-icon>
+          Paiements ({{ currentTransaction.paiements?.length || 0 }})
+        </mat-card-title>
+        <div class="spacer"></div>
+        <button 
+          *ngIf="isComptable && currentTransaction.montantRestant && currentTransaction.montantRestant > 0"
+          mat-raised-button 
+          color="primary" 
+          (click)="openAddPaiementDialog()">
+          <mat-icon>add</mat-icon>
+          Ajouter un paiement
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="paiements-table-wrapper" *ngIf="currentTransaction.paiements && currentTransaction.paiements.length > 0">
+          <table class="paiements-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Montant</th>
+                <th>Méthode</th>
+                <th>Référence</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let paiement of currentTransaction.paiements">
+                <td>{{ formatDate(paiement.datePaiement) }}</td>
+                <td class="amount-cell">{{ paiement.montant | number:'1.2-2' }} MAD</td>
+                <td>{{ paiement.modePaiement }}</td>
+                <td>{{ paiement.reference || '-' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div *ngIf="!currentTransaction.paiements || currentTransaction.paiements.length === 0" class="empty-state">
+          <p>Aucun paiement enregistré</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Échéances -->
+    <mat-card class="echeances-card" *ngIf="currentTransaction.echeances && currentTransaction.echeances.length > 0">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>schedule</mat-icon>
+          Échéances ({{ currentTransaction.echeances.length }})
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="echeances-table-wrapper">
+          <table class="echeances-table">
+            <thead>
+              <tr>
+                <th>Date d'échéance</th>
+                <th>Montant</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let echeance of currentTransaction.echeances">
+                <td>{{ formatDate(echeance.dateEcheance) }}</td>
+                <td class="amount-cell">{{ echeance.montant | number:'1.2-2' }} MAD</td>
+                <td>
+                  <mat-chip [class]="'statut-' + echeance.statut.toLowerCase()">
+                    {{ getStatutLabel(echeance.statut) }}
+                  </mat-chip>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Métadonnées -->
+    <mat-card class="metadata-card" *ngIf="currentTransaction.createdBy || currentTransaction.createdAt">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>history</mat-icon>
+          Informations système
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="metadata-grid">
+          <div class="info-item" *ngIf="currentTransaction.createdBy">
+            <span class="info-label">Créé par :</span>
+            <span class="info-value">{{ currentTransaction.createdBy }}</span>
+          </div>
+          <div class="info-item" *ngIf="currentTransaction.createdAt">
+            <span class="info-label">Date de création :</span>
+            <span class="info-value">{{ formatDateTime(currentTransaction.createdAt) }}</span>
+          </div>
+          <div class="info-item" *ngIf="currentTransaction.updatedAt">
+            <span class="info-label">Dernière modification :</span>
+            <span class="info-value">{{ formatDateTime(currentTransaction.updatedAt) }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- MODE CRÉATION/ÉDITION : Formulaire -->
+  <div *ngIf="!isViewMode">
+    <h1>{{ isEditMode ? 'Modifier la transaction' : 'Nouvelle transaction' }}</h1>
+
+    <mat-card>
+      <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+          <mat-form-field>
+            <mat-label>Type</mat-label>
+            <mat-select formControlName="type" [disabled]="isEditMode || typeFixe">
+              <mat-option value="RECETTE">Recette</mat-option>
+              <mat-option value="DEPENSE">Dépense</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Montant (MAD)</mat-label>
+            <input matInput type="number" formControlName="montant" step="0.01" min="0.01">
+            <mat-error *ngIf="transactionForm.get('montant')?.hasError('required')">
+              Le montant est obligatoire
+            </mat-error>
+            <mat-error *ngIf="transactionForm.get('montant')?.hasError('min')">
+              Le montant doit être supérieur à 0
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Date</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="dateTransaction">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field class="full-width">
+          <mat-label>Description *</mat-label>
+          <textarea matInput formControlName="description" rows="3"></textarea>
+          <mat-error *ngIf="transactionForm.get('description')?.hasError('required')">
+            La description est obligatoire
+          </mat-error>
+        </mat-form-field>
+
+        <div class="form-row">
+          <mat-form-field>
+            <mat-label>Catégorie</mat-label>
+            <input matInput formControlName="categorie" placeholder="Ex: Frais généraux, Facturation client...">
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Numéro de référence</mat-label>
+            <input matInput formControlName="numeroReference" placeholder="Ex: FACT-2024-001">
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field>
+            <mat-label>Société *</mat-label>
+            <mat-select formControlName="societeId" (selectionChange)="onSocieteChange($event.value)">
+              <mat-option *ngFor="let societe of societes" [value]="societe.id">
+                {{ societe.raisonSociale }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="transactionForm.get('societeId')?.hasError('required')">
+              La société est obligatoire
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Enlèvement (optionnel)</mat-label>
+            <mat-select formControlName="enlevementId">
+              <mat-option [value]="null">Aucun</mat-option>
+              <mat-option *ngFor="let enlevement of enlevements" [value]="enlevement.id">
+                {{ enlevement.numeroEnlevement }} - {{ enlevement.dateEnlevement | date:'dd/MM/yyyy' }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field class="full-width">
+          <mat-label>Notes</mat-label>
+          <textarea matInput formControlName="notes" rows="3"></textarea>
+        </mat-form-field>
+
+        <!-- Échéances -->
+        <div class="echeances-section">
+          <mat-checkbox formControlName="hasEcheances">
+            Ajouter des échéances de paiement
+          </mat-checkbox>
+
+          <div *ngIf="transactionForm.get('hasEcheances')?.value" class="echeances-list">
+            <div *ngFor="let echeance of echeancesFormArray.controls; let i = index" class="echeance-item">
+              <div class="form-row">
+                <mat-form-field>
+                  <mat-label>Montant échéance</mat-label>
+                  <input matInput type="number" [formControl]="$any(echeance.get('montant'))" step="0.01" min="0.01">
+                </mat-form-field>
+
+                <mat-form-field>
+                  <mat-label>Date échéance</mat-label>
+                  <input matInput [matDatepicker]="echeancePicker" [formControl]="$any(echeance.get('dateEcheance'))">
+                  <mat-datepicker-toggle matSuffix [for]="echeancePicker"></mat-datepicker-toggle>
+                  <mat-datepicker #echeancePicker></mat-datepicker>
+                </mat-form-field>
+
+                <button mat-icon-button type="button" (click)="removeEcheance(i)" color="warn">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <button mat-button type="button" (click)="addEcheance()">
+              <mat-icon>add</mat-icon>
+              Ajouter une échéance
+            </button>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button mat-button type="button" (click)="cancel()">Annuler</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="loading || transactionForm.invalid">
+            <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+            <span *ngIf="!loading">{{ isEditMode ? 'Modifier' : 'Créer' }}</span>
+          </button>
+        </div>
+      </form>
+    </mat-card>
+  </div>
+</div>

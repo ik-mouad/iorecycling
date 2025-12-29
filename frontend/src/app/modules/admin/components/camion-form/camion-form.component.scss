@@ -1,0 +1,33 @@
+.camion-form-container {
+  padding: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+
+  mat-card {
+    mat-card-content {
+      padding-top: 16px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+
+      mat-form-field {
+        flex: 1;
+      }
+
+      .full-width {
+        flex: 1 1 100%;
+      }
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 16px;
+      margin-top: 24px;
+    }
+  }
+}
+

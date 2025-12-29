@@ -203,14 +203,20 @@ export class AuthService {
    */
   private navigatePostLogin(): void {
     const currentPath = window.location.pathname || '';
-    const alreadyOnTarget = currentPath.startsWith('/admin') || currentPath.startsWith('/client');
+    const alreadyOnTarget = currentPath.startsWith('/admin') || 
+                            currentPath.startsWith('/client') || 
+                            currentPath.startsWith('/comptable');
     if (alreadyOnTarget) {
       return;
     }
     const claims = this.getClaims();
     const roles: string[] = claims?.realm_access?.roles || [];
-    if (roles.includes('ADMIN')) {
-      this.router.navigateByUrl('/admin');
+    
+    // Priorité : COMPTABLE > ADMIN > CLIENT
+    if (roles.includes('COMPTABLE')) {
+      this.router.navigateByUrl('/comptable/dashboard');
+    } else if (roles.includes('ADMIN')) {
+      this.router.navigateByUrl('/admin/enlevements');
     } else {
       this.router.navigateByUrl('/client');
     }

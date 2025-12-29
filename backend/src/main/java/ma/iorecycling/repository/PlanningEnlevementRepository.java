@@ -57,5 +57,22 @@ public interface PlanningEnlevementRepository extends JpaRepository<PlanningEnle
      * Compte les enlèvements planifiés d'une société
      */
     long countBySocieteIdAndStatutIn(Long societeId, List<StatutPlanning> statuts);
+    
+    /**
+     * Trouve toutes les occurrences d'une récurrence à partir d'une date donnée (inclusive)
+     */
+    @Query("SELECT p FROM PlanningEnlevement p WHERE p.recurrence.id = :recurrenceId " +
+           "AND p.datePrevue >= :dateMin " +
+           "ORDER BY p.datePrevue ASC, p.heurePrevue ASC")
+    List<PlanningEnlevement> findByRecurrenceIdAndDatePrevueGreaterThanEqual(
+            @Param("recurrenceId") Long recurrenceId,
+            @Param("dateMin") LocalDate dateMin);
+    
+    /**
+     * Trouve toutes les occurrences d'une récurrence
+     */
+    @Query("SELECT p FROM PlanningEnlevement p WHERE p.recurrence.id = :recurrenceId " +
+           "ORDER BY p.datePrevue ASC, p.heurePrevue ASC")
+    List<PlanningEnlevement> findByRecurrenceId(@Param("recurrenceId") Long recurrenceId);
 }
 

@@ -1,0 +1,101 @@
+<div class="destination-form-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        {{ isEditMode ? 'Modifier la destination' : 'Nouvelle destination' }}
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="destinationForm" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Raison sociale *</mat-label>
+            <input matInput formControlName="raisonSociale" placeholder="Ex: Centre de Tri ABC">
+            <mat-error>{{ getErrorMessage('raisonSociale') }}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Site *</mat-label>
+            <input matInput formControlName="site" placeholder="Ex: Site de Casablanca">
+            <mat-error>{{ getErrorMessage('site') }}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Types de traitement *</mat-label>
+            <mat-select formControlName="typesTraitement" multiple>
+              <mat-option *ngFor="let type of typesTraitement" [value]="type">
+                {{ getTypeTraitementLabel(type) }}
+              </mat-option>
+            </mat-select>
+            <mat-error>{{ getErrorMessage('typesTraitement') }}</mat-error>
+            <mat-hint>Sélectionnez au moins un type de traitement</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <div class="form-section">
+          <h3>Coordonnées de l'interlocuteur</h3>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Nom</mat-label>
+              <input matInput formControlName="nomInterlocuteur" placeholder="Ex: Mohamed BENALI">
+              <mat-error>{{ getErrorMessage('nomInterlocuteur') }}</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Téléphone</mat-label>
+              <input matInput formControlName="telInterlocuteur" placeholder="Ex: +212 6XX XXX XXX">
+              <mat-error>{{ getErrorMessage('telInterlocuteur') }}</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Poste</mat-label>
+              <input matInput formControlName="posteInterlocuteur" placeholder="Ex: Responsable traitement">
+              <mat-error>{{ getErrorMessage('posteInterlocuteur') }}</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Email</mat-label>
+              <input matInput type="email" formControlName="emailInterlocuteur" placeholder="Ex: contact@example.com">
+              <mat-error>{{ getErrorMessage('emailInterlocuteur') }}</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Adresse</mat-label>
+            <textarea matInput formControlName="adresse" rows="2" placeholder="Adresse complète du centre"></textarea>
+            <mat-error>{{ getErrorMessage('adresse') }}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Observation</mat-label>
+            <textarea matInput formControlName="observation" rows="3" placeholder="Notes ou remarques"></textarea>
+            <mat-error>{{ getErrorMessage('observation') }}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button mat-button type="button" (click)="cancel()" [disabled]="loading">
+            Annuler
+          </button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="loading || destinationForm.invalid">
+            <mat-spinner *ngIf="loading" diameter="20" style="display: inline-block; margin-right: 8px;"></mat-spinner>
+            {{ isEditMode ? 'Modifier' : 'Créer' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
+

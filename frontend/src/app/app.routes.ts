@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './components/login/login.component';
 import { authGuard } from './auth/auth.guard';
 import { adminGuard, clientGuard } from './auth/role.guard';
+import { comptableGuard } from './auth/comptable.guard';
 
 /**
  * Routes principales de l'application
@@ -25,6 +26,11 @@ export const routes: Routes = [
     path: 'client',
     canActivate: [authGuard, clientGuard],
     loadChildren: () => import('./modules/client/client.routes').then(m => m.clientRoutes)
+  },
+  {
+    path: 'comptable',
+    canActivate: [authGuard, comptableGuard],
+    loadChildren: () => import('./modules/comptable/comptable.routes').then(m => m.comptableRoutes)
   },
   {
     path: '**',

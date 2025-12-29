@@ -58,7 +58,7 @@ public class DashboardService {
         BigDecimal budgetRecyclage = pickupItemRepository.calculateBudgetRecyclage(
                 societeId, dateDebut, dateFin);
         
-        // KPI 5 : Budget traitement (A ELIMINER = BANAL + A_ELIMINER)
+        // KPI 5 : Budget traitement (A_DETRUIRE = BANAL + A_DETRUIRE)
         BigDecimal budgetTraitement = pickupItemRepository.calculateBudgetTraitement(
                 societeId, dateDebut, dateFin);
         
@@ -120,9 +120,9 @@ public class DashboardService {
             BigDecimal quantite = (BigDecimal) result[1];
             
             switch (type) {
-                case VALORISABLE -> recyclable = quantite;
+                case RECYCLABLE -> recyclable = quantite;
                 case BANAL -> banal = quantite;
-                case A_ELIMINER -> aDetruire = quantite;
+                case A_DETRUIRE -> aDetruire = quantite;
             }
         }
         
@@ -141,7 +141,7 @@ public class DashboardService {
                 ? aDetruire.divide(total, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).doubleValue()
                 : 0.0;
         
-        // Détail par sous-type pour VALORISABLE
+        // Détail par sous-type pour RECYCLABLE
         Map<String, BigDecimal> detailRecyclable = new HashMap<>();
         List<Object[]> detailResults = pickupItemRepository.getDetailRecyclableBySousType(
                 societeId, dateDebut, dateFin);

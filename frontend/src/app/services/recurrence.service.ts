@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Recurrence, CreateRecurrenceRequest } from '../models/planning.model';
 import { environment } from '../../environments/environment';
@@ -45,9 +45,13 @@ export class RecurrenceService {
 
   /**
    * Supprime une récurrence
+   * @param id ID de la récurrence à supprimer
+   * @param supprimerToutesOccurrences Si true, supprime toutes les occurrences (passées et futures), 
+   *                                   si false, supprime uniquement les occurrences futures
    */
-  supprimerRecurrence(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  supprimerRecurrence(id: number, supprimerToutesOccurrences: boolean = false): Observable<void> {
+    const params = new HttpParams().set('supprimerToutesOccurrences', supprimerToutesOccurrences.toString());
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, { params });
   }
 }
 

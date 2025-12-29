@@ -1,0 +1,259 @@
+<!-- BEGIN: MainContent -->
+<main class="comptabilite-dashboard-main">
+  <!-- BEGIN: HeaderSection -->
+  <section class="dashboard-header">
+    <!-- Title Group -->
+    <div class="header-title-group">
+      <h1 class="dashboard-title">Dashboard Comptabilité</h1>
+      <p class="dashboard-subtitle">Vue d'ensemble financière et suivi des transactions</p>
+    </div>
+    <!-- Action Buttons -->
+    <div class="header-actions">
+      <!-- New Income Button -->
+      <button class="btn btn-primary" [routerLink]="basePath + '/transactions/new'" [queryParams]="{type: 'RECETTE'}">
+        <div class="btn-icon-wrapper">
+          <mat-icon>add</mat-icon>
+        </div>
+        Nouvelle Recette
+      </button>
+      <!-- New Expense Button -->
+      <button class="btn btn-orange" [routerLink]="basePath + '/transactions/new'" [queryParams]="{type: 'DEPENSE'}">
+        <div class="btn-icon-wrapper">
+          <mat-icon>remove</mat-icon>
+        </div>
+        Nouvelle Dépense
+      </button>
+      <!-- View All Button -->
+      <button class="btn btn-secondary" [routerLink]="basePath + '/transactions'">
+        Voir toutes
+      </button>
+    </div>
+  </section>
+  <!-- END: HeaderSection -->
+
+  <!-- BEGIN: FilterSection -->
+  <section class="filters-section">
+    <div class="filters-container">
+      <div class="filters-left">
+        <!-- Company Select -->
+        <div class="select-wrapper">
+          <select class="select-field" [(ngModel)]="societeId" (change)="onSocieteChange()">
+            <option [value]="null">Toutes les sociétés</option>
+            <option *ngFor="let societe of societes" [value]="societe.id">
+              {{ societe.raisonSociale }}
+            </option>
+          </select>
+          <mat-icon class="select-arrow">arrow_drop_down</mat-icon>
+        </div>
+        <!-- Date Range Picker -->
+        <div class="date-range-wrapper">
+          <mat-icon class="date-icon">calendar_today</mat-icon>
+          <input 
+            class="date-input" 
+            type="date" 
+            [(ngModel)]="dateDebut" 
+            (change)="loadDashboard()"
+            title="Date début">
+          <span class="date-separator">–</span>
+          <input 
+            class="date-input" 
+            type="date" 
+            [(ngModel)]="dateFin" 
+            (change)="loadDashboard()"
+            title="Date fin">
+        </div>
+      </div>
+      <!-- Period Segmented Control -->
+      <div class="period-controls">
+        <button 
+          class="period-btn" 
+          [class.active]="periode === 'mensuel'"
+          (click)="onPeriodeChange('mensuel')">
+          Mensuel
+        </button>
+        <button 
+          class="period-btn" 
+          [class.active]="periode === 'trimestriel'"
+          (click)="onPeriodeChange('trimestriel')">
+          Trimestriel
+        </button>
+        <button 
+          class="period-btn" 
+          [class.active]="periode === 'annuel'"
+          (click)="onPeriodeChange('annuel')">
+          Annuel
+        </button>
+      </div>
+    </div>
+  </section>
+  <!-- END: FilterSection -->
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Chargement des données...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="dashboard && !loading" class="dashboard-content">
+    <!-- BEGIN: ChartsGrid -->
+    <div class="charts-grid">
+      <!-- Main Chart Card (Left - 2/3 width on LG screens) -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h2 class="chart-title">Aperçu Financier</h2>
+          <!-- Legend -->
+          <div class="chart-legend">
+            <div class="legend-item">
+              <span class="legend-dot legend-recettes"></span>
+              <span class="legend-label">Recettes</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot legend-depenses"></span>
+              <span class="legend-label">Dépenses</span>
+            </div>
+          </div>
+        </div>
+        <!-- Chart Container -->
+        <div class="chart-container">
+          <canvas #financialChart></canvas>
+        </div>
+      </div>
+
+      <!-- Recent Activity Card (Right - 1/3 width on LG screens) -->
+      <div class="activity-card">
+        <div class="activity-header">
+          <h2 class="activity-title">Activité Récente</h2>
+          <button class="activity-link" [routerLink]="basePath + '/transactions'">Voir tout</button>
+        </div>
+        <div class="activity-list">
+          <!-- Loading transactions -->
+          <div *ngIf="loadingRecentTransactions" class="activity-loading">
+            <mat-spinner diameter="30"></mat-spinner>
+          </div>
+          <!-- Transaction Items -->
+          <div *ngIf="!loadingRecentTransactions && recentTransactions.length > 0" class="activity-items">
+            <div 
+              *ngFor="let transaction of recentTransactions" 
+              class="activity-item"
+              [class.activity-item-income]="transaction.type === 'RECETTE'"
+              [class.activity-item-expense]="transaction.type === 'DEPENSE'"
+              (click)="viewTransaction(transaction.id)">
+              <div class="activity-icon-wrapper" 
+                   [class.icon-income]="transaction.type === 'RECETTE'"
+                   [class.icon-expense]="transaction.type === 'DEPENSE'">
+                <mat-icon *ngIf="transaction.type === 'RECETTE'">description</mat-icon>
+                <mat-icon *ngIf="transaction.type === 'DEPENSE'">shopping_cart</mat-icon>
+              </div>
+              <div class="activity-content">
+                <div class="activity-header-row">
+                  <h3 class="activity-item-title">{{ transaction.description }}</h3>
+                  <span class="activity-amount" 
+                        [class.amount-income]="transaction.type === 'RECETTE'"
+                        [class.amount-expense]="transaction.type === 'DEPENSE'">
+                    {{ transaction.type === 'RECETTE' ? '+' : '-' }}{{ transaction.montant | number:'1.2-2' }} MAD
+                  </span>
+                </div>
+                <div class="activity-footer">
+                  <p class="activity-subtitle">{{ getTransactionSubtitle(transaction) }}</p>
+                  <span class="activity-date" *ngIf="transaction.dateTransaction">
+                    {{ formatTransactionDate(transaction.dateTransaction) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Empty state -->
+          <div *ngIf="!loadingRecentTransactions && recentTransactions.length === 0" class="activity-empty">
+            <p>Aucune transaction récente</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- END: ChartsGrid -->
+
+    <!-- BEGIN: SummaryCards -->
+    <section class="summary-cards">
+      <!-- Card 1: CA PRESTATION (Blue) -->
+      <div class="summary-card card-prestation">
+        <div class="summary-card-content">
+          <div class="summary-icon-wrapper icon-blue">
+            <mat-icon>local_shipping</mat-icon>
+          </div>
+          <div class="summary-text">
+            <p class="summary-label">CA PRESTATION</p>
+            <p class="summary-value">{{ (dashboard.caPrestation || 0) | number:'1.2-2' }} MAD</p>
+          </div>
+        </div>
+        <!-- Mini Chart -->
+        <div class="summary-mini-chart">
+          <svg height="100%" preserveAspectRatio="none" viewBox="0 0 200 60" width="100%">
+            <path d="M0 40 Q 50 10 100 35 T 200 20" fill="none" stroke="#3B82F6" stroke-width="3"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Card 2: CA VENTE MATIÈRE (Orange) -->
+      <div class="summary-card card-vente">
+        <div class="summary-card-content">
+          <div class="summary-icon-wrapper icon-orange">
+            <mat-icon>shopping_cart</mat-icon>
+          </div>
+          <div class="summary-text">
+            <p class="summary-label">CA VENTE MATIÈRE</p>
+            <p class="summary-value">{{ (dashboard.caVenteMatiere || 0) | number:'1.2-2' }} MAD</p>
+          </div>
+        </div>
+        <div class="summary-mini-chart">
+          <svg height="100%" preserveAspectRatio="none" viewBox="0 0 200 60" width="100%">
+            <path d="M0 45 Q 60 55 120 30 T 200 40" fill="none" stroke="#F97316" stroke-width="3"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Card 3: TOTAL RECETTES (Green) -->
+      <div class="summary-card card-recettes">
+        <div class="summary-card-content">
+          <div class="summary-icon-wrapper icon-green">
+            <mat-icon>trending_up</mat-icon>
+          </div>
+          <div class="summary-text">
+            <p class="summary-label">TOTAL RECETTES</p>
+            <p class="summary-value">{{ dashboard.totalRecettes | number:'1.2-2' }} MAD</p>
+          </div>
+        </div>
+        <div class="summary-mini-chart">
+          <svg height="100%" preserveAspectRatio="none" viewBox="0 0 200 60" width="100%">
+            <path d="M0 50 L 40 40 L 80 20 L 140 30 L 200 10" fill="none" stroke="#10B981" stroke-width="3"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Card 4: TOTAL DÉPENSES (Red) -->
+      <div class="summary-card card-depenses">
+        <div class="summary-card-content">
+          <div class="summary-icon-wrapper icon-red">
+            <mat-icon>trending_down</mat-icon>
+          </div>
+          <div class="summary-text">
+            <p class="summary-label">TOTAL DÉPENSES</p>
+            <p class="summary-value">{{ dashboard.totalDepenses | number:'1.2-2' }} MAD</p>
+          </div>
+        </div>
+        <div class="summary-mini-chart">
+          <svg height="100%" preserveAspectRatio="none" viewBox="0 0 200 60" width="100%">
+            <path d="M0 10 L 50 30 L 100 40 L 150 50 L 200 55" fill="none" stroke="#EF4444" stroke-width="3"></path>
+          </svg>
+        </div>
+      </div>
+    </section>
+    <!-- END: SummaryCards -->
+  </div>
+</main>
+<!-- END: MainContent -->

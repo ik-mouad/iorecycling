@@ -20,9 +20,9 @@ import java.math.BigDecimal;
 public class CreatePickupItemRequest {
     
     @NotBlank(message = "Le type de déchet est obligatoire")
-    private String typeDechet;  // VALORISABLE, BANAL, A_ELIMINER
+    private String typeDechet;  // RECYCLABLE, BANAL, A_DETRUIRE
     
-    private String sousType;  // Obligatoire si VALORISABLE
+    private String sousType;  // Obligatoire si RECYCLABLE
     
     @NotNull(message = "La quantité est obligatoire")
     @PositiveOrZero(message = "La quantité doit être positive ou zéro")
@@ -35,5 +35,14 @@ public class CreatePickupItemRequest {
     @NotNull(message = "Le prix unitaire est obligatoire")
     @PositiveOrZero(message = "Le prix unitaire doit être positif ou zéro")
     private BigDecimal prixUnitaireMad;
+    
+    // NOUVEAUX CHAMPS - Prestation (tous types)
+    private BigDecimal prixPrestationMad;
+    
+    // NOUVEAUX CHAMPS - Achat (valorisable)
+    private BigDecimal prixAchatMad;
+    
+    // NOUVEAUX CHAMPS - Traitement (banal)
+    private BigDecimal prixTraitementMad;
 }
 

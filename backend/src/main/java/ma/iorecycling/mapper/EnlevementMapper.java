@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.stream.Collectors;
+import java.util.List;
 
 /**
  * Mapper pour l'entité Enlevement
@@ -28,20 +29,20 @@ public class EnlevementMapper {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         
         BigDecimal budgetRecyclage = enlevement.getItems().stream()
-                .filter(item -> TypeDechet.VALORISABLE.equals(item.getTypeDechet()))
+                .filter(item -> TypeDechet.RECYCLABLE.equals(item.getTypeDechet()))
                 .map(PickupItem::getMontantMad)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         
         BigDecimal budgetTraitement = enlevement.getItems().stream()
                 .filter(item -> TypeDechet.BANAL.equals(item.getTypeDechet()) || 
-                               TypeDechet.A_ELIMINER.equals(item.getTypeDechet()))
+                               TypeDechet.A_DETRUIRE.equals(item.getTypeDechet()))
                 .map(PickupItem::getMontantMad)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         
         BigDecimal bilanNet = budgetRecyclage.subtract(budgetTraitement);
         
         BigDecimal poidsRecyclable = enlevement.getItems().stream()
-                .filter(item -> TypeDechet.VALORISABLE.equals(item.getTypeDechet()))
+                .filter(item -> TypeDechet.RECYCLABLE.equals(item.getTypeDechet()))
                 .map(PickupItem::getQuantiteKg)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         
@@ -54,11 +55,27 @@ public class EnlevementMapper {
                 .id(enlevement.getId())
                 .numeroEnlevement(enlevement.getNumeroEnlevement())
                 .dateEnlevement(enlevement.getDateEnlevement())
+                .heureEnlevement(enlevement.getHeureEnlevement())
+                .dateDestination(enlevement.getDateDestination())
+                .heureDestination(enlevement.getHeureDestination())
                 .societeId(enlevement.getSociete().getId())
                 .societeNom(enlevement.getSociete().getRaisonSociale())
                 .siteId(enlevement.getSite().getId())
                 .siteNom(enlevement.getSite().getName())
                 .observation(enlevement.getObservation())
+                .camionId(enlevement.getCamion() != null ? enlevement.getCamion().getId() : null)
+                .camionMatricule(enlevement.getCamion() != null ? enlevement.getCamion().getMatricule() : null)
+                .chauffeurNom(enlevement.getChauffeurNom())
+                .destinationId(enlevement.getDestination() != null ? enlevement.getDestination().getId() : null)
+                .destinationRaisonSociale(enlevement.getDestination() != null ? enlevement.getDestination().getRaisonSociale() : null)
+                .destinationSite(enlevement.getDestination() != null ? enlevement.getDestination().getSite() : null)
+                .destinationTypesTraitement(enlevement.getDestination() != null 
+                        ? enlevement.getDestination().getTypesTraitement().stream()
+                                .map(Enum::name)
+                                .collect(Collectors.toList())
+                        : null)
+                .destinationNomInterlocuteur(enlevement.getDestination() != null ? enlevement.getDestination().getNomInterlocuteur() : null)
+                .destinationTelInterlocuteur(enlevement.getDestination() != null ? enlevement.getDestination().getTelInterlocuteur() : null)
                 .items(enlevement.getItems().stream()
                         .map(this::toItemDTO)
                         .collect(Collectors.toList()))
@@ -74,11 +91,7 @@ public class EnlevementMapper {
     }
     
     private PickupItemDTO toItemDTO(PickupItem item) {
-        // Mapping entre backend (A_ELIMINER) et frontend (A_DETRUIRE)
         String typeDechet = item.getTypeDechet().name();
-        if ("A_ELIMINER".equals(typeDechet)) {
-            typeDechet = "A_DETRUIRE";
-        }
         
         return PickupItemDTO.builder()
                 .id(item.getId())
@@ -90,6 +103,15 @@ public class EnlevementMapper {
                 .etat(item.getEtat())
                 .prixUnitaireMad(item.getPrixUnitaireMad())
                 .montantMad(item.getMontantMad())
+                .prixPrestationMad(item.getPrixPrestationMad())
+                .montantPrestationMad(item.getMontantPrestationMad())
+                .prixAchatMad(item.getPrixAchatMad())
+                .montantAchatMad(item.getMontantAchatMad())
+                .prixTraitementMad(item.getPrixTraitementMad())
+                .montantTraitementMad(item.getMontantTraitementMad())
+                .quantiteVendueKg(item.getQuantiteVendueKg())
+                .resteAVendreKg(item.getResteAVendreKg())
+                .statutStock(item.getStatutStock() != null ? item.getStatutStock().name() : null)
                 .build();
     }
 }

@@ -55,13 +55,19 @@ public interface EnlevementRepository extends JpaRepository<Enlevement, Long> {
             @Param("dateFin") LocalDate dateFin);
     
     /**
-     * Trouve les enlèvements contenant des déchets A_ELIMINER sans BSDI ou PV
+     * Trouve les enlèvements contenant des déchets A_DETRUIRE sans BSDI ou PV
      */
     @Query("SELECT DISTINCT e FROM Enlevement e " +
            "JOIN e.items i " +
-           "WHERE i.typeDechet = 'A_ELIMINER' " +
+           "WHERE i.typeDechet = 'A_DETRUIRE' " +
            "AND (NOT EXISTS (SELECT d FROM Document d WHERE d.enlevement.id = e.id AND d.typeDocument = 'BSDI') " +
            "OR NOT EXISTS (SELECT d FROM Document d WHERE d.enlevement.id = e.id AND d.typeDocument = 'PV_DESTRUCTION'))")
     List<Enlevement> findEnlevementsWithMissingDocuments();
+    
+    /**
+     * Trouve un enlèvement par son ID avec ses items chargés
+     */
+    @Query("SELECT e FROM Enlevement e LEFT JOIN FETCH e.items WHERE e.id = :id")
+    Optional<Enlevement> findByIdWithItems(@Param("id") Long id);
 }
 
