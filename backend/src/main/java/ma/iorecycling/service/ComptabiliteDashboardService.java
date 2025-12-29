@@ -78,8 +78,8 @@ public class ComptabiliteDashboardService {
         // Répartition des dépenses par catégorie
         Map<String, BigDecimal> depensesParCategorie = calculateDepensesParCategorie(societeId, dateDebut, dateFin);
         
-        // Évolution mensuelle (12 derniers mois)
-        List<EvolutionMensuelleDTO> evolutionMensuelle = calculateEvolutionMensuelle(societeId);
+        // Évolution selon la période sélectionnée
+        List<EvolutionMensuelleDTO> evolutionMensuelle = calculateEvolutionByPeriod(societeId, dateDebut, dateFin, periode);
         
         // Calcul des évolutions (comparaison avec période précédente)
         LocalDate periodePrecedenteDebut = dateDebut.minusMonths(periode.equals("mensuel") ? 1 : 
@@ -151,30 +151,116 @@ public class ComptabiliteDashboardService {
     }
     
     /**
-     * Calcule l'évolution mensuelle sur 12 mois
+     * Calcule l'évolution selon la période sélectionnée pour une société
      */
-    private List<EvolutionMensuelleDTO> calculateEvolutionMensuelle(Long societeId) {
-        List<EvolutionMensuelleDTO> result = new ArrayList<>();
-        LocalDate maintenant = LocalDate.now();
+    private List<EvolutionMensuelleDTO> calculateEvolutionByPeriod(
+            Long societeId, 
+            LocalDate dateDebut, 
+            LocalDate dateFin, 
+            String periode) {
         
-        for (int i = 11; i >= 0; i--) {
-            YearMonth yearMonth = YearMonth.from(maintenant.minusMonths(i));
-            LocalDate debutMois = yearMonth.atDay(1);
-            LocalDate finMois = yearMonth.atEndOfMonth();
+        List<EvolutionMensuelleDTO> result = new ArrayList<>();
+        
+        if ("mensuel".equals(periode)) {
+            // Pour mensuel : afficher par semaine
+            LocalDate current = dateDebut;
+            int weekNumber = 1;
             
-            BigDecimal recettes = transactionRepository.sumRecettesBySocieteAndPeriod(
-                    societeId, debutMois, finMois);
-            BigDecimal depenses = transactionRepository.sumDepensesBySocieteAndPeriod(
-                    societeId, debutMois, finMois);
-            BigDecimal resultat = recettes.subtract(depenses);
+            while (!current.isAfter(dateFin)) {
+                LocalDate weekStart = current;
+                LocalDate weekEnd = current.plusDays(6);
+                if (weekEnd.isAfter(dateFin)) {
+                    weekEnd = dateFin;
+                }
+                
+                BigDecimal recettes = transactionRepository.sumRecettesBySocieteAndPeriod(
+                        societeId, weekStart, weekEnd);
+                BigDecimal depenses = transactionRepository.sumDepensesBySocieteAndPeriod(
+                        societeId, weekStart, weekEnd);
+                BigDecimal resultat = recettes.subtract(depenses);
+                
+                String label = "Semaine " + weekNumber;
+                result.add(EvolutionMensuelleDTO.builder()
+                        .mois(weekStart.format(MONTH_FORMATTER))
+                        .moisLibelle(label)
+                        .recettes(recettes)
+                        .depenses(depenses)
+                        .resultat(resultat)
+                        .build());
+                
+                current = weekEnd.plusDays(1);
+                weekNumber++;
+            }
             
-            result.add(EvolutionMensuelleDTO.builder()
-                    .mois(yearMonth.format(MONTH_FORMATTER))
-                    .moisLibelle(debutMois.format(MONTH_LIBELLE_FORMATTER))
-                    .recettes(recettes)
-                    .depenses(depenses)
-                    .resultat(resultat)
-                    .build());
+        } else if ("trimestriel".equals(periode)) {
+            // Pour trimestriel : afficher par mois
+            YearMonth startMonth = YearMonth.from(dateDebut);
+            YearMonth endMonth = YearMonth.from(dateFin);
+            
+            YearMonth current = startMonth;
+            while (!current.isAfter(endMonth)) {
+                LocalDate debutMois = current.atDay(1);
+                LocalDate finMois = current.atEndOfMonth();
+                
+                // Ajuster aux dates réelles de la période
+                if (debutMois.isBefore(dateDebut)) {
+                    debutMois = dateDebut;
+                }
+                if (finMois.isAfter(dateFin)) {
+                    finMois = dateFin;
+                }
+                
+                BigDecimal recettes = transactionRepository.sumRecettesBySocieteAndPeriod(
+                        societeId, debutMois, finMois);
+                BigDecimal depenses = transactionRepository.sumDepensesBySocieteAndPeriod(
+                        societeId, debutMois, finMois);
+                BigDecimal resultat = recettes.subtract(depenses);
+                
+                result.add(EvolutionMensuelleDTO.builder()
+                        .mois(current.format(MONTH_FORMATTER))
+                        .moisLibelle(debutMois.format(MONTH_LIBELLE_FORMATTER))
+                        .recettes(recettes)
+                        .depenses(depenses)
+                        .resultat(resultat)
+                        .build());
+                
+                current = current.plusMonths(1);
+            }
+            
+        } else {
+            // Pour annuel : afficher par mois (12 mois de l'année)
+            YearMonth startMonth = YearMonth.from(dateDebut);
+            YearMonth endMonth = YearMonth.from(dateFin);
+            
+            YearMonth current = startMonth;
+            while (!current.isAfter(endMonth)) {
+                LocalDate debutMois = current.atDay(1);
+                LocalDate finMois = current.atEndOfMonth();
+                
+                // Ajuster aux dates réelles de la période
+                if (debutMois.isBefore(dateDebut)) {
+                    debutMois = dateDebut;
+                }
+                if (finMois.isAfter(dateFin)) {
+                    finMois = dateFin;
+                }
+                
+                BigDecimal recettes = transactionRepository.sumRecettesBySocieteAndPeriod(
+                        societeId, debutMois, finMois);
+                BigDecimal depenses = transactionRepository.sumDepensesBySocieteAndPeriod(
+                        societeId, debutMois, finMois);
+                BigDecimal resultat = recettes.subtract(depenses);
+                
+                result.add(EvolutionMensuelleDTO.builder()
+                        .mois(current.format(MONTH_FORMATTER))
+                        .moisLibelle(debutMois.format(MONTH_LIBELLE_FORMATTER))
+                        .recettes(recettes)
+                        .depenses(depenses)
+                        .resultat(resultat)
+                        .build());
+                
+                current = current.plusMonths(1);
+            }
         }
         
         return result;
@@ -233,8 +319,8 @@ public class ComptabiliteDashboardService {
         // Répartition des dépenses par catégorie
         Map<String, BigDecimal> depensesParCategorie = calculateDepensesParCategorieAll(dateDebut, dateFin);
         
-        // Évolution mensuelle (12 derniers mois)
-        List<EvolutionMensuelleDTO> evolutionMensuelle = calculateEvolutionMensuelleAll();
+        // Évolution selon la période sélectionnée
+        List<EvolutionMensuelleDTO> evolutionMensuelle = calculateEvolutionByPeriodAll(dateDebut, dateFin, periode);
         
         // Calcul des évolutions (comparaison avec période précédente)
         LocalDate periodePrecedenteDebut = dateDebut.minusMonths(periode.equals("mensuel") ? 1 : 
@@ -303,28 +389,109 @@ public class ComptabiliteDashboardService {
     }
     
     /**
-     * Calcule l'évolution mensuelle sur 12 mois pour toutes les sociétés
+     * Calcule l'évolution selon la période sélectionnée pour toutes les sociétés
      */
-    private List<EvolutionMensuelleDTO> calculateEvolutionMensuelleAll() {
-        List<EvolutionMensuelleDTO> result = new ArrayList<>();
-        LocalDate maintenant = LocalDate.now();
+    private List<EvolutionMensuelleDTO> calculateEvolutionByPeriodAll(
+            LocalDate dateDebut, 
+            LocalDate dateFin, 
+            String periode) {
         
-        for (int i = 11; i >= 0; i--) {
-            YearMonth yearMonth = YearMonth.from(maintenant.minusMonths(i));
-            LocalDate debutMois = yearMonth.atDay(1);
-            LocalDate finMois = yearMonth.atEndOfMonth();
+        List<EvolutionMensuelleDTO> result = new ArrayList<>();
+        
+        if ("mensuel".equals(periode)) {
+            // Pour mensuel : afficher par semaine
+            LocalDate current = dateDebut;
+            int weekNumber = 1;
             
-            BigDecimal recettes = transactionRepository.sumRecettesByPeriod(debutMois, finMois);
-            BigDecimal depenses = transactionRepository.sumDepensesByPeriod(debutMois, finMois);
-            BigDecimal resultat = recettes.subtract(depenses);
+            while (!current.isAfter(dateFin)) {
+                LocalDate weekStart = current;
+                LocalDate weekEnd = current.plusDays(6);
+                if (weekEnd.isAfter(dateFin)) {
+                    weekEnd = dateFin;
+                }
+                
+                BigDecimal recettes = transactionRepository.sumRecettesByPeriod(weekStart, weekEnd);
+                BigDecimal depenses = transactionRepository.sumDepensesByPeriod(weekStart, weekEnd);
+                BigDecimal resultat = recettes.subtract(depenses);
+                
+                String label = "Semaine " + weekNumber;
+                result.add(EvolutionMensuelleDTO.builder()
+                        .mois(weekStart.format(MONTH_FORMATTER))
+                        .moisLibelle(label)
+                        .recettes(recettes)
+                        .depenses(depenses)
+                        .resultat(resultat)
+                        .build());
+                
+                current = weekEnd.plusDays(1);
+                weekNumber++;
+            }
             
-            result.add(EvolutionMensuelleDTO.builder()
-                    .mois(yearMonth.format(MONTH_FORMATTER))
-                    .moisLibelle(debutMois.format(MONTH_LIBELLE_FORMATTER))
-                    .recettes(recettes)
-                    .depenses(depenses)
-                    .resultat(resultat)
-                    .build());
+        } else if ("trimestriel".equals(periode)) {
+            // Pour trimestriel : afficher par mois
+            YearMonth startMonth = YearMonth.from(dateDebut);
+            YearMonth endMonth = YearMonth.from(dateFin);
+            
+            YearMonth current = startMonth;
+            while (!current.isAfter(endMonth)) {
+                LocalDate debutMois = current.atDay(1);
+                LocalDate finMois = current.atEndOfMonth();
+                
+                // Ajuster aux dates réelles de la période
+                if (debutMois.isBefore(dateDebut)) {
+                    debutMois = dateDebut;
+                }
+                if (finMois.isAfter(dateFin)) {
+                    finMois = dateFin;
+                }
+                
+                BigDecimal recettes = transactionRepository.sumRecettesByPeriod(debutMois, finMois);
+                BigDecimal depenses = transactionRepository.sumDepensesByPeriod(debutMois, finMois);
+                BigDecimal resultat = recettes.subtract(depenses);
+                
+                result.add(EvolutionMensuelleDTO.builder()
+                        .mois(current.format(MONTH_FORMATTER))
+                        .moisLibelle(debutMois.format(MONTH_LIBELLE_FORMATTER))
+                        .recettes(recettes)
+                        .depenses(depenses)
+                        .resultat(resultat)
+                        .build());
+                
+                current = current.plusMonths(1);
+            }
+            
+        } else {
+            // Pour annuel : afficher par mois (12 mois de l'année)
+            YearMonth startMonth = YearMonth.from(dateDebut);
+            YearMonth endMonth = YearMonth.from(dateFin);
+            
+            YearMonth current = startMonth;
+            while (!current.isAfter(endMonth)) {
+                LocalDate debutMois = current.atDay(1);
+                LocalDate finMois = current.atEndOfMonth();
+                
+                // Ajuster aux dates réelles de la période
+                if (debutMois.isBefore(dateDebut)) {
+                    debutMois = dateDebut;
+                }
+                if (finMois.isAfter(dateFin)) {
+                    finMois = dateFin;
+                }
+                
+                BigDecimal recettes = transactionRepository.sumRecettesByPeriod(debutMois, finMois);
+                BigDecimal depenses = transactionRepository.sumDepensesByPeriod(debutMois, finMois);
+                BigDecimal resultat = recettes.subtract(depenses);
+                
+                result.add(EvolutionMensuelleDTO.builder()
+                        .mois(current.format(MONTH_FORMATTER))
+                        .moisLibelle(debutMois.format(MONTH_LIBELLE_FORMATTER))
+                        .recettes(recettes)
+                        .depenses(depenses)
+                        .resultat(resultat)
+                        .build());
+                
+                current = current.plusMonths(1);
+            }
         }
         
         return result;

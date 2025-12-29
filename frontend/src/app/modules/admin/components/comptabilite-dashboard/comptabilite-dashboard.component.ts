@@ -208,7 +208,11 @@ export class ComptabiliteDashboardComponent implements OnInit, AfterViewInit, On
     
     // Préparer les données pour le graphique
     const labels = evolutionMensuelle.map(e => {
-      // Extraire le mois du libellé (ex: "Janvier 2024" -> "Jan")
+      // Si c'est une semaine (format "Semaine X"), utiliser tel quel
+      if (e.moisLibelle.startsWith('Semaine')) {
+        return e.moisLibelle.replace('Semaine ', 'S');
+      }
+      // Sinon, extraire le mois du libellé (ex: "Janvier 2024" -> "Jan")
       const parts = e.moisLibelle.split(' ');
       return parts[0].substring(0, 3);
     });
