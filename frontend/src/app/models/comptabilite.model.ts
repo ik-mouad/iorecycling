@@ -98,6 +98,7 @@ export interface UpdateTransactionRequest {
 export interface Paiement {
   id: number;
   transactionId: number;
+  echeanceId?: number; // Lien vers l'échéance (optionnel)
   montant: number;
   datePaiement: string; // ISO date string
   modePaiement: ModePaiement;

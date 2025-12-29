@@ -50,7 +50,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers("/api/client/**").hasRole("CLIENT")
                 .requestMatchers("/api/swagger-ui/**", "/v3/api-docs/**").hasRole("ADMIN")
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "COMPTABLE")
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2

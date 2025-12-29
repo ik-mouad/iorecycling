@@ -64,10 +64,13 @@ export class TransactionsListComponent implements OnInit {
   selectedType: TypeTransaction | null = null;
   selectedSocieteId: number | null = null;
 
-  displayedColumns: string[] = ['date', 'type', 'description', 'societe', 'montant', 'montantPaye', 'statut', 'actions'];
+  displayedColumns: string[] = ['date', 'type', 'description', 'enlevement', 'societe', 'montant', 'montantPaye', 'statut', 'actions'];
   
   // Exposer l'enum au template
   TypeTransaction = TypeTransaction;
+  
+  // Base path pour les routes (admin ou comptable)
+  private basePath: string = '/admin/comptabilite';
 
   constructor(
     private fb: FormBuilder,
@@ -85,8 +88,20 @@ export class TransactionsListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Détecter le contexte (admin ou comptable) depuis l'URL
+    this.updateBasePath();
+    
     this.loadSocietes();
     this.loadTransactions();
+  }
+  
+  private updateBasePath(): void {
+    const currentUrl = this.router.url;
+    if (currentUrl.startsWith('/comptable')) {
+      this.basePath = '/comptable';
+    } else {
+      this.basePath = '/admin/comptabilite';
+    }
   }
 
   loadSocietes(): void {
@@ -103,14 +118,11 @@ export class TransactionsListComponent implements OnInit {
   loadTransactions(): void {
     const societeId = this.filterForm.get('societeId')?.value;
     const type = this.filterForm.get('type')?.value;
+    const enlevementId = this.filterForm.get('enlevementId')?.value;
     
-    if (!societeId) {
-      this.snackBar.open('Veuillez sélectionner une société', 'Fermer', { duration: 3000 });
-      return;
-    }
-
+    // Si aucune société n'est sélectionnée, charger toutes les transactions
     this.loading = true;
-    this.comptabiliteService.getTransactions(societeId, type, this.pageIndex, this.pageSize)
+    this.comptabiliteService.getTransactions(societeId || null, type, enlevementId || null, this.pageIndex, this.pageSize)
       .subscribe({
         next: (page) => {
           this.transactions = page.content;
@@ -138,21 +150,30 @@ export class TransactionsListComponent implements OnInit {
 
   createTransaction(type: TypeTransaction): void {
     const societeId = this.filterForm.get('societeId')?.value;
-    if (!societeId) {
-      this.snackBar.open('Veuillez sélectionner une société', 'Fermer', { duration: 3000 });
-      return;
+    // La société n'est plus obligatoire, on peut créer une transaction sans société sélectionnée
+    const queryParams: any = { type };
+    if (societeId) {
+      queryParams.societeId = societeId;
     }
-    this.router.navigate(['/admin/comptabilite/transactions/new'], { 
-      queryParams: { type, societeId } 
+    this.router.navigate([this.basePath + '/transactions/new'], { 
+      queryParams 
     });
   }
 
   editTransaction(id: number): void {
-    this.router.navigate(['/admin/comptabilite/transactions', id, 'edit']);
+    this.updateBasePath(); // Mettre à jour le basePath avant la navigation
+    this.router.navigate([this.basePath + '/transactions', id, 'edit']);
   }
 
   viewTransaction(id: number): void {
-    this.router.navigate(['/admin/comptabilite/transactions', id]);
+    this.updateBasePath(); // Mettre à jour le basePath avant la navigation
+    this.router.navigate([this.basePath + '/transactions', id]);
+  }
+
+  viewEnlevement(enlevementId: number): void {
+    // Déterminer le chemin selon le contexte (admin ou comptable)
+    const enlevementPath = this.router.url.startsWith('/comptable') ? '/comptable/enlevements' : '/admin/enlevements';
+    this.router.navigate([enlevementPath, enlevementId]);
   }
 
   deleteTransaction(id: number): void {

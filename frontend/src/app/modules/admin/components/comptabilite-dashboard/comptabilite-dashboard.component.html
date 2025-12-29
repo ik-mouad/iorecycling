@@ -1,187 +1,251 @@
 <div class="comptabilite-dashboard">
-  <div class="header-actions">
-    <h1>Dashboard Comptabilité</h1>
-    <div class="actions">
-      <button mat-raised-button color="primary" routerLink="/admin/comptabilite/transactions/new" [queryParams]="{type: 'RECETTE'}">
-        <mat-icon>add</mat-icon>
-        Nouvelle Recette
-      </button>
-      <button mat-raised-button color="warn" routerLink="/admin/comptabilite/transactions/new" [queryParams]="{type: 'DEPENSE'}">
-        <mat-icon>remove</mat-icon>
-        Nouvelle Dépense
-      </button>
-      <button mat-stroked-button routerLink="/admin/comptabilite/transactions">
-        <mat-icon>list</mat-icon>
-        Liste des transactions
-      </button>
+  <!-- Header Premium -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1 class="page-title">Dashboard Comptabilité</h1>
+        <p class="page-description">Vue d'ensemble financière et suivi des transactions</p>
+      </div>
+      <div class="header-actions">
+        <button mat-raised-button color="primary" class="action-button" [routerLink]="basePath + '/transactions/new'" [queryParams]="{type: 'RECETTE'}">
+          <mat-icon>add</mat-icon>
+          <span>Nouvelle Recette</span>
+        </button>
+        <button mat-raised-button color="warn" class="action-button" [routerLink]="basePath + '/transactions/new'" [queryParams]="{type: 'DEPENSE'}">
+          <mat-icon>remove</mat-icon>
+          <span>Nouvelle Dépense</span>
+        </button>
+        <button mat-stroked-button class="action-button-secondary" [routerLink]="basePath + '/transactions'">
+          <mat-icon>list</mat-icon>
+          <span>Voir toutes</span>
+        </button>
+      </div>
     </div>
   </div>
-  
-  <!-- Filtres -->
-  <div class="filters">
-    <mat-form-field>
-      <mat-label>Société</mat-label>
-      <mat-select [(ngModel)]="societeId" (selectionChange)="loadDashboard()">
-        <mat-option *ngFor="let societe of societes" [value]="societe.id">
-          {{ societe.raisonSociale }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-    
-    <mat-form-field>
-      <mat-label>Date début</mat-label>
-      <input matInput type="date" [(ngModel)]="dateDebut" (change)="loadDashboard()">
-    </mat-form-field>
-    
-    <mat-form-field>
-      <mat-label>Date fin</mat-label>
-      <input matInput type="date" [(ngModel)]="dateFin" (change)="loadDashboard()">
-    </mat-form-field>
-    
-    <mat-button-toggle-group [(ngModel)]="periode" (change)="onPeriodeChange($event.value)">
-      <mat-button-toggle value="mensuel">Mensuel</mat-button-toggle>
-      <mat-button-toggle value="trimestriel">Trimestriel</mat-button-toggle>
-      <mat-button-toggle value="annuel">Annuel</mat-button-toggle>
-    </mat-button-toggle-group>
+
+  <!-- Filtres Card -->
+  <mat-card class="filters-card">
+    <div class="filters-content">
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Société</mat-label>
+        <mat-select [(ngModel)]="societeId" (selectionChange)="loadDashboard()">
+          <mat-option [value]="null">Toutes les sociétés</mat-option>
+          <mat-option *ngFor="let societe of societes" [value]="societe.id">
+            {{ societe.raisonSociale }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Date début</mat-label>
+        <input matInput type="date" [(ngModel)]="dateDebut" (change)="loadDashboard()">
+      </mat-form-field>
+      
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Date fin</mat-label>
+        <input matInput type="date" [(ngModel)]="dateFin" (change)="loadDashboard()">
+      </mat-form-field>
+      
+      <mat-button-toggle-group [(ngModel)]="periode" (change)="onPeriodeChange($event.value)" class="period-toggle">
+        <mat-button-toggle value="mensuel">
+          <mat-icon>calendar_month</mat-icon>
+          <span>Mensuel</span>
+        </mat-button-toggle>
+        <mat-button-toggle value="trimestriel">
+          <mat-icon>calendar_view_month</mat-icon>
+          <span>Trimestriel</span>
+        </mat-button-toggle>
+        <mat-button-toggle value="annuel">
+          <mat-icon>event</mat-icon>
+          <span>Annuel</span>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+  </mat-card>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Chargement des données...</p>
   </div>
 
-  <!-- Loading -->
-  <div *ngIf="loading" class="loading">
-    <mat-spinner></mat-spinner>
-  </div>
+  <!-- Error State -->
+  <mat-card *ngIf="error && !loading" class="error-card">
+    <mat-card-content>
+      <div class="error-content">
+        <mat-icon color="warn">error_outline</mat-icon>
+        <p>{{ error }}</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
 
-  <!-- Error -->
-  <div *ngIf="error" class="error">
-    {{ error }}
-  </div>
-
-  <!-- Dashboard -->
+  <!-- Dashboard Content -->
   <div *ngIf="dashboard && !loading" class="dashboard-content">
-    <!-- KPIs -->
-    <div class="kpis">
-      <mat-card>
-        <mat-card-title>CA Prestation</mat-card-title>
+    <!-- KPIs Grid -->
+    <div class="kpis-grid">
+      <mat-card class="kpi-card kpi-prestation">
         <mat-card-content>
-          <div class="kpi-value">{{ (dashboard.caPrestation || 0) | number:'1.2-2' }} MAD</div>
+          <div class="kpi-header">
+            <mat-icon>local_shipping</mat-icon>
+            <span class="kpi-label">CA Prestation</span>
+          </div>
+          <div class="kpi-value">{{ (dashboard.caPrestation || 0) | number:'1.2-2' }} <span class="kpi-currency">MAD</span></div>
           <div class="kpi-subtitle">Recettes d'enlèvement</div>
         </mat-card-content>
       </mat-card>
 
-      <mat-card>
-        <mat-card-title>CA Vente Matière</mat-card-title>
+      <mat-card class="kpi-card kpi-vente">
         <mat-card-content>
-          <div class="kpi-value">{{ (dashboard.caVenteMatiere || 0) | number:'1.2-2' }} MAD</div>
+          <div class="kpi-header">
+            <mat-icon>shopping_cart</mat-icon>
+            <span class="kpi-label">CA Vente Matière</span>
+          </div>
+          <div class="kpi-value">{{ (dashboard.caVenteMatiere || 0) | number:'1.2-2' }} <span class="kpi-currency">MAD</span></div>
           <div class="kpi-subtitle">Recettes de vente</div>
         </mat-card-content>
       </mat-card>
 
-      <mat-card>
-        <mat-card-title>Total Recettes</mat-card-title>
+      <mat-card class="kpi-card kpi-recettes">
         <mat-card-content>
-          <div class="kpi-value">{{ dashboard.totalRecettes | number:'1.2-2' }} MAD</div>
-          <div class="kpi-evolution" [class.positive]="dashboard.evolutionRecettesPct && dashboard.evolutionRecettesPct > 0">
-            {{ dashboard.evolutionRecettesPct ? (dashboard.evolutionRecettesPct > 0 ? '+' : '') + (dashboard.evolutionRecettesPct | number:'1.1-1') + '%' : '-' }}
+          <div class="kpi-header">
+            <mat-icon>trending_up</mat-icon>
+            <span class="kpi-label">Total Recettes</span>
+          </div>
+          <div class="kpi-value">{{ dashboard.totalRecettes | number:'1.2-2' }} <span class="kpi-currency">MAD</span></div>
+          <div class="kpi-evolution" [class.positive]="dashboard.evolutionRecettesPct && dashboard.evolutionRecettesPct > 0" [class.negative]="dashboard.evolutionRecettesPct && dashboard.evolutionRecettesPct < 0">
+            <mat-icon>{{ dashboard.evolutionRecettesPct && dashboard.evolutionRecettesPct > 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+            <span>{{ dashboard.evolutionRecettesPct ? (dashboard.evolutionRecettesPct > 0 ? '+' : '') + (dashboard.evolutionRecettesPct | number:'1.1-1') + '%' : '-' }}</span>
           </div>
         </mat-card-content>
       </mat-card>
 
-      <mat-card>
-        <mat-card-title>Total Dépenses</mat-card-title>
+      <mat-card class="kpi-card kpi-depenses">
         <mat-card-content>
-          <div class="kpi-value">{{ dashboard.totalDepenses | number:'1.2-2' }} MAD</div>
-          <div class="kpi-evolution" [class.negative]="dashboard.evolutionDepensesPct && dashboard.evolutionDepensesPct > 0">
-            {{ dashboard.evolutionDepensesPct ? (dashboard.evolutionDepensesPct > 0 ? '+' : '') + (dashboard.evolutionDepensesPct | number:'1.1-1') + '%' : '-' }}
+          <div class="kpi-header">
+            <mat-icon>trending_down</mat-icon>
+            <span class="kpi-label">Total Dépenses</span>
+          </div>
+          <div class="kpi-value">{{ dashboard.totalDepenses | number:'1.2-2' }} <span class="kpi-currency">MAD</span></div>
+          <div class="kpi-evolution" [class.positive]="dashboard.evolutionDepensesPct && dashboard.evolutionDepensesPct < 0" [class.negative]="dashboard.evolutionDepensesPct && dashboard.evolutionDepensesPct > 0">
+            <mat-icon>{{ dashboard.evolutionDepensesPct && dashboard.evolutionDepensesPct < 0 ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+            <span>{{ dashboard.evolutionDepensesPct ? (dashboard.evolutionDepensesPct > 0 ? '+' : '') + (dashboard.evolutionDepensesPct | number:'1.1-1') + '%' : '-' }}</span>
           </div>
         </mat-card-content>
       </mat-card>
 
-      <mat-card>
-        <mat-card-title>Résultat Net</mat-card-title>
+      <mat-card class="kpi-card kpi-resultat" [class.positive]="dashboard.resultatNet >= 0" [class.negative]="dashboard.resultatNet < 0">
         <mat-card-content>
-          <div class="kpi-value" [class.positive]="dashboard.resultatNet >= 0" [class.negative]="dashboard.resultatNet < 0">
-            {{ dashboard.resultatNet | number:'1.2-2' }} MAD
+          <div class="kpi-header">
+            <mat-icon>{{ dashboard.resultatNet >= 0 ? 'check_circle' : 'cancel' }}</mat-icon>
+            <span class="kpi-label">Résultat Net</span>
           </div>
+          <div class="kpi-value">{{ dashboard.resultatNet | number:'1.2-2' }} <span class="kpi-currency">MAD</span></div>
+          <div class="kpi-subtitle">{{ dashboard.resultatNet >= 0 ? 'Bénéfice' : 'Perte' }}</div>
         </mat-card-content>
       </mat-card>
 
-      <mat-card>
-        <mat-card-title>Trésorerie</mat-card-title>
+      <mat-card class="kpi-card kpi-tresorerie">
         <mat-card-content>
-          <div class="kpi-value">{{ dashboard.tresorerie | number:'1.2-2' }} MAD</div>
+          <div class="kpi-header">
+            <mat-icon>account_balance_wallet</mat-icon>
+            <span class="kpi-label">Trésorerie</span>
+          </div>
+          <div class="kpi-value">{{ dashboard.tresorerie | number:'1.2-2' }} <span class="kpi-currency">MAD</span></div>
+          <div class="kpi-subtitle">Solde disponible</div>
         </mat-card-content>
       </mat-card>
     </div>
 
-    <!-- Alertes -->
-    <div class="alertes">
-      <!-- Échéances en retard -->
-      <mat-card *ngIf="dashboard.nombreEcheancesEnRetard > 0" class="alerte-card">
-        <mat-card-header>
-          <mat-card-title>
-            <mat-icon color="warn">warning</mat-icon>
-            Échéances en retard
-          </mat-card-title>
-          <mat-card-subtitle>
-            {{ dashboard.nombreEcheancesEnRetard }} échéance(s) - {{ dashboard.montantEcheancesEnRetard | number:'1.2-2' }} MAD
-          </mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <div *ngIf="loadingEcheances" class="loading-small">
-            <mat-spinner diameter="30"></mat-spinner>
-          </div>
-          <div *ngIf="!loadingEcheances && echeancesEnRetard.length > 0" class="liste-alerte">
-            <div *ngFor="let echeance of echeancesEnRetard" class="item-alerte" (click)="viewTransaction(echeance.transactionId)">
-              <div class="item-header">
-                <span class="item-montant">{{ echeance.montant | number:'1.2-2' }} MAD</span>
-                <span class="item-date">{{ echeance.dateEcheance | date:'dd/MM/yyyy' }}</span>
+    <!-- Alertes Section -->
+    <div class="alertes-section" *ngIf="dashboard.nombreEcheancesEnRetard > 0 || dashboard.nombreTransactionsImpayees > 0">
+      <h2 class="section-title">
+        <mat-icon>notifications_active</mat-icon>
+        <span>Alertes</span>
+      </h2>
+      
+      <div class="alertes-grid">
+        <!-- Échéances en retard -->
+        <mat-card *ngIf="dashboard.nombreEcheancesEnRetard > 0" class="alerte-card alerte-echeances">
+          <mat-card-header>
+            <div class="alerte-header">
+              <div class="alerte-icon-wrapper">
+                <mat-icon>schedule</mat-icon>
               </div>
-              <div class="item-details">
-                <mat-icon>arrow_forward</mat-icon>
-                <span>Voir la transaction</span>
+              <div>
+                <mat-card-title>Échéances en retard</mat-card-title>
+                <mat-card-subtitle>
+                  {{ dashboard.nombreEcheancesEnRetard }} échéance(s) - {{ dashboard.montantEcheancesEnRetard | number:'1.2-2' }} MAD
+                </mat-card-subtitle>
               </div>
             </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-      <!-- Transactions impayées -->
-      <mat-card *ngIf="dashboard.nombreTransactionsImpayees > 0" class="alerte-card">
-        <mat-card-header>
-          <mat-card-title>
-            <mat-icon color="warn">warning</mat-icon>
-            Transactions impayées
-          </mat-card-title>
-          <mat-card-subtitle>
-            {{ dashboard.nombreTransactionsImpayees }} transaction(s) - {{ dashboard.totalImpayes | number:'1.2-2' }} MAD
-          </mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <div *ngIf="loadingTransactions" class="loading-small">
-            <mat-spinner diameter="30"></mat-spinner>
-          </div>
-          <div *ngIf="!loadingTransactions && transactionsImpayees.length > 0" class="liste-alerte">
-            <div *ngFor="let transaction of transactionsImpayees" class="item-alerte" (click)="viewTransaction(transaction.id)">
-              <div class="item-header">
-                <span class="item-type" [class.recette]="transaction.type === 'RECETTE'" [class.depense]="transaction.type === 'DEPENSE'">
-                  {{ transaction.type === 'RECETTE' ? 'Recette' : 'Dépense' }}
-                </span>
-                <span class="item-montant">{{ transaction.montantRestant | number:'1.2-2' }} MAD</span>
-              </div>
-              <div class="item-description">{{ transaction.description }}</div>
-              <div class="item-footer">
-                <span class="item-date">{{ transaction.dateTransaction | date:'dd/MM/yyyy' }}</span>
-                <span class="item-reference" *ngIf="transaction.numeroReference">{{ transaction.numeroReference }}</span>
+          </mat-card-header>
+          <mat-card-content>
+            <div *ngIf="loadingEcheances" class="loading-small">
+              <mat-spinner diameter="30"></mat-spinner>
+            </div>
+            <div *ngIf="!loadingEcheances && echeancesEnRetard.length > 0" class="liste-alerte">
+              <div *ngFor="let echeance of echeancesEnRetard" class="item-alerte" (click)="viewTransaction(echeance.transactionId)">
+                <div class="item-header">
+                  <span class="item-montant">{{ echeance.montant | number:'1.2-2' }} MAD</span>
+                  <span class="item-date">{{ echeance.dateEcheance | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="item-details">
+                  <mat-icon>arrow_forward</mat-icon>
+                  <span>Voir la transaction</span>
+                </div>
               </div>
             </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Transactions impayées -->
+        <mat-card *ngIf="dashboard.nombreTransactionsImpayees > 0" class="alerte-card alerte-transactions">
+          <mat-card-header>
+            <div class="alerte-header">
+              <div class="alerte-icon-wrapper">
+                <mat-icon>payment</mat-icon>
+              </div>
+              <div>
+                <mat-card-title>Transactions impayées</mat-card-title>
+                <mat-card-subtitle>
+                  {{ dashboard.nombreTransactionsImpayees }} transaction(s) - {{ dashboard.totalImpayes | number:'1.2-2' }} MAD
+                </mat-card-subtitle>
+              </div>
+            </div>
+          </mat-card-header>
+          <mat-card-content>
+            <div *ngIf="loadingTransactions" class="loading-small">
+              <mat-spinner diameter="30"></mat-spinner>
+            </div>
+            <div *ngIf="!loadingTransactions && transactionsImpayees.length > 0" class="liste-alerte">
+              <div *ngFor="let transaction of transactionsImpayees" class="item-alerte" (click)="viewTransaction(transaction.id)">
+                <div class="item-header">
+                  <span class="item-type" [class.recette]="transaction.type === 'RECETTE'" [class.depense]="transaction.type === 'DEPENSE'">
+                    {{ transaction.type === 'RECETTE' ? 'Recette' : 'Dépense' }}
+                  </span>
+                  <span class="item-montant">{{ transaction.montantRestant | number:'1.2-2' }} MAD</span>
+                </div>
+                <div class="item-description">{{ transaction.description }}</div>
+                <div class="item-footer">
+                  <span class="item-date">{{ transaction.dateTransaction | date:'dd/MM/yyyy' }}</span>
+                  <span class="item-reference" *ngIf="transaction.numeroReference">{{ transaction.numeroReference }}</span>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
     </div>
 
-    <!-- Graphiques -->
-    <div class="charts">
-      <!-- TODO: Ajouter les graphiques d'évolution mensuelle -->
-    </div>
+    <!-- Empty State pour Alertes -->
+    <mat-card *ngIf="dashboard.nombreEcheancesEnRetard === 0 && dashboard.nombreTransactionsImpayees === 0" class="empty-state-card">
+      <mat-card-content>
+        <div class="empty-state">
+          <mat-icon>check_circle</mat-icon>
+          <h3>Aucune alerte</h3>
+          <p>Toutes les transactions sont à jour</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
   </div>
 </div>
-

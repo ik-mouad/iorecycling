@@ -52,6 +52,11 @@ public class ComptabiliteDashboardDTO {
     private LocalDate dateFin;
     private String periode; // "mensuel", "trimestriel", "annuel"
     
+    // Distinction CA Prestation vs CA Vente Matière
+    private BigDecimal caPrestation; // CA généré par les prestations d'enlèvement
+    private BigDecimal caVenteMatiere; // CA généré par les ventes de matière
+    private BigDecimal caTotal; // CA Prestation + CA Vente Matière
+    
     @Data
     @Builder
     @NoArgsConstructor

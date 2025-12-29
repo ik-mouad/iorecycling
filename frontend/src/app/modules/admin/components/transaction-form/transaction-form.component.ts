@@ -12,18 +12,23 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ComptabiliteService } from '../../../../services/comptabilite.service';
 import { SocieteService } from '../../../../services/societe.service';
 import { EnlevementService } from '../../../../services/enlevement.service';
+import { RoleService } from '../../../../services/role.service';
 import { 
   CreateTransactionRequest, 
   UpdateTransactionRequest,
   TypeTransaction,
-  CreateEcheanceRequest
+  CreateEcheanceRequest,
+  Transaction
 } from '../../../../models/comptabilite.model';
 import { Societe } from '../../../../models/societe.model';
 import { Enlevement } from '../../../../models/enlevement.model';
+import { AddPaiementDialogComponent } from '../add-paiement-dialog/add-paiement-dialog.component';
 
 /**
  * Composant : Formulaire de création/édition de transaction
@@ -45,7 +50,8 @@ import { Enlevement } from '../../../../models/enlevement.model';
     MatDatepickerModule,
     MatNativeDateModule,
     MatCheckboxModule,
-    MatIconModule
+    MatChipsModule,
+    MatDialogModule
   ],
   templateUrl: './transaction-form.component.html',
   styleUrls: ['./transaction-form.component.scss']
@@ -53,11 +59,17 @@ import { Enlevement } from '../../../../models/enlevement.model';
 export class TransactionFormComponent implements OnInit {
   transactionForm!: FormGroup;
   isEditMode = false;
+  isViewMode = false; // Mode consultation (lecture seule)
   transactionId?: number;
   loading = false;
   societes: Societe[] = [];
   enlevements: Enlevement[] = [];
   typeFixe = false; // Indique si le type est fixe (passé en paramètre)
+  currentTransaction?: Transaction; // Transaction chargée pour la consultation
+  isComptable = false; // Indique si l'utilisateur est comptable
+  
+  // Base path pour les routes (admin ou comptable)
+  basePath: string = '/admin/comptabilite'; // Public pour le template
 
   constructor(
     private fb: FormBuilder,
@@ -66,18 +78,39 @@ export class TransactionFormComponent implements OnInit {
     private enlevementService: EnlevementService,
     private router: Router,
     private route: ActivatedRoute,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private roleService: RoleService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
+    // Détecter le contexte (admin ou comptable) depuis l'URL
+    const currentUrl = this.router.url;
+    if (currentUrl.startsWith('/comptable')) {
+      this.basePath = '/comptable';
+    } else {
+      this.basePath = '/admin/comptabilite';
+    }
+    
+    // Vérifier si l'utilisateur est comptable
+    this.isComptable = this.roleService.isComptable();
+    
     this.initForm();
     this.loadSocietes();
     
-    // Vérifier si on est en mode édition ou création avec paramètres
+    // Vérifier si on est en mode consultation, édition ou création
     this.route.params.subscribe(params => {
       if (params['id']) {
-        this.isEditMode = true;
         this.transactionId = +params['id'];
+        // Vérifier si on est en mode édition (URL contient /edit) ou consultation
+        const url = this.router.url;
+        if (url.includes('/edit')) {
+          this.isEditMode = true;
+          this.isViewMode = false;
+        } else {
+          this.isViewMode = true; // Mode consultation par défaut
+          this.isEditMode = false;
+        }
         this.loadTransaction();
       }
     });
@@ -158,6 +191,8 @@ export class TransactionFormComponent implements OnInit {
     this.loading = true;
     this.comptabiliteService.getTransactionById(this.transactionId).subscribe({
       next: (transaction) => {
+        this.currentTransaction = transaction; // Stocker pour la vue consultation
+        
         this.transactionForm.patchValue({
           type: transaction.type,
           montant: transaction.montant,
@@ -170,8 +205,13 @@ export class TransactionFormComponent implements OnInit {
           notes: transaction.notes || ''
         });
 
-        // En mode édition, le type est toujours désactivé
-        this.transactionForm.get('type')?.disable();
+        // En mode consultation, désactiver tous les champs
+        if (this.isViewMode) {
+          this.transactionForm.disable();
+        } else {
+          // En mode édition, le type est toujours désactivé
+          this.transactionForm.get('type')?.disable();
+        }
 
         if (transaction.societeId) {
           this.onSocieteChange(transaction.societeId);
@@ -185,6 +225,9 @@ export class TransactionFormComponent implements OnInit {
               montant: [echeance.montant, [Validators.required, Validators.min(0.01)]],
               dateEcheance: [new Date(echeance.dateEcheance), Validators.required]
             });
+            if (this.isViewMode) {
+              echeanceGroup.disable();
+            }
             this.echeancesFormArray.push(echeanceGroup);
           });
         }
@@ -195,6 +238,7 @@ export class TransactionFormComponent implements OnInit {
         console.error('Erreur lors du chargement de la transaction', err);
         this.snackBar.open('Erreur lors du chargement de la transaction', 'Fermer', { duration: 3000 });
         this.loading = false;
+        this.router.navigate([this.basePath + '/transactions']);
       }
     });
   }
@@ -222,7 +266,7 @@ export class TransactionFormComponent implements OnInit {
       this.comptabiliteService.updateTransaction(this.transactionId, updateRequest).subscribe({
         next: () => {
           this.snackBar.open('Transaction mise à jour avec succès', 'Fermer', { duration: 3000 });
-          this.router.navigate(['/admin/comptabilite/transactions']);
+          this.router.navigate([this.basePath + '/transactions']);
         },
         error: (err) => {
           console.error('Erreur lors de la mise à jour', err);
@@ -260,7 +304,7 @@ export class TransactionFormComponent implements OnInit {
       this.comptabiliteService.createTransaction(createRequest).subscribe({
         next: () => {
           this.snackBar.open('Transaction créée avec succès', 'Fermer', { duration: 3000 });
-          this.router.navigate(['/admin/comptabilite/transactions']);
+          this.router.navigate([this.basePath + '/transactions']);
         },
         error: (err) => {
           console.error('Erreur lors de la création', err);
@@ -272,7 +316,88 @@ export class TransactionFormComponent implements OnInit {
   }
 
   cancel(): void {
-    this.router.navigate(['/admin/comptabilite/transactions']);
+    this.router.navigate([this.basePath + '/transactions']);
   }
+
+  // Méthodes helper pour la vue consultation
+  getTypeLabel(type: TypeTransaction): string {
+    return type === TypeTransaction.RECETTE ? 'Recette' : 'Dépense';
+  }
+
+  getStatutLabel(statut: string): string {
+    const labels: { [key: string]: string } = {
+      'EN_ATTENTE': 'En attente',
+      'PARTIELLEMENT_PAYEE': 'Partiellement payée',
+      'PAYEE': 'Payée',
+      'ANNULEE': 'Annulée'
+    };
+    return labels[statut] || statut;
+  }
+
+  formatDate(dateString: string): string {
+    return new Date(dateString).toLocaleDateString('fr-FR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+
+  formatDateTime(isoString: string): string {
+    const date = new Date(isoString);
+    return date.toLocaleDateString('fr-FR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  getSocieteName(societeId: number): string {
+    const societe = this.societes.find(s => s.id === societeId);
+    return societe ? societe.raisonSociale : 'N/A';
+  }
+
+  viewEnlevement(enlevementId: number): void {
+    if (!enlevementId) {
+      console.error('EnlevementId is required');
+      return;
+    }
+    // Déterminer le chemin selon le contexte (admin ou comptable)
+    const currentUrl = this.router.url;
+    const enlevementPath = currentUrl.startsWith('/comptable') ? '/comptable/enlevements' : '/admin/enlevements';
+    console.log('Navigating to enlevement:', enlevementPath, enlevementId);
+    this.router.navigate([enlevementPath, enlevementId]).catch(err => {
+      console.error('Error navigating to enlevement:', err);
+      this.snackBar.open('Erreur lors de la navigation vers l\'enlèvement', 'Fermer', { duration: 3000 });
+    });
+  }
+
+  editTransaction(): void {
+    this.router.navigate([this.basePath + '/transactions', this.transactionId, 'edit']);
+  }
+
+  openAddPaiementDialog(): void {
+    if (!this.currentTransaction) return;
+
+    const montantRestant = (this.currentTransaction.montant || 0) - (this.currentTransaction.montantPaye || 0);
+    
+    const dialogRef = this.dialog.open(AddPaiementDialogComponent, {
+      width: '500px',
+      data: {
+        transactionId: this.currentTransaction.id,
+        montantRestant: montantRestant
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Recharger la transaction pour afficher le nouveau paiement
+        this.loadTransaction();
+      }
+    });
+  }
+
+  TypeTransaction = TypeTransaction;
 }
 

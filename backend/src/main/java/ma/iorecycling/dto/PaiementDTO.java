@@ -21,6 +21,7 @@ public class PaiementDTO {
     
     private Long id;
     private Long transactionId;
+    private Long echeanceId; // Lien vers l'échéance (optionnel)
     private BigDecimal montant;
     private LocalDate datePaiement;
     private Paiement.ModePaiement modePaiement;

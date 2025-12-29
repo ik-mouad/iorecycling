@@ -63,5 +63,11 @@ public interface EnlevementRepository extends JpaRepository<Enlevement, Long> {
            "AND (NOT EXISTS (SELECT d FROM Document d WHERE d.enlevement.id = e.id AND d.typeDocument = 'BSDI') " +
            "OR NOT EXISTS (SELECT d FROM Document d WHERE d.enlevement.id = e.id AND d.typeDocument = 'PV_DESTRUCTION'))")
     List<Enlevement> findEnlevementsWithMissingDocuments();
+    
+    /**
+     * Trouve un enlèvement par son ID avec ses items chargés
+     */
+    @Query("SELECT e FROM Enlevement e LEFT JOIN FETCH e.items WHERE e.id = :id")
+    Optional<Enlevement> findByIdWithItems(@Param("id") Long id);
 }
 

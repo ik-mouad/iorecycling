@@ -1,7 +1,135 @@
-<div class="vente-form">
-  <h1>🛒 Nouvelle Vente</h1>
+<div class="vente-form" [class.view-mode]="isViewMode">
+  <!-- MODE CONSULTATION : Vue dédiée pour les détails -->
+  <div *ngIf="isViewMode && currentVente" class="vente-detail-view">
+    <!-- Header avec informations principales -->
+    <div class="detail-header">
+      <div class="header-left">
+        <h1>🛒 Détail de la Vente</h1>
+        <div class="vente-meta">
+          <span class="vente-number">{{ currentVente.numeroVente }}</span>
+          <mat-chip [class]="'statut-' + currentVente.statut.toLowerCase()">
+            {{ getStatutLabel(currentVente.statut) }}
+          </mat-chip>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button mat-stroked-button (click)="cancel()">
+          <mat-icon>arrow_back</mat-icon>
+          Retour à la liste
+        </button>
+      </div>
+    </div>
 
-  <mat-card>
+    <!-- Informations générales -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>info</mat-icon>
+          Informations générales
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Date de vente</span>
+            <span class="info-value">{{ formatDate(currentVente.dateVente) }}</span>
+          </div>
+          <div class="info-item" *ngIf="currentVente.acheteurId">
+            <span class="info-label">Acheteur (Société)</span>
+            <span class="info-value">{{ getSocieteName(currentVente.acheteurId) }}</span>
+          </div>
+          <div class="info-item" *ngIf="currentVente.acheteurNom">
+            <span class="info-label">Nom de l'acheteur</span>
+            <span class="info-value">{{ currentVente.acheteurNom }}</span>
+          </div>
+          <div class="info-item" *ngIf="currentVente.observation">
+            <span class="info-label">Observation</span>
+            <span class="info-value">{{ currentVente.observation }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Items de vente -->
+    <mat-card class="items-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>shopping_cart</mat-icon>
+          Items de vente
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="items-table-container">
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th>Type de déchet</th>
+                <th>Sous-type</th>
+                <th>Quantité</th>
+                <th>Prix unitaire (MAD)</th>
+                <th>Montant (MAD)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of currentVente.items">
+                <td>
+                  <mat-chip class="type-chip">{{ getTypeDechetLabel(item.typeDechet) }}</mat-chip>
+                </td>
+                <td>{{ item.sousType || '-' }}</td>
+                <td class="number-cell">{{ item.quantiteVendueKg | number:'1.2-2' }}</td>
+                <td class="number-cell">{{ item.prixVenteUnitaireMad | number:'1.2-2' }}</td>
+                <td class="number-cell amount-cell">{{ item.montantVenteMad | number:'1.2-2' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Total -->
+    <mat-card class="total-card">
+      <div class="total-content">
+        <div class="total-label">
+          <mat-icon>attach_money</mat-icon>
+          <span>Total de la vente</span>
+        </div>
+        <div class="total-amount">
+          {{ calculateTotal() | number:'1.2-2' }} <span class="currency">MAD</span>
+        </div>
+      </div>
+    </mat-card>
+
+    <!-- Métadonnées -->
+    <mat-card class="metadata-card" *ngIf="currentVente.createdBy || currentVente.createdAt">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>history</mat-icon>
+          Informations système
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="metadata-grid">
+          <div class="info-item" *ngIf="currentVente.createdBy">
+            <span class="info-label">Créé par :</span>
+            <span class="info-value">{{ currentVente.createdBy }}</span>
+          </div>
+          <div class="info-item" *ngIf="currentVente.createdAt">
+            <span class="info-label">Date de création :</span>
+            <span class="info-value">{{ formatDateTime(currentVente.createdAt) }}</span>
+          </div>
+          <div class="info-item" *ngIf="currentVente.updatedAt">
+            <span class="info-label">Dernière modification :</span>
+            <span class="info-value">{{ formatDateTime(currentVente.updatedAt) }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- MODE CRÉATION : Formulaire avec stepper -->
+  <div *ngIf="!isViewMode">
+    <h1>🛒 Nouvelle Vente</h1>
+    <mat-card>
     <mat-stepper #stepper>
       <!-- ÉTAPE 1 : Informations générales -->
       <mat-step [stepControl]="step1Form">
@@ -36,7 +164,7 @@
           </mat-form-field>
 
           <div class="step-actions">
-            <button mat-button matStepperNext [disabled]="step1Form.invalid">
+            <button mat-button matStepperNext [disabled]="step1Form.invalid || isViewMode">
               Suivant
               <mat-icon>arrow_forward</mat-icon>
             </button>
@@ -54,7 +182,7 @@
               <h3>Item {{ i + 1 }}</h3>
 
               <!-- Sélection depuis stock disponible -->
-              <div *ngIf="stocksDisponibles.length > 0" class="stock-selection">
+              <div *ngIf="stocksDisponibles.length > 0 && !isViewMode" class="stock-selection">
                 <mat-form-field appearance="outline">
                   <mat-label>Sélectionner depuis stock</mat-label>
                   <mat-select (selectionChange)="selectStockFromList($event.value, i)">
@@ -98,13 +226,14 @@
                 </div>
               </div>
 
-              <button mat-icon-button color="warn" (click)="removeItem(i)" *ngIf="itemsFormArray.length > 1">
+              <button mat-icon-button color="warn" (click)="removeItem(i)" 
+                      *ngIf="itemsFormArray.length > 1 && !isViewMode">
                 <mat-icon>delete</mat-icon>
               </button>
             </div>
           </div>
 
-          <button mat-stroked-button color="primary" (click)="addItem()">
+          <button mat-stroked-button color="primary" (click)="addItem()" *ngIf="!isViewMode">
             <mat-icon>add</mat-icon>
             Ajouter un item
           </button>
@@ -114,18 +243,25 @@
           </div>
 
           <div class="step-actions">
-            <button mat-button matStepperPrevious>
+            <button mat-button matStepperPrevious *ngIf="!isViewMode">
               <mat-icon>arrow_back</mat-icon>
               Précédent
             </button>
-            <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="step2Form.invalid || loading">
+            <button mat-raised-button color="primary" (click)="onSubmit()" 
+                    [disabled]="step2Form.invalid || loading || isViewMode" 
+                    *ngIf="!isViewMode">
               <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
               <mat-icon *ngIf="!loading">check</mat-icon>
               {{ loading ? 'Création...' : 'Créer la vente' }}
+            </button>
+            <button mat-stroked-button (click)="cancel()" *ngIf="isViewMode">
+              <mat-icon>arrow_back</mat-icon>
+              Retour à la liste
             </button>
           </div>
         </form>
       </mat-step>
     </mat-stepper>
-  </mat-card>
+    </mat-card>
+  </div>
 </div>

@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 public class TransactionService {
     
     private final TransactionRepository transactionRepository;
+    private final PaiementRepository paiementRepository;
     private final SocieteRepository societeRepository;
     private final EnlevementRepository enlevementRepository;
     private final EcheanceRepository echeanceRepository;
@@ -129,16 +130,41 @@ public class TransactionService {
     }
     
     /**
-     * Liste les transactions d'une société
+     * Liste les transactions d'une société ou toutes les transactions si societeId est null
      */
     @Transactional(readOnly = true)
     public Page<TransactionDTO> getTransactionsBySociete(Long societeId, Transaction.TypeTransaction type, 
                                                          Pageable pageable) {
         Page<Transaction> transactions;
-        if (type != null) {
-            transactions = transactionRepository.findBySocieteIdAndType(societeId, type, pageable);
+        if (societeId != null) {
+            // Transactions d'une société spécifique
+            if (type != null) {
+                transactions = transactionRepository.findBySocieteIdAndType(societeId, type, pageable);
+            } else {
+                transactions = transactionRepository.findBySocieteId(societeId, pageable);
+            }
         } else {
-            transactions = transactionRepository.findBySocieteId(societeId, pageable);
+            // Toutes les transactions (toutes sociétés)
+            if (type != null) {
+                transactions = transactionRepository.findByType(type, pageable);
+            } else {
+                transactions = transactionRepository.findAll(pageable);
+            }
+        }
+        return transactions.map(this::toDTO);
+    }
+    
+    /**
+     * Liste les transactions d'un enlèvement
+     */
+    @Transactional(readOnly = true)
+    public Page<TransactionDTO> getTransactionsByEnlevement(Long enlevementId, Transaction.TypeTransaction type, 
+                                                             Pageable pageable) {
+        Page<Transaction> transactions;
+        if (type != null) {
+            transactions = transactionRepository.findByEnlevementIdAndType(enlevementId, type, pageable);
+        } else {
+            transactions = transactionRepository.findByEnlevementId(enlevementId, pageable);
         }
         return transactions.map(this::toDTO);
     }
@@ -167,28 +193,33 @@ public class TransactionService {
     
     /**
      * Met à jour le statut d'une transaction selon ses paiements
+     * Utilise une requête SQL directe pour éviter les problèmes de lazy loading
      */
     private void updateStatutTransaction(Transaction transaction) {
-        BigDecimal montantPaye = transaction.getMontantPaye();
+        // Calculer le montant payé via une requête SQL directe pour éviter les problèmes de lazy loading
+        BigDecimal montantPaye = paiementRepository.sumMontantPayeByTransactionId(transaction.getId());
         BigDecimal montant = transaction.getMontant();
         
         if (transaction.getStatut() == Transaction.StatutTransaction.ANNULEE) {
             return; // Ne pas modifier si annulée
         }
         
-        if (montantPaye.compareTo(BigDecimal.ZERO) == 0) {
+        if (montantPaye == null || montantPaye.compareTo(BigDecimal.ZERO) == 0) {
             transaction.setStatut(Transaction.StatutTransaction.EN_ATTENTE);
         } else if (montantPaye.compareTo(montant) >= 0) {
             transaction.setStatut(Transaction.StatutTransaction.PAYEE);
         } else {
             transaction.setStatut(Transaction.StatutTransaction.PARTIELLEMENT_PAYEE);
         }
+        
+        log.debug("Mise à jour statut transaction {}: montant={}, montantPaye={}, nouveauStatut={}", 
+                transaction.getId(), montant, montantPaye, transaction.getStatut());
     }
     
     /**
      * Convertit une entité Transaction en DTO
      */
-    private TransactionDTO toDTO(Transaction transaction) {
+    public TransactionDTO toDTO(Transaction transaction) {
         TransactionDTO dto = TransactionDTO.builder()
                 .id(transaction.getId())
                 .type(transaction.getType())
@@ -211,10 +242,27 @@ public class TransactionService {
             dto.setEnlevementNumero(transaction.getEnlevement().getNumeroEnlevement());
         }
         
-        // Calculs automatiques
-        dto.setMontantPaye(transaction.getMontantPaye());
-        dto.setMontantRestant(transaction.getMontantRestant());
-        dto.setCompletementPayee(transaction.isCompletementPayee());
+        // Type de recette
+        dto.setTypeRecette(transaction.getTypeRecette());
+        
+        // Information vente
+        if (transaction.getVenteItem() != null) {
+            dto.setVenteItemId(transaction.getVenteItem().getId());
+            if (transaction.getVenteItem().getVente() != null) {
+                dto.setVenteId(transaction.getVenteItem().getVente().getId());
+                dto.setVenteNumero(transaction.getVenteItem().getVente().getNumeroVente());
+            }
+        }
+        
+        // Calculs automatiques - Utiliser une requête SQL directe pour éviter les problèmes de lazy loading
+        BigDecimal montantPaye = paiementRepository.sumMontantPayeByTransactionId(transaction.getId());
+        if (montantPaye == null) {
+            montantPaye = BigDecimal.ZERO;
+        }
+        BigDecimal montantRestant = transaction.getMontant().subtract(montantPaye);
+        dto.setMontantPaye(montantPaye);
+        dto.setMontantRestant(montantRestant);
+        dto.setCompletementPayee(montantRestant.compareTo(BigDecimal.ZERO) <= 0);
         
         // Paiements
         dto.setPaiements(transaction.getPaiements().stream()

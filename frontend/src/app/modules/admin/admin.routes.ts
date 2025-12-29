@@ -121,7 +121,7 @@ export const adminRoutes: Routes = [
       },
       {
         path: '',
-        redirectTo: 'societes',
+        redirectTo: 'enlevements',
         pathMatch: 'full'
       }
     ]

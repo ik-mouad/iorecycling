@@ -9,7 +9,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatMenuModule } from '@angular/material/menu';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { VenteService } from '../../../../services/vente.service';
 import { Vente, StatutVente } from '../../../../models/vente.model';
 import { Page } from '../../../../models/societe.model';
@@ -52,13 +52,25 @@ export class VentesListComponent implements OnInit {
   
   loading = false;
 
+  // Base path pour les routes (admin ou comptable)
+  private basePath: string = '/admin/ventes';
+
   constructor(
     private venteService: VenteService,
     private router: Router,
+    private route: ActivatedRoute,
     private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
+    // Détecter le contexte (admin ou comptable) depuis l'URL
+    const currentUrl = this.router.url;
+    if (currentUrl.startsWith('/comptable')) {
+      this.basePath = '/comptable/ventes';
+    } else {
+      this.basePath = '/admin/ventes';
+    }
+    
     this.loadVentes();
   }
 
@@ -96,11 +108,11 @@ export class VentesListComponent implements OnInit {
   }
 
   createVente(): void {
-    this.router.navigate(['/admin/ventes/nouvelle']);
+    this.router.navigate([this.basePath + '/nouvelle']);
   }
 
   viewVente(vente: Vente): void {
-    this.router.navigate(['/admin/ventes', vente.id]);
+    this.router.navigate([this.basePath, vente.id]);
   }
 
   validerVente(vente: Vente): void {

@@ -40,5 +40,23 @@ public interface PaiementRepository extends JpaRepository<Paiement, Long> {
             @Param("societeId") Long societeId,
             @Param("dateDebut") LocalDate dateDebut,
             @Param("dateFin") LocalDate dateFin);
+    
+    /**
+     * Calcule le total des paiements de toutes les sociétés sur une période
+     */
+    @Query("SELECT COALESCE(SUM(p.montant), 0) FROM Paiement p " +
+           "WHERE p.datePaiement BETWEEN :dateDebut AND :dateFin " +
+           "AND p.statut = 'VALIDE'")
+    BigDecimal sumPaiementsByPeriod(
+            @Param("dateDebut") LocalDate dateDebut,
+            @Param("dateFin") LocalDate dateFin);
+    
+    /**
+     * Calcule le montant total payé pour une transaction (paiements valides uniquement)
+     */
+    @Query("SELECT COALESCE(SUM(p.montant), 0) FROM Paiement p " +
+           "WHERE p.transaction.id = :transactionId " +
+           "AND p.statut = 'VALIDE'")
+    BigDecimal sumMontantPayeByTransactionId(@Param("transactionId") Long transactionId);
 }
 

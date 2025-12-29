@@ -43,5 +43,33 @@ public interface EcheanceRepository extends JpaRepository<Echeance, Long> {
             @Param("societeId") Long societeId,
             @Param("dateDebut") LocalDate dateDebut,
             @Param("dateFin") LocalDate dateFin);
+    
+    /**
+     * Trouve les échéances en retard de toutes les sociétés
+     */
+    @Query("SELECT e FROM Echeance e WHERE e.dateEcheance < :dateLimite " +
+           "AND e.statut = 'EN_ATTENTE' " +
+           "ORDER BY e.dateEcheance ASC")
+    List<Echeance> findEcheancesEnRetardAll(@Param("dateLimite") LocalDate dateLimite);
+    
+    /**
+     * Trouve les échéances à venir de toutes les sociétés
+     */
+    @Query("SELECT e FROM Echeance e WHERE e.dateEcheance >= :dateDebut " +
+           "AND e.dateEcheance <= :dateFin " +
+           "AND e.statut = 'EN_ATTENTE' " +
+           "ORDER BY e.dateEcheance ASC")
+    List<Echeance> findEcheancesAVenirAll(
+            @Param("dateDebut") LocalDate dateDebut,
+            @Param("dateFin") LocalDate dateFin);
+    
+    /**
+     * Trouve les échéances en attente d'une transaction, triées par date (plus anciennes d'abord)
+     */
+    @Query("SELECT e FROM Echeance e WHERE e.transaction.id = :transactionId " +
+           "AND e.statut = 'EN_ATTENTE' " +
+           "ORDER BY e.dateEcheance ASC")
+    List<Echeance> findEcheancesEnAttenteByTransactionId(
+            @Param("transactionId") Long transactionId);
 }
 

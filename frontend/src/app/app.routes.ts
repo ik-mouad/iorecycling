@@ -28,6 +28,11 @@ export const routes: Routes = [
     loadChildren: () => import('./modules/client/client.routes').then(m => m.clientRoutes)
   },
   {
+    path: 'comptable',
+    canActivate: [authGuard, comptableGuard],
+    loadChildren: () => import('./modules/comptable/comptable.routes').then(m => m.comptableRoutes)
+  },
+  {
     path: '**',
     redirectTo: ''
   }

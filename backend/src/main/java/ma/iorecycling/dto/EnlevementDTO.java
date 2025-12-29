@@ -65,6 +65,9 @@ public class EnlevementDTO {
     private String destinationNomInterlocuteur;
     private String destinationTelInterlocuteur;
     
+    // Transactions liées
+    private List<TransactionDTO> transactions;
+    
     // Métadonnées
     private String createdBy;
     private Instant createdAt;

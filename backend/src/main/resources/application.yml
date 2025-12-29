@@ -6,7 +6,7 @@ spring:
     active: ${SPRING_PROFILES_ACTIVE:dev}
   
   datasource:
-    url: jdbc:postgresql://postgres:5432/app
+    url: jdbc:postgresql://postgres:5432/app?useUnicode=true&characterEncoding=UTF-8
     username: app
     password: app123
     driver-class-name: org.postgresql.Driver

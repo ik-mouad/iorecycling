@@ -12,9 +12,13 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { EnlevementService } from '../../../../services/enlevement.service';
 import { DocumentService } from '../../../../services/document.service';
+import { ComptabiliteService } from '../../../../services/comptabilite.service';
+import { RoleService } from '../../../../services/role.service';
 import { Enlevement, DocumentInfo } from '../../../../models/enlevement.model';
 import { DocumentUploadComponent, DocumentUploadData } from '../document-upload/document-upload.component';
 import { TypeTraitement } from '../../../../models/destination.model';
+import { Transaction, TypeTransaction } from '../../../../models/comptabilite.model';
+import { AddPaiementDialogComponent } from '../add-paiement-dialog/add-paiement-dialog.component';
 
 /**
  * Composant : Détail d'un enlèvement
@@ -40,20 +44,30 @@ import { TypeTraitement } from '../../../../models/destination.model';
 export class EnlevementDetailComponent implements OnInit {
   enlevement?: Enlevement;
   documents: DocumentInfo[] = [];
+  transactions: Transaction[] = [];
   loading = false;
   loadingDocuments = false;
+  loadingTransactions = false;
   displayedColumns = ['typeDechet', 'sousType', 'quantiteKg', 'etat', 'prixUnitaireMad', 'montant'];
+  transactionColumns = ['date', 'type', 'description', 'montant', 'statut', 'actions'];
+  TypeTransaction = TypeTransaction;
+  isComptable = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private enlevementService: EnlevementService,
     private documentService: DocumentService,
+    private comptabiliteService: ComptabiliteService,
+    private roleService: RoleService,
     private snackBar: MatSnackBar,
     private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
+    // Vérifier si l'utilisateur est comptable
+    this.isComptable = this.roleService.isComptable();
+    
     this.route.params.subscribe(params => {
       const id = +params['id'];
       if (id) {
@@ -69,6 +83,12 @@ export class EnlevementDetailComponent implements OnInit {
         this.enlevement = enlevement;
         this.loading = false;
         this.loadDocuments(id);
+        // Charger les transactions si elles sont incluses dans le DTO
+        if (enlevement.transactions) {
+          this.transactions = enlevement.transactions;
+        } else {
+          this.loadTransactions(id);
+        }
       },
       error: (error) => {
         console.error('Erreur chargement enlèvement:', error);
@@ -77,6 +97,39 @@ export class EnlevementDetailComponent implements OnInit {
         this.backToList();
       }
     });
+  }
+
+  loadTransactions(enlevementId: number): void {
+    this.loadingTransactions = true;
+    this.enlevementService.getEnlevementTransactions(enlevementId).subscribe({
+      next: (transactions) => {
+        this.transactions = transactions;
+        this.loadingTransactions = false;
+      },
+      error: (error) => {
+        console.error('Erreur chargement transactions:', error);
+        this.loadingTransactions = false;
+      }
+    });
+  }
+
+  viewTransaction(transactionId: number): void {
+    const basePath = this.router.url.startsWith('/comptable') ? '/comptable' : '/admin/comptabilite';
+    this.router.navigate([basePath + '/transactions', transactionId]);
+  }
+
+  getTransactionTypeLabel(type: TypeTransaction): string {
+    return type === TypeTransaction.RECETTE ? 'Recette' : 'Dépense';
+  }
+
+  getStatutLabel(statut: string): string {
+    const labels: { [key: string]: string } = {
+      'EN_ATTENTE': 'En attente',
+      'PARTIELLEMENT_PAYEE': 'Partiellement payée',
+      'PAYEE': 'Payée',
+      'ANNULEE': 'Annulée'
+    };
+    return labels[statut] || statut;
   }
 
   loadDocuments(enlevementId: number): void {
@@ -136,7 +189,10 @@ export class EnlevementDetailComponent implements OnInit {
   }
 
   backToList(): void {
-    this.router.navigate(['/admin/enlevements']);
+    // Déterminer le chemin selon le contexte (admin ou comptable)
+    const currentUrl = this.router.url;
+    const enlevementsPath = currentUrl.startsWith('/comptable') ? '/comptable/transactions' : '/admin/enlevements';
+    this.router.navigate([enlevementsPath]);
   }
 
   getBilanClass(bilanNet: number): string {
@@ -188,6 +244,27 @@ export class EnlevementDetailComponent implements OnInit {
     // Format ISO date string -> dd/MM/yyyy
     const d = new Date(date);
     return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
+
+  openAddPaiementDialog(transaction: Transaction): void {
+    const montantRestant = (transaction.montant || 0) - (transaction.montantPaye || 0);
+    
+    const dialogRef = this.dialog.open(AddPaiementDialogComponent, {
+      width: '500px',
+      data: {
+        transactionId: transaction.id,
+        montantRestant: montantRestant
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Recharger les transactions de l'enlèvement
+        if (this.enlevement?.id) {
+          this.loadTransactions(this.enlevement.id);
+        }
+      }
+    });
   }
 }
 

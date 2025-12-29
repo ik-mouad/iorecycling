@@ -57,6 +57,9 @@ export class StocksDisponiblesComponent implements OnInit {
                       'sousType', 'quantiteRecupereeKg', 'quantiteVendueKg', 
                       'resteAVendreKg', 'statutStock', 'actions'];
   
+  // Base path pour les routes (admin ou comptable)
+  private basePath: string = '/admin/ventes';
+  
   constructor(
     private venteService: VenteService,
     private societeService: SocieteService,
@@ -65,6 +68,14 @@ export class StocksDisponiblesComponent implements OnInit {
   ) {}
   
   ngOnInit(): void {
+    // Détecter le contexte (admin ou comptable) depuis l'URL
+    const currentUrl = this.router.url;
+    if (currentUrl.startsWith('/comptable')) {
+      this.basePath = '/comptable/ventes';
+    } else {
+      this.basePath = '/admin/ventes';
+    }
+    
     this.loadSocietes();
   }
   
@@ -137,7 +148,7 @@ export class StocksDisponiblesComponent implements OnInit {
   
   createVenteFromStock(stock: StockDisponible): void {
     // Navigation vers le formulaire de vente avec pré-remplissage
-    this.router.navigate(['/admin/ventes/nouvelle'], {
+    this.router.navigate([this.basePath + '/nouvelle'], {
       queryParams: {
         pickupItemId: stock.pickupItemId,
         typeDechet: stock.typeDechet,
@@ -148,6 +159,9 @@ export class StocksDisponiblesComponent implements OnInit {
   }
   
   viewEnlevement(enlevementId: number): void {
-    this.router.navigate(['/admin/enlevements', enlevementId]);
+    // Pour les enlèvements, on garde la route admin car les comptables n'ont pas accès aux enlèvements
+    // Si nécessaire, on peut ajouter une route comptable pour voir les enlèvements en lecture seule
+    const enlevementPath = this.router.url.startsWith('/comptable') ? '/comptable/enlevements' : '/admin/enlevements';
+    this.router.navigate([enlevementPath, enlevementId]);
   }
 }

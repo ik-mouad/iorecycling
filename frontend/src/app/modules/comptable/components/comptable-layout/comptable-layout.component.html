@@ -1,0 +1,80 @@
+<div class="comptable-layout">
+  <!-- Header -->
+  <header class="comptable-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1 class="comptable-title">
+          <mat-icon>account_balance</mat-icon>
+          Comptabilité IORecycling
+        </h1>
+      </div>
+      <div class="header-right">
+        <span class="user-info">
+          <mat-icon>person</mat-icon>
+          {{ getUserName() }}
+        </span>
+        <button mat-icon-button [matMenuTriggerFor]="userMenu" aria-label="Menu utilisateur">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Se déconnecter</span>
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="comptable-nav">
+    <div class="nav-buttons">
+      <a mat-button 
+         routerLink="/comptable/dashboard" 
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{exact: true}">
+        <mat-icon>dashboard</mat-icon>
+        <span>Dashboard</span>
+      </a>
+      <a mat-button 
+         routerLink="/comptable/transactions" 
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{exact: false}">
+        <mat-icon>list_alt</mat-icon>
+        <span>Transactions</span>
+      </a>
+      <a mat-button 
+         routerLink="/comptable/ventes" 
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{exact: false}">
+        <mat-icon>shopping_cart</mat-icon>
+        <span>Ventes</span>
+      </a>
+      <a mat-button 
+         routerLink="/comptable/stocks" 
+         routerLinkActive="active">
+        <mat-icon>inventory_2</mat-icon>
+        <span>Stocks</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Breadcrumbs -->
+  <div class="breadcrumbs-container" *ngIf="breadcrumbs.length > 0">
+    <nav class="breadcrumbs">
+      <a *ngFor="let crumb of breadcrumbs; let last = last" 
+         [routerLink]="crumb.url" 
+         [class.active]="last"
+         class="breadcrumb-item">
+        <mat-icon *ngIf="crumb.icon">{{ crumb.icon }}</mat-icon>
+        <span>{{ crumb.label }}</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <main class="comptable-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>
+

@@ -14,7 +14,7 @@ import { ComptabiliteService } from '../../../../services/comptabilite.service';
 import { ComptabiliteDashboard, Transaction, Echeance } from '../../../../models/comptabilite.model';
 import { SocieteService } from '../../../../services/societe.service';
 import { Societe } from '../../../../models/societe.model';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-comptabilite-dashboard',
@@ -40,8 +40,11 @@ export class ComptabiliteDashboardComponent implements OnInit {
   loading = false;
   error: string | null = null;
   
+  // Base path pour les routes (admin ou comptable)
+  basePath: string = '/admin/comptabilite';
+  
   // Filtres
-  societeId: number | null = null;
+  societeId: number | null = null; // null = toutes les sociétés
   societes: Societe[] = [];
   dateDebut: string = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
   dateFin: string = new Date().toISOString().split('T')[0];
@@ -56,10 +59,19 @@ export class ComptabiliteDashboardComponent implements OnInit {
   constructor(
     private comptabiliteService: ComptabiliteService,
     private societeService: SocieteService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    // Détecter le contexte (admin ou comptable) depuis l'URL
+    const currentUrl = this.router.url;
+    if (currentUrl.startsWith('/comptable')) {
+      this.basePath = '/comptable';
+    } else {
+      this.basePath = '/admin/comptabilite';
+    }
+    
     this.loadSocietes();
   }
 
@@ -67,8 +79,8 @@ export class ComptabiliteDashboardComponent implements OnInit {
     this.societeService.getAllSocietes(0, 1000).subscribe({
       next: (page) => {
         this.societes = page.content;
-        if (this.societes.length > 0 && !this.societeId) {
-          this.societeId = this.societes[0].id;
+        // Par défaut, aucune société n'est sélectionnée (affiche toutes les sociétés)
+        if (this.societeId === null || this.societeId === undefined) {
           this.loadDashboard();
         }
       },
@@ -80,11 +92,7 @@ export class ComptabiliteDashboardComponent implements OnInit {
   }
 
   loadDashboard(): void {
-    if (!this.societeId) {
-      this.error = 'Veuillez sélectionner une société';
-      return;
-    }
-
+    // Permettre null pour "toutes les sociétés"
     this.loading = true;
     this.error = null;
 
@@ -94,12 +102,18 @@ export class ComptabiliteDashboardComponent implements OnInit {
           this.dashboard = data;
           this.loading = false;
           
-          // Charger les détails des alertes si nécessaire
-          if (data.nombreTransactionsImpayees > 0) {
-            this.loadTransactionsImpayees();
-          }
-          if (data.nombreEcheancesEnRetard > 0) {
-            this.loadEcheancesEnRetard();
+          // Charger les détails des alertes si nécessaire (seulement si une société est sélectionnée)
+          if (this.societeId !== null && this.societeId !== undefined) {
+            if (data.nombreTransactionsImpayees > 0) {
+              this.loadTransactionsImpayees();
+            }
+            if (data.nombreEcheancesEnRetard > 0) {
+              this.loadEcheancesEnRetard();
+            }
+          } else {
+            // Si toutes les sociétés, vider les listes d'alertes
+            this.transactionsImpayees = [];
+            this.echeancesEnRetard = [];
           }
         },
         error: (err) => {
@@ -111,7 +125,7 @@ export class ComptabiliteDashboardComponent implements OnInit {
   }
 
   loadTransactionsImpayees(): void {
-    if (!this.societeId) return;
+    if (this.societeId === null || this.societeId === undefined) return;
     
     this.loadingTransactions = true;
     this.comptabiliteService.getTransactionsImpayees(this.societeId).subscribe({
@@ -127,7 +141,7 @@ export class ComptabiliteDashboardComponent implements OnInit {
   }
 
   loadEcheancesEnRetard(): void {
-    if (!this.societeId) return;
+    if (this.societeId === null || this.societeId === undefined) return;
     
     this.loadingEcheances = true;
     this.comptabiliteService.getEcheancesEnRetard(this.societeId).subscribe({

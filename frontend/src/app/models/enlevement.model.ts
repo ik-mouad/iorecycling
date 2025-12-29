@@ -35,7 +35,12 @@ export interface Enlevement {
   createdBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  
+  // Transactions liées
+  transactions?: Transaction[];
 }
+
+import { Transaction } from './comptabilite.model';
 
 export interface CreateEnlevementRequest {
   dateEnlevement: string;

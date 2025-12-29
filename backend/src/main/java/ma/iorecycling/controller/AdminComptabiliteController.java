@@ -64,20 +64,30 @@ public class AdminComptabiliteController {
     }
     
     /**
-     * Liste les transactions d'une société
+     * Liste les transactions d'une société ou toutes les transactions si societeId n'est pas fourni
      */
     @GetMapping("/transactions")
-    @Operation(summary = "Liste les transactions", description = "Liste les transactions avec filtres optionnels")
+    @Operation(summary = "Liste les transactions", description = "Liste les transactions avec filtres optionnels. Si societeId n'est pas fourni, retourne toutes les transactions.")
     public ResponseEntity<Page<TransactionDTO>> getTransactions(
-            @RequestParam Long societeId,
+            @RequestParam(required = false) Long societeId,
+            @RequestParam(required = false) Long enlevementId,
             @RequestParam(required = false) Transaction.TypeTransaction type,
             @PageableDefault(sort = "dateTransaction", direction = Sort.Direction.DESC) Pageable pageable) {
         
-        log.info("GET /api/admin/comptabilite/transactions - Société: {}, Type: {}", societeId, type);
+        log.info("GET /api/admin/comptabilite/transactions - Société: {}, Enlèvement: {}, Type: {}", 
+                societeId != null ? societeId : "TOUTES", 
+                enlevementId != null ? enlevementId : "TOUS",
+                type);
         
         try {
-            Page<TransactionDTO> transactions = transactionService.getTransactionsBySociete(
-                    societeId, type, pageable);
+            Page<TransactionDTO> transactions;
+            if (enlevementId != null) {
+                // Filtrer par enlèvement
+                transactions = transactionService.getTransactionsByEnlevement(enlevementId, type, pageable);
+            } else {
+                // Filtrer par société ou toutes
+                transactions = transactionService.getTransactionsBySociete(societeId, type, pageable);
+            }
             return ResponseEntity.ok(transactions);
         } catch (Exception e) {
             log.error("Erreur lors de la récupération des transactions", e);
@@ -277,21 +287,26 @@ public class AdminComptabiliteController {
     
     /**
      * Récupère le dashboard de comptabilité
+     * Si societeId est null, calcule le dashboard pour toutes les sociétés
      */
     @GetMapping("/dashboard")
-    @Operation(summary = "Dashboard comptabilité", description = "Récupère les KPIs du dashboard de comptabilité")
+    @Operation(summary = "Dashboard comptabilité", description = "Récupère les KPIs du dashboard de comptabilité. Si societeId n'est pas fourni, calcule pour toutes les sociétés.")
     public ResponseEntity<ComptabiliteDashboardDTO> getDashboard(
-            @RequestParam Long societeId,
+            @RequestParam(required = false) Long societeId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateDebut,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFin,
             @RequestParam(defaultValue = "mensuel") String periode) {
         
         log.info("GET /api/admin/comptabilite/dashboard - Société: {}, Période: {} - {}", 
-                societeId, dateDebut, dateFin);
+                societeId != null ? societeId : "TOUTES", dateDebut, dateFin);
         
         try {
-            ComptabiliteDashboardDTO dashboard = dashboardService.calculateDashboard(
-                    societeId, dateDebut, dateFin, periode);
+            ComptabiliteDashboardDTO dashboard;
+            if (societeId != null) {
+                dashboard = dashboardService.calculateDashboard(societeId, dateDebut, dateFin, periode);
+            } else {
+                dashboard = dashboardService.calculateDashboardAll(dateDebut, dateFin, periode);
+            }
             return ResponseEntity.ok(dashboard);
         } catch (Exception e) {
             log.error("Erreur lors du calcul du dashboard", e);

@@ -48,3 +48,240 @@
   }
 }
 
+// ============================================
+// VIEW MODE - Détail de la transaction
+// ============================================
+.transaction-detail-view {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+  background: #f9fafb;
+  min-height: 100vh;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  padding: 24px;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+
+  .header-left {
+    flex: 1;
+
+    h1 {
+      margin: 0 0 16px 0;
+      font-size: 32px;
+      font-weight: 700;
+      color: #0a0a0a;
+    }
+
+    .transaction-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 12px;
+  }
+}
+
+.info-card, .financial-card, .paiements-card, .echeances-card, .metadata-card {
+  margin-bottom: 24px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+
+  .mat-card-header {
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f3f4f6;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 600;
+      color: #374151;
+
+      mat-icon {
+        color: #3b82f6;
+      }
+    }
+
+    .spacer {
+      flex: 1;
+    }
+  }
+}
+
+.info-grid, .financial-grid, .metadata-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.info-item, .financial-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .info-label, .financial-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .info-value, .financial-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #0a0a0a;
+
+    &.amount-value {
+      font-size: 24px;
+      font-weight: 700;
+
+      &.amount-recette {
+        color: #059669;
+      }
+
+      &.amount-depense {
+        color: #dc2626;
+      }
+
+      .currency {
+        font-size: 16px;
+        font-weight: 500;
+        margin-left: 4px;
+      }
+    }
+
+    &.paid-value {
+      color: #059669;
+    }
+
+    &.remaining-value {
+      color: #dc2626;
+    }
+  }
+}
+
+.paiements-table-wrapper, .echeances-table-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.paiements-table, .echeances-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th, td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  th {
+    background: #f9fafb;
+    font-weight: 600;
+    color: #374151;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  td {
+    font-size: 14px;
+    color: #374151;
+
+    &.amount-cell {
+      text-align: right;
+      font-family: 'Roboto Mono', monospace;
+      font-weight: 600;
+    }
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6b7280;
+  font-size: 14px;
+
+  p {
+    margin: 0;
+  }
+}
+
+// Chips styles
+mat-chip {
+  &.chip-recette {
+    background-color: #dcfce7;
+    color: #047857;
+  }
+
+  &.chip-depense {
+    background-color: #fee2e2;
+    color: #b91c1c;
+  }
+
+  &.statut-en_attente {
+    background-color: #fef3c7;
+    color: #b45309;
+  }
+
+  &.statut-partiellement_payee {
+    background-color: #dbeafe;
+    color: #1d4ed8;
+  }
+
+  &.statut-payee {
+    background-color: #dcfce7;
+    color: #047857;
+  }
+
+  &.statut-annulee {
+    background-color: #fee2e2;
+    color: #b91c1c;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .detail-header {
+    flex-direction: column;
+    gap: 16px;
+
+    .header-actions {
+      width: 100%;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+
+  .info-grid, .financial-grid, .metadata-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

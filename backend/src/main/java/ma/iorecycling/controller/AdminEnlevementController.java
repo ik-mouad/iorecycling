@@ -129,5 +129,44 @@ public class AdminEnlevementController {
             return ResponseEntity.notFound().build();
         }
     }
+    
+    /**
+     * Régénère les transactions comptables pour un enlèvement
+     */
+    @PostMapping("/{id}/regenerate-transactions")
+    @Operation(summary = "Régénérer les transactions", description = "Régénère les transactions comptables pour un enlèvement existant")
+    public ResponseEntity<Void> regenerateTransactions(@PathVariable Long id) {
+        log.info("POST /api/admin/enlevements/{}/regenerate-transactions", id);
+        
+        try {
+            enlevementService.regenerateTransactions(id);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            log.error("Erreur lors de la régénération des transactions : {}", e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error("Erreur inattendue lors de la régénération des transactions", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+    /**
+     * Récupère les transactions d'un enlèvement
+     */
+    @GetMapping("/{id}/transactions")
+    @Operation(summary = "Transactions d'un enlèvement", description = "Récupère toutes les transactions liées à un enlèvement")
+    public ResponseEntity<List<ma.iorecycling.dto.TransactionDTO>> getEnlevementTransactions(@PathVariable Long id) {
+        log.info("GET /api/admin/enlevements/{}/transactions", id);
+        try {
+            EnlevementDTO enlevement = enlevementService.getEnlevementById(id);
+            return ResponseEntity.ok(enlevement.getTransactions() != null ? enlevement.getTransactions() : List.of());
+        } catch (IllegalArgumentException e) {
+            log.error("Enlèvement non trouvé : {}", e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error("Erreur lors de la récupération des transactions", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
 

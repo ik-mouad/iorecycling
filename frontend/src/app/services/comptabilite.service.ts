@@ -44,17 +44,25 @@ export class ComptabiliteService {
 
   /**
    * Liste les transactions (admin)
+   * Si societeId n'est pas fourni, retourne toutes les transactions
+   * Si enlevementId est fourni, filtre par enlèvement
    */
   getTransactions(
-    societeId: number,
+    societeId: number | null,
     type?: TypeTransaction,
+    enlevementId?: number | null,
     page: number = 0,
     size: number = 20
   ): Observable<Page<Transaction>> {
     let params = new HttpParams()
-      .set('societeId', societeId.toString())
       .set('page', page.toString())
       .set('size', size.toString());
+
+    if (enlevementId !== null && enlevementId !== undefined) {
+      params = params.set('enlevementId', enlevementId.toString());
+    } else if (societeId !== null && societeId !== undefined) {
+      params = params.set('societeId', societeId.toString());
+    }
 
     if (type) {
       params = params.set('type', type);
@@ -146,18 +154,23 @@ export class ComptabiliteService {
 
   /**
    * Récupère le dashboard de comptabilité
+   * Si societeId est null, calcule pour toutes les sociétés
    */
   getDashboard(
-    societeId: number,
+    societeId: number | null,
     dateDebut: string,
     dateFin: string,
     periode: 'mensuel' | 'trimestriel' | 'annuel' = 'mensuel'
   ): Observable<ComptabiliteDashboard> {
-    const params = new HttpParams()
-      .set('societeId', societeId.toString())
+    let params = new HttpParams()
       .set('dateDebut', dateDebut)
       .set('dateFin', dateFin)
       .set('periode', periode);
+
+    // Ajouter societeId seulement s'il n'est pas null
+    if (societeId !== null) {
+      params = params.set('societeId', societeId.toString());
+    }
 
     return this.http.get<ComptabiliteDashboard>(`${this.comptabiliteApiUrl}/dashboard`, { params });
   }

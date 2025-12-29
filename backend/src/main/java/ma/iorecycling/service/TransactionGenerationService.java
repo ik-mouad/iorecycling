@@ -28,12 +28,17 @@ public class TransactionGenerationService {
     public void generateTransactionsFromEnlevement(Enlevement enlevement) {
         log.info("Génération des transactions pour l'enlèvement {}", enlevement.getNumeroEnlevement());
         
-        // Supprimer les transactions existantes liées à cet enlèvement (si régénération)
-        // Note: On suppose qu'il existe une méthode deleteByEnlevementId dans TransactionRepository
-        // Si elle n'existe pas, il faudra l'ajouter
+        // Supprimer uniquement les transactions générées automatiquement depuis l'enlèvement
+        // (pas celles liées aux ventes qui sont créées lors de la création de la vente)
         List<Transaction> existingTransactions = transactionRepository.findByEnlevementId(enlevement.getId());
-        if (!existingTransactions.isEmpty()) {
-            transactionRepository.deleteAll(existingTransactions);
+        List<Transaction> transactionsToDelete = existingTransactions.stream()
+                .filter(t -> t.getVenteItem() == null) // Ne pas supprimer les transactions liées aux ventes
+                .toList();
+        
+        if (!transactionsToDelete.isEmpty()) {
+            transactionRepository.deleteAll(transactionsToDelete);
+            log.info("{} transactions existantes supprimées (transactions liées aux ventes conservées)", 
+                    transactionsToDelete.size());
         }
         
         // Parcourir tous les items de l'enlèvement

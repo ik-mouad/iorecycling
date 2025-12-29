@@ -16,6 +16,8 @@ import ma.iorecycling.repository.EnlevementRepository;
 import ma.iorecycling.repository.PickupItemRepository;
 import ma.iorecycling.repository.SiteRepository;
 import ma.iorecycling.repository.SocieteRepository;
+import ma.iorecycling.repository.TransactionRepository;
+import ma.iorecycling.service.TransactionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -41,6 +43,8 @@ public class EnlevementService {
     private final DestinationRepository destinationRepository;
     private final EnlevementMapper enlevementMapper;
     private final TransactionGenerationService transactionGenerationService;
+    private final TransactionService transactionService;
+    private final TransactionRepository transactionRepository;
     
     /**
      * Crée un nouvel enlèvement avec ses items
@@ -173,14 +177,22 @@ public class EnlevementService {
     }
     
     /**
-     * Récupère un enlèvement par son ID
+     * Récupère un enlèvement par son ID avec ses transactions
      */
     @Transactional(readOnly = true)
     public EnlevementDTO getEnlevementById(Long id) {
         Enlevement enlevement = enlevementRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Enlèvement non trouvé avec l'ID : " + id));
         
-        return enlevementMapper.toDTO(enlevement);
+        EnlevementDTO dto = enlevementMapper.toDTO(enlevement);
+        
+        // Charger les transactions liées à cet enlèvement
+        List<ma.iorecycling.entity.Transaction> transactions = transactionRepository.findByEnlevementId(id);
+        dto.setTransactions(transactions.stream()
+                .map(transactionService::toDTO)
+                .collect(java.util.stream.Collectors.toList()));
+        
+        return dto;
     }
     
     /**
@@ -228,6 +240,27 @@ public class EnlevementService {
         
         enlevementRepository.deleteById(id);
         log.info("Enlèvement supprimé avec succès : ID {}", id);
+    }
+    
+    /**
+     * Régénère les transactions comptables pour un enlèvement existant
+     */
+    public void regenerateTransactions(Long enlevementId) {
+        log.info("Régénération des transactions pour l'enlèvement ID {}", enlevementId);
+        
+        Enlevement enlevement = enlevementRepository.findByIdWithItems(enlevementId)
+                .orElseThrow(() -> new IllegalArgumentException("Enlèvement non trouvé avec l'ID : " + enlevementId));
+        
+        // Vérifier que l'enlèvement a des items
+        if (enlevement.getItems() == null || enlevement.getItems().isEmpty()) {
+            log.warn("L'enlèvement {} n'a pas d'items, aucune transaction à générer", enlevement.getNumeroEnlevement());
+            return;
+        }
+        
+        // Générer les transactions
+        transactionGenerationService.generateTransactionsFromEnlevement(enlevement);
+        
+        log.info("Transactions régénérées avec succès pour l'enlèvement {}", enlevement.getNumeroEnlevement());
     }
 }
 

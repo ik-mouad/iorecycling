@@ -73,6 +73,11 @@ public class Paiement {
     @Column(name = "created_by", length = 100)
     private String createdBy;
     
+    // Lien optionnel vers une échéance (pour traçabilité)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "echeance_id")
+    private Echeance echeance;
+    
     /**
      * Enum pour le mode de paiement
      */

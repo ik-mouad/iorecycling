@@ -83,4 +83,11 @@ export class EnlevementService {
   deleteEnlevement(id: number): Observable<void> {
     return this.http.delete<void>(`${this.adminApiUrl}/${id}`);
   }
+
+  /**
+   * Récupère les transactions d'un enlèvement
+   */
+  getEnlevementTransactions(id: number): Observable<import('../models/comptabilite.model').Transaction[]> {
+    return this.http.get<import('../models/comptabilite.model').Transaction[]>(`${this.adminApiUrl}/${id}/transactions`);
+  }
 }
