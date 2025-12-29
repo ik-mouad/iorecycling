@@ -1,0 +1,19 @@
+:88 {
+  encode gzip
+
+  @authRoot path /auth
+  redir @authRoot /auth/ 308
+
+  handle /auth/* {
+    reverse_proxy keycloak:8080
+  }
+
+  handle /api/* {
+    reverse_proxy backend:8080
+  }
+
+  handle {
+    reverse_proxy frontend:80
+  }
+}
+

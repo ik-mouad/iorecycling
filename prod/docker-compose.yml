@@ -16,6 +16,8 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
+    networks:
+      - iorecycling-network
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.0
@@ -29,23 +31,31 @@ services:
       KC_HTTP_RELATIVE_PATH: "/auth"
       KC_HOSTNAME: ${KC_HOSTNAME:-localhost}
       KC_HOSTNAME_URL: ${KC_HOSTNAME_URL:-http://localhost:88/auth}
+      KC_HOSTNAME_ADMIN_URL: ${KC_HOSTNAME_URL:-http://localhost:88/auth}
       KC_PROXY: "edge"
+      KC_PROXY_ADDRESS_FORWARDING: "true"
       KC_HOSTNAME_STRICT: "false"
       KC_HOSTNAME_STRICT_HTTPS: "false"
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-app}
       KC_DB_USERNAME: ${POSTGRES_USER:-app}
       KC_DB_PASSWORD: ${POSTGRES_PASSWORD:-app123}
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+    volumes:
+      - keycloak_data:/opt/keycloak/data
     depends_on:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "echo > /dev/tcp/localhost/8080"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health/ready || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 10
-      start_period: 60s
+      start_period: 90s
     restart: unless-stopped
+    networks:
+      - iorecycling-network
 
   minio:
     image: minio/minio
@@ -64,6 +74,8 @@ services:
       timeout: 20s
       retries: 3
     restart: unless-stopped
+    networks:
+      - iorecycling-network
 
   backend:
     build:
@@ -73,7 +85,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-app}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-app}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-app123}
@@ -89,12 +101,6 @@ services:
       KEYCLOAK_ADMIN_CLIENT_ID: ${KEYCLOAK_ADMIN_CLIENT_ID:-admin-cli}
       KEYCLOAK_ADMIN_REALM: ${KEYCLOAK_REALM:-iorecycling}
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/auth/realms/${KEYCLOAK_REALM:-iorecycling}/protocol/openid-connect/certs
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4318
-      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
-      OTEL_LOGS_EXPORTER: none
-      OTEL_METRICS_EXPORTER: none
-      OTEL_TRACES_EXPORTER: otlp
-      OTEL_SERVICE_NAME: iorecycling-backend
     volumes:
       - ./logs:/var/log/backend
     depends_on:
@@ -109,72 +115,8 @@ services:
       retries: 5
       start_period: 40s
     restart: unless-stopped
-
-  prometheus:
-    image: prom/prometheus:v2.54.1
-    container_name: prometheus
-    volumes:
-      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - ./monitoring/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-    ports:
-      - "9090:9090"
-    depends_on:
-      - backend
-    restart: unless-stopped
-
-  loki:
-    image: grafana/loki:2.9.3
-    container_name: loki
-    ports:
-      - "3100:3100"
-    volumes:
-      - ./monitoring/loki/loki-config.yml:/etc/loki/local-config.yaml:ro
-      - loki_data:/loki
-    command: -config.file=/etc/loki/local-config.yaml
-    restart: unless-stopped
-
-  tempo:
-    image: grafana/tempo:2.3.1
-    container_name: tempo
-    ports:
-      - "3200:3200"  # HTTP
-      - "4317:4317"  # OTLP gRPC
-      - "4318:4318"  # OTLP HTTP
-    volumes:
-      - ./monitoring/tempo/tempo-config.yml:/etc/tempo.yaml:ro
-      - tempo_data:/var/tempo
-    command: ["-config.file=/etc/tempo.yaml"]
-    restart: unless-stopped
-
-  promtail:
-    image: grafana/promtail:2.9.3
-    container_name: promtail
-    volumes:
-      - ./monitoring/promtail/promtail-config.yml:/etc/promtail/config.yml:ro
-      - ./logs:/var/log/backend:ro
-    command: -config.file=/etc/promtail/config.yml
-    depends_on:
-      - loki
-    restart: unless-stopped
-
-  grafana:
-    image: grafana/grafana:11.0.0
-    container_name: grafana
-    environment:
-      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
-    ports:
-      - "3001:3000"
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
-    depends_on:
-      - prometheus
-      - loki
-      - tempo
-    restart: unless-stopped
+    networks:
+      - iorecycling-network
 
   frontend:
     build:
@@ -188,6 +130,8 @@ services:
       timeout: 10s
       retries: 3
     restart: unless-stopped
+    networks:
+      - iorecycling-network
 
   caddy:
     image: caddy:2
@@ -207,11 +151,16 @@ services:
       timeout: 10s
       retries: 3
     restart: unless-stopped
+    networks:
+      - iorecycling-network
 
 volumes:
   pg:
   minio:
   caddy_data:
-  grafana_data:
-  loki_data:
-  tempo_data:
+  keycloak_data:
+
+networks:
+  iorecycling-network:
+    driver: bridge
+
