@@ -48,6 +48,9 @@ public class CreateTransactionRequest {
     
     private Long enlevementId;
     
+    // Type de recette (PRESTATION ou VENTE_MATIERE) - uniquement pour les RECETTE
+    private Transaction.TypeRecette typeRecette;
+    
     @Size(max = 1000, message = "Les notes ne peuvent pas dépasser 1000 caractères")
     private String notes;
     

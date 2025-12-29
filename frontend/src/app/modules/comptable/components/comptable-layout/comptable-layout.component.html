@@ -3,18 +3,32 @@
   <header class="comptable-header">
     <div class="header-content">
       <div class="header-left">
-        <h1 class="comptable-title">
-          <mat-icon>account_balance</mat-icon>
-          Comptabilité IORecycling
-        </h1>
+        <div class="logo-section">
+          <div class="logo-icon">
+            <svg fill="none" height="40" viewBox="0 0 40 40" width="40" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 5L25 14H15L20 5Z" fill="#3B82F6"></path>
+              <path d="M28 20L36 24L28 28V20Z" fill="#10B981"></path>
+              <path d="M12 20L4 24L12 28V20Z" fill="#3B82F6"></path>
+              <circle cx="20" cy="20" r="18" stroke="#3B82F6" stroke-opacity="0.5" stroke-width="3"></circle>
+              <path d="M14 26L20 16L26 26H14Z" fill="#10B981"></path>
+            </svg>
+          </div>
+          <div class="logo-text">
+            <div class="logo-title">Comptabilité</div>
+            <div class="logo-subtitle">IORecycling</div>
+          </div>
+        </div>
       </div>
       <div class="header-right">
-        <span class="user-info">
-          <mat-icon>person</mat-icon>
-          {{ getUserName() }}
-        </span>
-        <button mat-icon-button [matMenuTriggerFor]="userMenu" aria-label="Menu utilisateur">
-          <mat-icon>more_vert</mat-icon>
+        <div class="user-profile">
+          <div class="user-info-text">
+            <p class="user-name">{{ getUserName() }}</p>
+            <p class="user-role">Admin</p>
+          </div>
+          <div class="user-avatar">{{ getUserInitials() }}</div>
+        </div>
+        <button class="menu-button" [matMenuTriggerFor]="userMenu" aria-label="Menu utilisateur">
+          <mat-icon>menu</mat-icon>
         </button>
         <mat-menu #userMenu="matMenu">
           <button mat-menu-item (click)="logout()">

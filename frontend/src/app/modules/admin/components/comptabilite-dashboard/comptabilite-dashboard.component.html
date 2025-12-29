@@ -160,7 +160,12 @@
                     {{ transaction.type === 'RECETTE' ? '+' : '-' }}{{ transaction.montant | number:'1.2-2' }} MAD
                   </span>
                 </div>
-                <p class="activity-subtitle">{{ getTransactionSubtitle(transaction) }}</p>
+                <div class="activity-footer">
+                  <p class="activity-subtitle">{{ getTransactionSubtitle(transaction) }}</p>
+                  <span class="activity-date" *ngIf="transaction.dateTransaction">
+                    {{ formatTransactionDate(transaction.dateTransaction) }}
+                  </span>
+                </div>
               </div>
             </div>
           </div>

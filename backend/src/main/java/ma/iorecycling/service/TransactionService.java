@@ -47,6 +47,16 @@ public class TransactionService {
                     .orElseThrow(() -> new RuntimeException("Enlèvement non trouvé: " + request.getEnlevementId()));
         }
         
+        // Déterminer le typeRecette si c'est une RECETTE
+        Transaction.TypeRecette typeRecette = request.getTypeRecette();
+        if (request.getType() == Transaction.TypeTransaction.RECETTE && typeRecette == null) {
+            // Par défaut, si c'est lié à un enlèvement, c'est une PRESTATION
+            // Sinon, on laisse null (sera déterminé lors de la création d'une vente)
+            if (enlevement != null) {
+                typeRecette = Transaction.TypeRecette.PRESTATION;
+            }
+        }
+        
         // Créer la transaction
         Transaction transaction = Transaction.builder()
                 .type(request.getType())
@@ -57,6 +67,7 @@ public class TransactionService {
                 .numeroReference(request.getNumeroReference())
                 .societe(societe)
                 .enlevement(enlevement)
+                .typeRecette(typeRecette)
                 .notes(request.getNotes())
                 .statut(Transaction.StatutTransaction.EN_ATTENTE)
                 .createdBy(createdBy)

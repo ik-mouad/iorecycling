@@ -51,8 +51,8 @@ export class ComptabiliteDashboardComponent implements OnInit, AfterViewInit, On
   // Filtres
   societeId: number | null = null; // null = toutes les sociétés
   societes: Societe[] = [];
-  dateDebut: string = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
-  dateFin: string = new Date().toISOString().split('T')[0];
+  dateDebut: string = '';
+  dateFin: string = '';
   periode: 'mensuel' | 'trimestriel' | 'annuel' = 'mensuel';
   
   // Transactions récentes
@@ -77,7 +77,47 @@ export class ComptabiliteDashboardComponent implements OnInit, AfterViewInit, On
       this.basePath = '/admin/comptabilite';
     }
     
+    // Initialiser les dates selon la période par défaut
+    this.updateDatesForPeriod();
+    
     this.loadSocietes();
+  }
+
+  /**
+   * Calcule les dates début et fin selon la période sélectionnée
+   */
+  updateDatesForPeriod(): void {
+    const now = new Date();
+    let startDate: Date;
+    let endDate: Date = new Date(now);
+
+    switch (this.periode) {
+      case 'mensuel':
+        // Mois en cours
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        endDate = new Date(now);
+        break;
+      
+      case 'trimestriel':
+        // Trimestre en cours
+        const currentQuarter = Math.floor(now.getMonth() / 3);
+        startDate = new Date(now.getFullYear(), currentQuarter * 3, 1);
+        endDate = new Date(now);
+        break;
+      
+      case 'annuel':
+        // Année en cours
+        startDate = new Date(now.getFullYear(), 0, 1);
+        endDate = new Date(now);
+        break;
+      
+      default:
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        endDate = new Date(now);
+    }
+
+    this.dateDebut = startDate.toISOString().split('T')[0];
+    this.dateFin = endDate.toISOString().split('T')[0];
   }
 
   ngAfterViewInit(): void {
@@ -240,7 +280,11 @@ export class ComptabiliteDashboardComponent implements OnInit, AfterViewInit, On
             displayColors: true,
             callbacks: {
               label: function(context) {
-                return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' MAD';
+                const value = context.parsed.y;
+                if (value === null || value === undefined) {
+                  return context.dataset.label + ': 0.00 MAD';
+                }
+                return context.dataset.label + ': ' + value.toFixed(2) + ' MAD';
               }
             }
           }
@@ -259,8 +303,10 @@ export class ComptabiliteDashboardComponent implements OnInit, AfterViewInit, On
           },
           y: {
             grid: {
-              color: 'rgba(0, 0, 0, 0.05)',
-              drawBorder: false
+              color: 'rgba(0, 0, 0, 0.05)'
+            },
+            border: {
+              display: false
             },
             ticks: {
               font: {
@@ -268,7 +314,10 @@ export class ComptabiliteDashboardComponent implements OnInit, AfterViewInit, On
               },
               color: '#6b7280',
               callback: function(value) {
-                return value.toFixed(2);
+                if (typeof value === 'number') {
+                  return value.toFixed(2);
+                }
+                return value;
               }
             }
           }
@@ -288,6 +337,9 @@ export class ComptabiliteDashboardComponent implements OnInit, AfterViewInit, On
 
   onPeriodeChange(periode: 'mensuel' | 'trimestriel' | 'annuel'): void {
     this.periode = periode;
+    // Mettre à jour les dates selon la nouvelle période
+    this.updateDatesForPeriod();
+    // Recharger le dashboard avec les nouvelles dates
     this.loadDashboard();
   }
 
@@ -306,5 +358,14 @@ export class ComptabiliteDashboardComponent implements OnInit, AfterViewInit, On
 
   viewTransaction(transactionId: number): void {
     this.router.navigate([this.basePath + '/transactions', transactionId]);
+  }
+
+  formatTransactionDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR', { 
+      day: '2-digit', 
+      month: '2-digit', 
+      year: 'numeric' 
+    });
   }
 }

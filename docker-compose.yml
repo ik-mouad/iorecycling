@@ -67,7 +67,7 @@ services:
 
   backend:
     build:
-      context: https://github.com/ik-mouad/iorecycling.git#main:backend
+      context: ./backend
       dockerfile: Dockerfile
     container_name: backend
     ports:
@@ -178,7 +178,7 @@ services:
 
   frontend:
     build:
-      context: https://github.com/ik-mouad/iorecycling.git#main:frontend
+      context: ./frontend
       dockerfile: Dockerfile
     depends_on: 
       - backend
