@@ -17,8 +17,9 @@ fi
 
 echo "✅ IP détectée: $SERVER_IP"
 
-# Créer le dossier logs s'il n'existe pas
+# Créer le dossier logs s'il n'existe pas avec les bonnes permissions
 mkdir -p logs
+chmod 777 logs  # Permissions pour que appuser (uid 1001) puisse écrire
 
 # Créer ou mettre à jour le .env
 if [ ! -f .env ]; then

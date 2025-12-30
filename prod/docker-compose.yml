@@ -105,7 +105,10 @@ services:
       KEYCLOAK_ADMIN_REALM: ${KEYCLOAK_REALM:-iorecycling}
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/auth/realms/${KEYCLOAK_REALM:-iorecycling}/protocol/openid-connect/certs
     volumes:
+      # Option 1: Bind mount (nécessite chmod 777 sur ./logs)
       - ./logs:/var/log/backend
+      # Option 2: Volume nommé (décommentez pour utiliser)
+      # - backend_logs:/var/log/backend
     depends_on:
       postgres:
         condition: service_healthy
@@ -164,6 +167,7 @@ volumes:
   minio:
   caddy_data:
   keycloak_data:
+  # backend_logs:  # Décommentez si vous utilisez le volume nommé pour les logs
 
 networks:
   iorecycling-network:

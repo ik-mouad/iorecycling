@@ -134,8 +134,9 @@ docker compose ps
 
 1. **Mots de passe** : Changez TOUS les mots de passe dans le `.env` avant le déploiement
 2. **Volumes** : Les données PostgreSQL et MinIO sont persistées dans des volumes Docker
-3. **Logs** : Les logs du backend sont dans `./logs` sur le serveur
+3. **Logs** : Les logs du backend sont dans `./logs` sur le serveur (permissions automatiquement configurées)
 4. **Build** : Le premier démarrage peut prendre plusieurs minutes car il construit les images depuis GitHub
+5. **Permissions logs** : Les scripts `init.sh` et `start.sh` configurent automatiquement les permissions du dossier `logs`
 
 ## 🆘 Dépannage
 
@@ -166,4 +167,18 @@ Si le build depuis GitHub échoue, vérifiez :
 - La connexion internet du serveur
 - Que la branche `main` existe sur GitHub
 - Les logs de build : `docker compose logs backend`
+
+### Erreur de permissions sur les logs
+
+Si vous voyez `Permission denied` pour `/var/log/backend/app.log` :
+
+```bash
+# Solution rapide : corriger les permissions
+chmod 777 logs
+
+# Ou utiliser un volume nommé (modifier docker-compose.yml)
+# Remplacer: - ./logs:/var/log/backend
+# Par: - backend_logs:/var/log/backend
+# Et décommenter backend_logs dans la section volumes
+```
 

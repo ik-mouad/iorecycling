@@ -23,8 +23,9 @@ if ! command -v docker compose &> /dev/null; then
     exit 1
 fi
 
-# Créer le dossier logs
+# Créer le dossier logs avec les bonnes permissions
 mkdir -p logs
+chmod 777 logs  # Permissions pour que appuser (uid 1001) puisse écrire
 
 # Démarrer les services
 echo "🐳 Démarrage des services Docker..."
