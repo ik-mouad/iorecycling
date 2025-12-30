@@ -23,9 +23,9 @@ CREATE TABLE IF NOT EXISTS demande_enlevement (
     FOREIGN KEY (societe_id) REFERENCES societe(id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_demande_societe ON demande_enlevement(societe_id);
-CREATE INDEX idx_demande_statut ON demande_enlevement(statut);
-CREATE INDEX idx_demande_date_souhaitee ON demande_enlevement(date_souhaitee);
+CREATE INDEX IF NOT EXISTS idx_demande_societe ON demande_enlevement(societe_id);
+CREATE INDEX IF NOT EXISTS idx_demande_statut ON demande_enlevement(statut);
+CREATE INDEX IF NOT EXISTS idx_demande_date_souhaitee ON demande_enlevement(date_souhaitee);
 
 COMMENT ON TABLE demande_enlevement IS 'Demandes d''enlèvements ponctuels des clients';
 COMMENT ON COLUMN demande_enlevement.statut IS 'EN_ATTENTE, VALIDEE, PLANIFIEE, REALISEE, REFUSEE, ANNULEE';
@@ -35,5 +35,6 @@ COMMENT ON COLUMN demande_enlevement.statut IS 'EN_ATTENTE, VALIDEE, PLANIFIEE, 
 -- ============================================
 INSERT INTO demande_enlevement (numero_demande, date_souhaitee, heure_souhaitee, site_id, societe_id, type_dechet_estime, quantite_estimee, commentaire, statut, created_by) VALUES
 ('DEM-2024-000001', '2024-12-05', '09h00 - 11h00', 1, 1, 'Déchets valorisables', 300.0, 'Besoin d''un enlèvement supplémentaire', 'EN_ATTENTE', 's.bennani@yazaki.ma'),
-('DEM-2024-000002', '2024-12-08', '14h00 - 16h00', 3, 2, 'Carton principalement', 150.0, 'Collecte exceptionnelle', 'VALIDEE', 'k.alami@marjane.ma');
+('DEM-2024-000002', '2024-12-08', '14h00 - 16h00', 3, 2, 'Carton principalement', 150.0, 'Collecte exceptionnelle', 'VALIDEE', 'k.alami@marjane.ma')
+ON CONFLICT (numero_demande) DO NOTHING;
 

@@ -10,9 +10,17 @@ ALTER TABLE enlevement
 ADD COLUMN IF NOT EXISTS chauffeur_nom VARCHAR(100);
 
 -- Ajout de la clé étrangère vers camion
-ALTER TABLE enlevement 
-ADD CONSTRAINT fk_enlevement_camion 
-FOREIGN KEY (camion_id) REFERENCES camion(id) ON DELETE SET NULL;
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.table_constraints 
+        WHERE constraint_name = 'fk_enlevement_camion' AND table_name = 'enlevement'
+    ) THEN
+        ALTER TABLE enlevement 
+        ADD CONSTRAINT fk_enlevement_camion 
+        FOREIGN KEY (camion_id) REFERENCES camion(id) ON DELETE SET NULL;
+    END IF;
+END $$;
 
 -- Index pour améliorer les performances
 CREATE INDEX IF NOT EXISTS idx_enlevement_camion ON enlevement(camion_id);

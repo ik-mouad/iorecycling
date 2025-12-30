@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS societe (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_societe_ice ON societe(ice);
+CREATE INDEX IF NOT EXISTS idx_societe_ice ON societe(ice);
 
 -- ============================================
 -- 2. TABLE CLIENT_USER (Utilisateur)
@@ -45,8 +45,8 @@ CREATE TABLE IF NOT EXISTS client_user (
     FOREIGN KEY (societe_id) REFERENCES societe(id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_client_user_email ON client_user(email);
-CREATE INDEX idx_client_user_societe ON client_user(societe_id);
+CREATE INDEX IF NOT EXISTS idx_client_user_email ON client_user(email);
+CREATE INDEX IF NOT EXISTS idx_client_user_societe ON client_user(societe_id);
 
 -- ============================================
 -- 3. TABLE SITE (Lieu de collecte)
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS site (
     FOREIGN KEY (societe_id) REFERENCES societe(id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_site_societe ON site(societe_id);
+CREATE INDEX IF NOT EXISTS idx_site_societe ON site(societe_id);
 
 -- ============================================
 -- 4. TABLE ENLEVEMENT (Collecte)
@@ -80,10 +80,10 @@ CREATE TABLE IF NOT EXISTS enlevement (
     FOREIGN KEY (societe_id) REFERENCES societe(id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_enlevement_date ON enlevement(date_enlevement);
-CREATE INDEX idx_enlevement_site ON enlevement(site_id);
-CREATE INDEX idx_enlevement_societe ON enlevement(societe_id);
-CREATE INDEX idx_enlevement_numero ON enlevement(numero_enlevement);
+CREATE INDEX IF NOT EXISTS idx_enlevement_date ON enlevement(date_enlevement);
+CREATE INDEX IF NOT EXISTS idx_enlevement_site ON enlevement(site_id);
+CREATE INDEX IF NOT EXISTS idx_enlevement_societe ON enlevement(societe_id);
+CREATE INDEX IF NOT EXISTS idx_enlevement_numero ON enlevement(numero_enlevement);
 
 -- ============================================
 -- 5. TABLE PICKUP_ITEM (Ligne de détail)
@@ -100,8 +100,8 @@ CREATE TABLE IF NOT EXISTS pickup_item (
     FOREIGN KEY (enlevement_id) REFERENCES enlevement(id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_pickup_item_enlevement ON pickup_item(enlevement_id);
-CREATE INDEX idx_pickup_item_type ON pickup_item(type_dechet);
+CREATE INDEX IF NOT EXISTS idx_pickup_item_enlevement ON pickup_item(enlevement_id);
+CREATE INDEX IF NOT EXISTS idx_pickup_item_type ON pickup_item(type_dechet);
 
 -- ============================================
 -- 6. TABLE DOCUMENT (Fichiers)
@@ -129,10 +129,10 @@ CREATE TABLE IF NOT EXISTS document (
         )
 );
 
-CREATE INDEX idx_document_enlevement ON document(enlevement_id);
-CREATE INDEX idx_document_societe ON document(societe_id);
-CREATE INDEX idx_document_periode ON document(periode_mois);
-CREATE INDEX idx_document_type ON document(type_document);
+CREATE INDEX IF NOT EXISTS idx_document_enlevement ON document(enlevement_id);
+CREATE INDEX IF NOT EXISTS idx_document_societe ON document(societe_id);
+CREATE INDEX IF NOT EXISTS idx_document_periode ON document(periode_mois);
+CREATE INDEX IF NOT EXISTS idx_document_type ON document(type_document);
 
 -- ============================================
 -- 7. DONNÉES DE DÉMONSTRATION
@@ -142,52 +142,60 @@ CREATE INDEX idx_document_type ON document(type_document);
 INSERT INTO societe (id, raison_sociale, ice, email, telephone, commentaire) VALUES 
 (1, 'YAZAKI MOROCCO KENITRA', '002345678901234', 'contact@yazaki.ma', '0537123456', 'Contrat annuel - 2 collectes/semaine - Industrie automobile'),
 (2, 'MARJANE TANGER', '002345678901235', 'environnement@marjane.ma', '0539123456', 'Grande distribution - Collectes hebdomadaires'),
-(3, 'CHU HASSAN II FES', '002345678901236', 'dechets@chu-fes.ma', '0535123456', 'Établissement de santé - Déchets médicaux quotidiens');
+(3, 'CHU HASSAN II FES', '002345678901236', 'dechets@chu-fes.ma', '0535123456', 'Établissement de santé - Déchets médicaux quotidiens')
+ON CONFLICT (id) DO NOTHING;
 
 -- Utilisateurs de démonstration
 INSERT INTO client_user (nom, prenom, poste_occupe, email, telephone, societe_id, active) VALUES
 ('BENNANI', 'Sarah', 'Responsable Environnement et RSE', 's.bennani@yazaki.ma', '0661234567', 1, true),
 ('ALAMI', 'Karim', 'Responsable Qualité', 'k.alami@marjane.ma', '0662345678', 2, true),
-('TAZI', 'Amina', 'Directrice des Services Techniques', 'a.tazi@chu-fes.ma', '0663456789', 3, true);
+('TAZI', 'Amina', 'Directrice des Services Techniques', 'a.tazi@chu-fes.ma', '0663456789', 3, true)
+ON CONFLICT (email) DO NOTHING;
 
 -- Sites de démonstration
-INSERT INTO site (societe_id, name, adresse) VALUES
-(1, 'Usine principale Kenitra', 'Zone industrielle, Route de Rabat, Kenitra 14000'),
-(1, 'Entrepôt logistique', 'Zone franche, Tanger Med, Tanger 90000'),
-(2, 'Hypermarché Tanger', 'Boulevard Mohammed VI, Tanger 90000'),
-(3, 'Hôpital principal', 'Avenue Hassan II, Fès 30000');
+INSERT INTO site (id, societe_id, name, adresse) VALUES
+(1, 1, 'Usine principale Kenitra', 'Zone industrielle, Route de Rabat, Kenitra 14000'),
+(2, 1, 'Entrepôt logistique', 'Zone franche, Tanger Med, Tanger 90000'),
+(3, 2, 'Hypermarché Tanger', 'Boulevard Mohammed VI, Tanger 90000'),
+(4, 3, 'Hôpital principal', 'Avenue Hassan II, Fès 30000')
+ON CONFLICT (id) DO NOTHING;
 
 -- Enlèvements de démonstration
-INSERT INTO enlevement (numero_enlevement, date_enlevement, site_id, societe_id, observation, created_by) VALUES
-('ENL-2024-0001', '2024-11-15', 1, 1, 'Collecte régulière - Bon tri', 'admin'),
-('ENL-2024-0002', '2024-11-18', 1, 1, 'Collecte régulière', 'admin'),
-('ENL-2024-0003', '2024-11-20', 3, 2, 'Collecte hebdomadaire - Carton principalement', 'admin'),
-('ENL-2024-0004', '2024-11-25', 4, 3, 'Déchets médicaux - DASRI', 'admin');
+INSERT INTO enlevement (id, numero_enlevement, date_enlevement, site_id, societe_id, observation, created_by) VALUES
+(1, 'ENL-2024-0001', '2024-11-15', 1, 1, 'Collecte régulière - Bon tri', 'admin'),
+(2, 'ENL-2024-0002', '2024-11-18', 1, 1, 'Collecte régulière', 'admin'),
+(3, 'ENL-2024-0003', '2024-11-20', 3, 2, 'Collecte hebdomadaire - Carton principalement', 'admin'),
+(4, 'ENL-2024-0004', '2024-11-25', 4, 3, 'Déchets médicaux - DASRI', 'admin')
+ON CONFLICT (id) DO NOTHING;
 
 -- Items de démonstration
 -- Enlèvement 1 : YAZAKI (Valorisables)
-INSERT INTO pickup_item (enlevement_id, type_dechet, sous_type, quantite_kg, prix_unitaire_mad, montant_mad) VALUES
-(1, 'VALORISABLE', 'CARTON', 150.000, 1.20, 180.00),
-(1, 'VALORISABLE', 'PLASTIQUE_PET', 80.000, 2.50, 200.00),
-(1, 'VALORISABLE', 'ALUMINIUM', 25.000, 8.00, 200.00),
-(1, 'BANAL', NULL, 45.000, 0.30, 13.50);
+INSERT INTO pickup_item (id, enlevement_id, type_dechet, sous_type, quantite_kg, prix_unitaire_mad, montant_mad) VALUES
+(1, 1, 'VALORISABLE', 'CARTON', 150.000, 1.20, 180.00),
+(2, 1, 'VALORISABLE', 'PLASTIQUE_PET', 80.000, 2.50, 200.00),
+(3, 1, 'VALORISABLE', 'ALUMINIUM', 25.000, 8.00, 200.00),
+(4, 1, 'BANAL', NULL, 45.000, 0.30, 13.50)
+ON CONFLICT (id) DO NOTHING;
 
 -- Enlèvement 2 : YAZAKI (Valorisables + Banal)
-INSERT INTO pickup_item (enlevement_id, type_dechet, sous_type, quantite_kg, prix_unitaire_mad, montant_mad) VALUES
-(2, 'VALORISABLE', 'CARTON', 120.000, 1.20, 144.00),
-(2, 'VALORISABLE', 'FER', 200.000, 0.80, 160.00),
-(2, 'BANAL', NULL, 50.000, 0.30, 15.00);
+INSERT INTO pickup_item (id, enlevement_id, type_dechet, sous_type, quantite_kg, prix_unitaire_mad, montant_mad) VALUES
+(5, 2, 'VALORISABLE', 'CARTON', 120.000, 1.20, 144.00),
+(6, 2, 'VALORISABLE', 'FER', 200.000, 0.80, 160.00),
+(7, 2, 'BANAL', NULL, 50.000, 0.30, 15.00)
+ON CONFLICT (id) DO NOTHING;
 
 -- Enlèvement 3 : MARJANE (Principalement carton)
-INSERT INTO pickup_item (enlevement_id, type_dechet, sous_type, quantite_kg, prix_unitaire_mad, montant_mad) VALUES
-(3, 'VALORISABLE', 'CARTON', 350.000, 1.20, 420.00),
-(3, 'VALORISABLE', 'PLASTIQUE_PET', 45.000, 2.50, 112.50),
-(3, 'BANAL', NULL, 25.000, 0.30, 7.50);
+INSERT INTO pickup_item (id, enlevement_id, type_dechet, sous_type, quantite_kg, prix_unitaire_mad, montant_mad) VALUES
+(8, 3, 'VALORISABLE', 'CARTON', 350.000, 1.20, 420.00),
+(9, 3, 'VALORISABLE', 'PLASTIQUE_PET', 45.000, 2.50, 112.50),
+(10, 3, 'BANAL', NULL, 25.000, 0.30, 7.50)
+ON CONFLICT (id) DO NOTHING;
 
 -- Enlèvement 4 : CHU (Déchets médicaux - A_ELIMINER)
-INSERT INTO pickup_item (enlevement_id, type_dechet, sous_type, quantite_kg, prix_unitaire_mad, montant_mad) VALUES
-(4, 'A_ELIMINER', 'DASRI', 45.000, 8.00, 360.00),
-(4, 'BANAL', NULL, 12.000, 0.30, 3.60);
+INSERT INTO pickup_item (id, enlevement_id, type_dechet, sous_type, quantite_kg, prix_unitaire_mad, montant_mad) VALUES
+(11, 4, 'A_ELIMINER', 'DASRI', 45.000, 8.00, 360.00),
+(12, 4, 'BANAL', NULL, 12.000, 0.30, 3.60)
+ON CONFLICT (id) DO NOTHING;
 
 -- ============================================
 -- 8. SÉQUENCES (pour compatibilité)

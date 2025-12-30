@@ -43,9 +43,9 @@ CREATE TABLE IF NOT EXISTS vente (
     created_by VARCHAR(100)
 );
 
-CREATE INDEX idx_vente_date ON vente(date_vente);
-CREATE INDEX idx_vente_statut ON vente(statut);
-CREATE INDEX idx_vente_acheteur ON vente(acheteur_id);
+CREATE INDEX IF NOT EXISTS idx_vente_date ON vente(date_vente);
+CREATE INDEX IF NOT EXISTS idx_vente_statut ON vente(statut);
+CREATE INDEX IF NOT EXISTS idx_vente_acheteur ON vente(acheteur_id);
 
 -- 3. NOUVELLE TABLE vente_item
 -- ============================================
@@ -64,9 +64,9 @@ CREATE TABLE IF NOT EXISTS vente_item (
     FOREIGN KEY (pickup_item_id) REFERENCES pickup_item(id) ON DELETE SET NULL
 );
 
-CREATE INDEX idx_vente_item_vente ON vente_item(vente_id);
-CREATE INDEX idx_vente_item_pickup ON vente_item(pickup_item_id);
-CREATE INDEX idx_vente_item_type ON vente_item(type_dechet, sous_type);
+CREATE INDEX IF NOT EXISTS idx_vente_item_vente ON vente_item(vente_id);
+CREATE INDEX IF NOT EXISTS idx_vente_item_pickup ON vente_item(pickup_item_id);
+CREATE INDEX IF NOT EXISTS idx_vente_item_type ON vente_item(type_dechet, sous_type);
 
 -- 4. MODIFICATIONS TABLE transaction
 -- ============================================
@@ -78,8 +78,16 @@ ALTER TABLE transaction ADD COLUMN IF NOT EXISTS type_recette VARCHAR(20);
 -- Lien vers vente_item pour les recettes vente matière
 ALTER TABLE transaction ADD COLUMN IF NOT EXISTS vente_item_id BIGINT;
 ALTER TABLE transaction DROP CONSTRAINT IF EXISTS fk_transaction_vente_item;
-ALTER TABLE transaction ADD CONSTRAINT fk_transaction_vente_item 
-    FOREIGN KEY (vente_item_id) REFERENCES vente_item(id) ON DELETE SET NULL;
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.table_constraints 
+        WHERE constraint_name = 'fk_transaction_vente_item' AND table_name = 'transaction'
+    ) THEN
+        ALTER TABLE transaction ADD CONSTRAINT fk_transaction_vente_item 
+            FOREIGN KEY (vente_item_id) REFERENCES vente_item(id) ON DELETE SET NULL;
+    END IF;
+END $$;
 
 CREATE INDEX IF NOT EXISTS idx_transaction_type_recette ON transaction(type_recette);
 CREATE INDEX IF NOT EXISTS idx_transaction_vente_item ON transaction(vente_item_id);

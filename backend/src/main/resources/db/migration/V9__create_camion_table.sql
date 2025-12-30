@@ -18,14 +18,22 @@ CREATE TABLE IF NOT EXISTS camion (
 );
 
 -- Index pour améliorer les performances
-CREATE INDEX idx_camion_matricule ON camion(matricule);
-CREATE INDEX idx_camion_societe_proprietaire ON camion(societe_proprietaire_id);
-CREATE INDEX idx_camion_actif ON camion(actif);
-CREATE INDEX idx_camion_type ON camion(type_camion);
+CREATE INDEX IF NOT EXISTS idx_camion_matricule ON camion(matricule);
+CREATE INDEX IF NOT EXISTS idx_camion_societe_proprietaire ON camion(societe_proprietaire_id);
+CREATE INDEX IF NOT EXISTS idx_camion_actif ON camion(actif);
+CREATE INDEX IF NOT EXISTS idx_camion_type ON camion(type_camion);
 
 -- Contrainte pour vérifier que le type_camion est valide
-ALTER TABLE camion ADD CONSTRAINT chk_type_camion 
-    CHECK (type_camion IN ('PLATEAU', 'CAISSON', 'AMPLIROLL', 'GRUE', 'HYDROCUREUR'));
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.table_constraints 
+        WHERE constraint_name = 'chk_type_camion' AND table_name = 'camion'
+    ) THEN
+        ALTER TABLE camion ADD CONSTRAINT chk_type_camion 
+            CHECK (type_camion IN ('PLATEAU', 'CAISSON', 'AMPLIROLL', 'GRUE', 'HYDROCUREUR'));
+    END IF;
+END $$;
 
 -- Commentaires
 COMMENT ON TABLE camion IS 'Table des camions de la flotte (IORecycling et partenaires)';

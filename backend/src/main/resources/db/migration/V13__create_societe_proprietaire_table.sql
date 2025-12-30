@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS societe_proprietaire (
 );
 
 -- Index pour améliorer les performances
-CREATE INDEX idx_societe_proprietaire_raison_sociale ON societe_proprietaire(raison_sociale);
-CREATE INDEX idx_societe_proprietaire_actif ON societe_proprietaire(actif);
+CREATE INDEX IF NOT EXISTS idx_societe_proprietaire_raison_sociale ON societe_proprietaire(raison_sociale);
+CREATE INDEX IF NOT EXISTS idx_societe_proprietaire_actif ON societe_proprietaire(actif);
 
 -- Commentaires
 COMMENT ON TABLE societe_proprietaire IS 'Table des sociétés propriétaires de camions (partenaires, sous-traitants, etc.) - Sépare des sociétés clientes';

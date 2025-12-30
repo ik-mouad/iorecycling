@@ -21,8 +21,8 @@ CREATE TABLE IF NOT EXISTS recurrence (
     FOREIGN KEY (site_id) REFERENCES site(id) ON DELETE RESTRICT
 );
 
-CREATE INDEX idx_recurrence_societe ON recurrence(societe_id);
-CREATE INDEX idx_recurrence_active ON recurrence(active);
+CREATE INDEX IF NOT EXISTS idx_recurrence_societe ON recurrence(societe_id);
+CREATE INDEX IF NOT EXISTS idx_recurrence_active ON recurrence(active);
 
 -- ============================================
 -- TABLE PLANNING_ENLEVEMENT
@@ -45,10 +45,10 @@ CREATE TABLE IF NOT EXISTS planning_enlevement (
     FOREIGN KEY (enlevement_id) REFERENCES enlevement(id) ON DELETE SET NULL
 );
 
-CREATE INDEX idx_planning_date ON planning_enlevement(date_prevue);
-CREATE INDEX idx_planning_societe ON planning_enlevement(societe_id);
-CREATE INDEX idx_planning_site ON planning_enlevement(site_id);
-CREATE INDEX idx_planning_statut ON planning_enlevement(statut);
+CREATE INDEX IF NOT EXISTS idx_planning_date ON planning_enlevement(date_prevue);
+CREATE INDEX IF NOT EXISTS idx_planning_societe ON planning_enlevement(societe_id);
+CREATE INDEX IF NOT EXISTS idx_planning_site ON planning_enlevement(site_id);
+CREATE INDEX IF NOT EXISTS idx_planning_statut ON planning_enlevement(statut);
 
 COMMENT ON TABLE recurrence IS 'Récurrences d''enlèvements (hebdomadaire, bimensuelle, mensuelle)';
 COMMENT ON TABLE planning_enlevement IS 'Enlèvements planifiés (pas encore réalisés)';
@@ -59,17 +59,20 @@ COMMENT ON COLUMN planning_enlevement.statut IS 'PLANIFIE, CONFIRME, REALISE, AN
 -- ============================================
 
 -- Récurrence hebdomadaire pour YAZAKI (tous les mercredis)
-INSERT INTO recurrence (societe_id, site_id, type_recurrence, jour_semaine, heure_prevue, date_debut, active) VALUES
-(1, 1, 'HEBDOMADAIRE', 'MERCREDI', '09h00 - 11h00', '2024-12-01', true);
+INSERT INTO recurrence (id, societe_id, site_id, type_recurrence, jour_semaine, heure_prevue, date_debut, active) VALUES
+(1, 1, 1, 'HEBDOMADAIRE', 'MERCREDI', '09h00 - 11h00', '2024-12-01', true)
+ON CONFLICT (id) DO NOTHING;
 
 -- Récurrence bimensuelle pour MARJANE (lundi et jeudi)
-INSERT INTO recurrence (societe_id, site_id, type_recurrence, jours_semaine_bimensuel, heure_prevue, date_debut, active) VALUES
-(2, 3, 'BIMENSUELLE', 'LUNDI,JEUDI', '08h00 - 10h00', '2024-12-01', true);
+INSERT INTO recurrence (id, societe_id, site_id, type_recurrence, jours_semaine_bimensuel, heure_prevue, date_debut, active) VALUES
+(2, 2, 3, 'BIMENSUELLE', 'LUNDI,JEUDI', '08h00 - 10h00', '2024-12-01', true)
+ON CONFLICT (id) DO NOTHING;
 
 -- Planning enlèvements à venir
-INSERT INTO planning_enlevement (date_prevue, heure_prevue, site_id, societe_id, statut, recurrence_id) VALUES
-('2024-12-04', '09h00 - 11h00', 1, 1, 'PLANIFIE', 1),
-('2024-12-09', '08h00 - 10h00', 3, 2, 'PLANIFIE', 2),
-('2024-12-11', '09h00 - 11h00', 1, 1, 'PLANIFIE', 1),
-('2024-12-12', '08h00 - 10h00', 3, 2, 'PLANIFIE', 2);
+INSERT INTO planning_enlevement (id, date_prevue, heure_prevue, site_id, societe_id, statut, recurrence_id) VALUES
+(1, '2024-12-04', '09h00 - 11h00', 1, 1, 'PLANIFIE', 1),
+(2, '2024-12-09', '08h00 - 10h00', 3, 2, 'PLANIFIE', 2),
+(3, '2024-12-11', '09h00 - 11h00', 1, 1, 'PLANIFIE', 1),
+(4, '2024-12-12', '08h00 - 10h00', 3, 2, 'PLANIFIE', 2)
+ON CONFLICT (id) DO NOTHING;
 

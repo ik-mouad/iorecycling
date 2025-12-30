@@ -33,9 +33,9 @@ CREATE TABLE IF NOT EXISTS destination_types_traitement (
 );
 
 -- Index pour améliorer les performances
-CREATE INDEX idx_destination_raison_sociale ON destination(raison_sociale);
-CREATE INDEX idx_destination_site ON destination(site);
-CREATE INDEX idx_destination_types_traitement ON destination_types_traitement(destination_id);
+CREATE INDEX IF NOT EXISTS idx_destination_raison_sociale ON destination(raison_sociale);
+CREATE INDEX IF NOT EXISTS idx_destination_site ON destination(site);
+CREATE INDEX IF NOT EXISTS idx_destination_types_traitement ON destination_types_traitement(destination_id);
 
 -- Commentaires
 COMMENT ON TABLE destination IS 'Table des destinations (centres de tri/traitement)';

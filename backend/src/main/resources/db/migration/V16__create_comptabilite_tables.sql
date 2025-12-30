@@ -23,11 +23,11 @@ CREATE TABLE IF NOT EXISTS transaction (
     FOREIGN KEY (enlevement_id) REFERENCES enlevement(id) ON DELETE SET NULL
 );
 
-CREATE INDEX idx_transaction_societe ON transaction(societe_id);
-CREATE INDEX idx_transaction_date ON transaction(date_transaction);
-CREATE INDEX idx_transaction_type ON transaction(type);
-CREATE INDEX idx_transaction_statut ON transaction(statut);
-CREATE INDEX idx_transaction_enlevement ON transaction(enlevement_id);
+CREATE INDEX IF NOT EXISTS idx_transaction_societe ON transaction(societe_id);
+CREATE INDEX IF NOT EXISTS idx_transaction_date ON transaction(date_transaction);
+CREATE INDEX IF NOT EXISTS idx_transaction_type ON transaction(type);
+CREATE INDEX IF NOT EXISTS idx_transaction_statut ON transaction(statut);
+CREATE INDEX IF NOT EXISTS idx_transaction_enlevement ON transaction(enlevement_id);
 
 -- ============================================
 -- 2. TABLE PAIEMENT (Paiements reçus/effectués)
@@ -47,9 +47,9 @@ CREATE TABLE IF NOT EXISTS paiement (
     FOREIGN KEY (transaction_id) REFERENCES transaction(id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_paiement_transaction ON paiement(transaction_id);
-CREATE INDEX idx_paiement_date ON paiement(date_paiement);
-CREATE INDEX idx_paiement_statut ON paiement(statut);
+CREATE INDEX IF NOT EXISTS idx_paiement_transaction ON paiement(transaction_id);
+CREATE INDEX IF NOT EXISTS idx_paiement_date ON paiement(date_paiement);
+CREATE INDEX IF NOT EXISTS idx_paiement_statut ON paiement(statut);
 
 -- ============================================
 -- 3. TABLE ECHEANCE (Échéances de paiement)
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS echeance (
     FOREIGN KEY (transaction_id) REFERENCES transaction(id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_echeance_transaction ON echeance(transaction_id);
-CREATE INDEX idx_echeance_date ON echeance(date_echeance);
-CREATE INDEX idx_echeance_statut ON echeance(statut);
+CREATE INDEX IF NOT EXISTS idx_echeance_transaction ON echeance(transaction_id);
+CREATE INDEX IF NOT EXISTS idx_echeance_date ON echeance(date_echeance);
+CREATE INDEX IF NOT EXISTS idx_echeance_statut ON echeance(statut);
 
