@@ -299,7 +299,7 @@ services:
     ports:
       - "${CADDY_PORT:-88}:88"
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./Caddyfile.local:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
     depends_on:
       frontend:

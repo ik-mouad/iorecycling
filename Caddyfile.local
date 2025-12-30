@@ -1,11 +1,11 @@
-iorecycling.duckdns.org {
+:88 {
   encode gzip
 
   @authRoot path /auth
   redir @authRoot /auth/ 308
 
   handle /auth/* {
-    reverse_proxy keycloak:8081 {
+    reverse_proxy keycloak:8080 {
       header_up Host {host}
       header_up X-Real-IP {remote}
       header_up X-Forwarded-For {remote}
@@ -21,3 +21,4 @@ iorecycling.duckdns.org {
     reverse_proxy frontend:80
   }
 }
+

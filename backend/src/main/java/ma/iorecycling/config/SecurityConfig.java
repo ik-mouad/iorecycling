@@ -94,6 +94,8 @@ public class SecurityConfig {
         
         // Créer un validator qui accepte plusieurs issuers possibles
         String internalIssuer = "http://keycloak:8080/auth/realms/iorecycling";
+        String internalIssuer8081 = "http://keycloak:8081/auth/realms/iorecycling";
+        String productionIssuer = "https://iorecycling.duckdns.org/auth/realms/iorecycling";
         String externalIssuer = "http://146.59.234.174:88/auth/realms/iorecycling";
         String localhostIssuer = "http://localhost:88/auth/realms/iorecycling";
         
@@ -101,6 +103,8 @@ public class SecurityConfig {
         OAuth2TokenValidator<Jwt> issuerValidator = jwt -> {
             String tokenIssuer = jwt.getIssuer().toString();
             if (tokenIssuer.equals(internalIssuer) || 
+                tokenIssuer.equals(internalIssuer8081) ||
+                tokenIssuer.equals(productionIssuer) ||
                 tokenIssuer.equals(externalIssuer) || 
                 tokenIssuer.equals(localhostIssuer)) {
                 return org.springframework.security.oauth2.core.OAuth2TokenValidatorResult.success();

@@ -148,6 +148,7 @@ cors:
     - http://localhost:88
     - http://localhost:3000
     - http://localhost:4200
+    - https://iorecycling.duckdns.org
   allowed-methods:
     - GET
     - POST
