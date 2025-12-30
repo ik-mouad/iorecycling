@@ -16,7 +16,7 @@ scrape_configs:
         labels:
           job: iorecycling-backend
           service: iorecycling-backend
-          __path__: /var/log/backend/*.log
+          __path__: /opt/iorecycling/logs/backend/*.log
     pipeline_stages:
       - json:
           expressions:

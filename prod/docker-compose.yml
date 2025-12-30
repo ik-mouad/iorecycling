@@ -106,9 +106,9 @@ services:
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/auth/realms/${KEYCLOAK_REALM:-iorecycling}/protocol/openid-connect/certs
     volumes:
       # Option 1: Bind mount (nécessite chmod 777 sur ./logs)
-      - ./logs:/var/log/backend
+      - ./logs:/opt/iorecycling/logs/backend
       # Option 2: Volume nommé (décommentez pour utiliser)
-      # - backend_logs:/var/log/backend
+      # - backend_logs:/opt/iorecycling/logs/backend
     depends_on:
       postgres:
         condition: service_healthy

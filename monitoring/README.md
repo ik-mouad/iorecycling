@@ -280,7 +280,7 @@ En cas d'erreur, les champs supplémentaires :
 1. Vérifier que Promtail est démarré : `docker compose ps promtail`
 2. Vérifier les logs de Promtail : `docker compose logs promtail`
 3. Vérifier que le volume `./logs` est monté correctement
-4. Vérifier que le backend écrit dans `/var/log/backend/app.log`
+4. Vérifier que le backend écrit dans `/opt/iorecycling/logs/backend/app.log`
 
 ### Les traces n'apparaissent pas dans Tempo
 

@@ -170,15 +170,15 @@ Si le build depuis GitHub échoue, vérifiez :
 
 ### Erreur de permissions sur les logs
 
-Si vous voyez `Permission denied` pour `/var/log/backend/app.log` :
+Si vous voyez `Permission denied` pour `/opt/iorecycling/logs/backend/app.log` :
 
 ```bash
 # Solution rapide : corriger les permissions
 chmod 777 logs
 
 # Ou utiliser un volume nommé (modifier docker-compose.yml)
-# Remplacer: - ./logs:/var/log/backend
-# Par: - backend_logs:/var/log/backend
+# Remplacer: - ./logs:/opt/iorecycling/logs/backend
+# Par: - backend_logs:/opt/iorecycling/logs/backend
 # Et décommenter backend_logs dans la section volumes
 ```
 
