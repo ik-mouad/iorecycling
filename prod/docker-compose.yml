@@ -104,6 +104,12 @@ services:
       KEYCLOAK_ADMIN_CLIENT_ID: ${KEYCLOAK_ADMIN_CLIENT_ID:-admin-cli}
       KEYCLOAK_ADMIN_REALM: ${KEYCLOAK_REALM:-iorecycling}
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/auth/realms/${KEYCLOAK_REALM:-iorecycling}/protocol/openid-connect/certs
+      # OpenTelemetry - Configuration non-bloquante (démarre même si Tempo n'est pas disponible)
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-http://tempo:4318}
+      OTEL_EXPORTER_OTLP_TIMEOUT: 500
+      OTEL_BSP_SCHEDULE_DELAY: 1000
+      OTEL_BSP_EXPORT_TIMEOUT: 500
+      OTEL_BSP_MAX_QUEUE_SIZE: 2048
     volumes:
       # Option 1: Bind mount (nécessite chmod 777 sur ./logs)
       - ./logs:/opt/iorecycling/logs/backend

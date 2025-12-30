@@ -61,6 +61,9 @@
 
     <!-- Logger pour éviter les logs verbeux d'OpenTelemetry -->
     <logger name="io.opentelemetry" level="WARN"/>
+    <!-- Ignorer les erreurs de connexion OpenTelemetry (Tempo non disponible) -->
+    <logger name="io.opentelemetry.exporter.internal.http.HttpExporter" level="OFF"/>
+    <logger name="io.opentelemetry.exporter.internal" level="OFF"/>
     <logger name="io.grpc" level="WARN"/>
 
     <root level="INFO">
