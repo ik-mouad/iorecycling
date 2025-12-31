@@ -12,9 +12,9 @@ RUN npm install
 # Copier le code source
 COPY . .
 
-# Construire l'application
+# Construire l'application en mode production
 # Force rebuild - 2025-01-27
-RUN npm run build
+RUN npm run build -- --configuration production
 
 # Stage de production
 FROM nginx:alpine
