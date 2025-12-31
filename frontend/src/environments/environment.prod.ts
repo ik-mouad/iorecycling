@@ -1,9 +1,9 @@
 // Environnement de production
 export const environment = {
   production: true,
-  apiUrl: 'https://iorecycling.duckdns.org/api',
+  apiUrl: '/api',
   keycloak: {
-    url: 'https://iorecycling.duckdns.org/auth',
+    url: '/auth',
     realm: 'iorecycling',
     clientId: 'frontend'
   }

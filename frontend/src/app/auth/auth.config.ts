@@ -1,8 +1,9 @@
 import { AuthConfig } from 'angular-oauth2-oidc';
+import { environment } from '../environments/environment';
 
 export const authConfig: AuthConfig = {
-  issuer: `${window.location.origin}/auth/realms/iorecycling`,
-  clientId: 'frontend',
+  issuer: `${window.location.origin}${environment.keycloak.url}/realms/${environment.keycloak.realm}`,
+  clientId: environment.keycloak.clientId,
   redirectUri: window.location.origin + '/',
   responseType: 'code',
   scope: 'openid profile email',

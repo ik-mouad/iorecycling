@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -18,11 +19,25 @@ export class AuthService {
     // Vérifier si on a des paramètres d'authentification dans l'URL
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
+    const error = urlParams.get('error');
+    const errorDescription = urlParams.get('error_description');
     const sessionState = urlParams.get('session_state');
     
+    if (error) {
+      console.error('Erreur d\'authentification Keycloak:', error, errorDescription);
+      this.isAuthenticatedSubject.next(false);
+      // Afficher un message d'erreur
+      alert('Erreur d\'authentification: ' + (errorDescription || error));
+      // Nettoyer l'URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+      return;
+    }
+    
     if (code) {
-      console.log('Code d\'autorisation détecté dans l\'URL:', code);
+      console.log('Code d\'autorisation détecté dans l\'URL');
+      console.log('Code:', code.substring(0, 20) + '...');
       console.log('Session state:', sessionState);
+      console.log('URL complète:', window.location.href);
       
       // Échanger le code contre un token
       this.exchangeCodeForToken(code);
@@ -30,9 +45,18 @@ export class AuthService {
       // Vérifier si on a déjà un token valide
       const token = localStorage.getItem('keycloak_token');
       if (token && !this.isTokenExpired(token)) {
+        console.log('Token valide trouvé dans le localStorage');
         this.isAuthenticatedSubject.next(true);
-        this.navigatePostLogin();
+        // Si on est sur la page de login, rediriger
+        if (window.location.pathname === '/' || window.location.pathname === '/login') {
+          this.navigatePostLogin(token);
+        }
       } else {
+        console.log('Aucun token valide trouvé');
+        if (token) {
+          console.log('Token expiré, suppression...');
+          localStorage.removeItem('keycloak_token');
+        }
         this.isAuthenticatedSubject.next(false);
       }
     }
@@ -41,9 +65,9 @@ export class AuthService {
   login(): void {
     console.log('Tentative de connexion...');
     // Redirection directe vers Keycloak
-    const base = `${window.location.origin}/auth/realms/iorecycling/protocol/openid-connect`;
+    const base = `${window.location.origin}${environment.keycloak.url}/realms/${environment.keycloak.realm}/protocol/openid-connect`;
     const authUrl = `${base}/auth?` +
-      'client_id=frontend&' +
+      `client_id=${environment.keycloak.clientId}&` +
       'redirect_uri=' + encodeURIComponent(window.location.origin + '/') + '&' +
       'response_type=code&' +
       'scope=openid%20profile%20email';
@@ -60,7 +84,7 @@ export class AuthService {
     console.log('Déconnexion');
     
     // Rediriger vers Keycloak pour la déconnexion
-    const base = `${window.location.origin}/auth/realms/iorecycling/protocol/openid-connect`;
+    const base = `${window.location.origin}${environment.keycloak.url}/realms/${environment.keycloak.realm}/protocol/openid-connect`;
     const logoutUrl = `${base}/logout?redirect_uri=` + encodeURIComponent(window.location.origin + '/');
     
     window.location.href = logoutUrl;
@@ -148,40 +172,109 @@ export class AuthService {
    * Échange le code d'autorisation contre un token
    */
   private exchangeCodeForToken(code: string): void {
-    const tokenUrl = `${window.location.origin}/auth/realms/iorecycling/protocol/openid-connect/token`;
+    const tokenUrl = `${window.location.origin}${environment.keycloak.url}/realms/${environment.keycloak.realm}/protocol/openid-connect/token`;
+    const redirectUri = window.location.origin + '/';
+    
+    console.log('🔄 Échange du code contre un token...');
+    console.log('📍 Token URL:', tokenUrl);
+    console.log('📍 Redirect URI:', redirectUri);
+    console.log('🔑 Code:', code.substring(0, 20) + '...');
     
     const body = new URLSearchParams();
     body.append('grant_type', 'authorization_code');
-    body.append('client_id', 'frontend');
+    body.append('client_id', environment.keycloak.clientId);
     body.append('code', code);
-    body.append('redirect_uri', window.location.origin + '/');
+    body.append('redirect_uri', redirectUri);
+    
+    console.log('📤 Envoi de la requête POST vers:', tokenUrl);
+    console.log('📦 Body:', body.toString());
     
     fetch(tokenUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: body
+      body: body,
+      credentials: 'include' // Important pour les cookies
     })
-    .then(response => response.json())
+    .then(response => {
+      console.log('📥 Réponse du serveur:', response.status, response.statusText);
+      // Log des headers (si disponibles)
+      const headers: Record<string, string> = {};
+      response.headers.forEach((value, key) => {
+        headers[key] = value;
+      });
+      console.log('📥 Headers:', headers);
+      
+      if (!response.ok) {
+        return response.text().then(text => {
+          console.error('❌ Erreur HTTP:', response.status, response.statusText);
+          console.error('❌ Corps de la réponse:', text);
+          
+          // Essayer de parser comme JSON pour un message d'erreur plus clair
+          let errorMessage = `Erreur HTTP ${response.status}: ${response.statusText}`;
+          try {
+            const errorData = JSON.parse(text);
+            errorMessage = errorData.error_description || errorData.error || errorMessage;
+            console.error('❌ Détails de l\'erreur:', errorData);
+          } catch (e) {
+            // Ce n'est pas du JSON, utiliser le texte brut
+            errorMessage = text || errorMessage;
+          }
+          
+          throw new Error(errorMessage);
+        });
+      }
+      return response.json();
+    })
     .then(data => {
+      console.log('✅ Données reçues:', {
+        hasAccessToken: !!data.access_token,
+        hasRefreshToken: !!data.refresh_token,
+        expiresIn: data.expires_in,
+        tokenType: data.token_type
+      });
+      
       if (data.access_token) {
         localStorage.setItem('keycloak_token', data.access_token);
+        if (data.refresh_token) {
+          localStorage.setItem('keycloak_refresh_token', data.refresh_token);
+        }
         this.isAuthenticatedSubject.next(true);
         
         // Nettoyer l'URL
         window.history.replaceState({}, document.title, window.location.pathname);
         
-        console.log('Token récupéré avec succès');
-        this.navigatePostLogin();
+        console.log('✅ Token récupéré et stocké avec succès');
+        // Passer le token directement pour éviter les problèmes de timing
+        this.navigatePostLogin(data.access_token);
       } else {
-        console.error('Erreur lors de la récupération du token:', data);
+        console.error('❌ Erreur: pas de access_token dans la réponse:', data);
         this.isAuthenticatedSubject.next(false);
+        // Afficher un message d'erreur à l'utilisateur
+        const errorMsg = data.error_description || data.error || 'Token non reçu';
+        console.error('❌ Message d\'erreur:', errorMsg);
+        alert('Erreur d\'authentification: ' + errorMsg);
       }
     })
     .catch(error => {
-      console.error('Erreur lors de l\'échange du code:', error);
+      console.error('❌ Erreur lors de l\'échange du code:', error);
+      console.error('❌ Stack trace:', error.stack);
       this.isAuthenticatedSubject.next(false);
+      
+      // Message d'erreur plus détaillé
+      let errorMessage = error.message || 'Erreur inconnue';
+      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        errorMessage = 'Erreur de connexion réseau. Vérifiez que Keycloak est accessible.';
+      } else if (error.message.includes('CORS')) {
+        errorMessage = 'Erreur CORS. Vérifiez la configuration Web Origins dans Keycloak.';
+      } else if (error.message.includes('invalid_client') || error.message.includes('unauthorized_client')) {
+        errorMessage = 'Erreur de configuration client. Le client "frontend" doit être un client public (Client authentication: OFF).';
+      } else if (error.message.includes('invalid_grant') || error.message.includes('invalid_code')) {
+        errorMessage = 'Le code d\'autorisation est invalide ou a expiré. Réessayez de vous connecter.';
+      }
+      
+      alert('Erreur de connexion: ' + errorMessage);
     });
   }
 
@@ -201,7 +294,7 @@ export class AuthService {
   /**
    * Redirige l'utilisateur après authentification selon ses rôles
    */
-  private navigatePostLogin(): void {
+  private navigatePostLogin(token?: string): void {
     const currentPath = window.location.pathname || '';
     const alreadyOnTarget = currentPath.startsWith('/admin') || 
                             currentPath.startsWith('/client') || 
@@ -209,15 +302,40 @@ export class AuthService {
     if (alreadyOnTarget) {
       return;
     }
-    const claims = this.getClaims();
-    const roles: string[] = claims?.realm_access?.roles || [];
+    
+    // Utiliser le token fourni ou récupérer depuis localStorage
+    const tokenToUse = token || localStorage.getItem('keycloak_token');
+    let roles: string[] = [];
+    
+    if (tokenToUse) {
+      try {
+        // Décoder le JWT (partie payload)
+        const payload = JSON.parse(atob(tokenToUse.split('.')[1]));
+        roles = payload?.realm_access?.roles || [];
+        console.log('Rôles extraits du token:', roles);
+      } catch (error) {
+        console.error('Erreur lors du décodage du token pour la redirection:', error);
+        // Fallback : utiliser getClaims()
+        const claims = this.getClaims();
+        roles = claims?.realm_access?.roles || [];
+      }
+    } else {
+      // Fallback : utiliser getClaims()
+      const claims = this.getClaims();
+      roles = claims?.realm_access?.roles || [];
+    }
+    
+    console.log('Redirection selon les rôles:', roles);
     
     // Priorité : COMPTABLE > ADMIN > CLIENT
     if (roles.includes('COMPTABLE')) {
+      console.log('Redirection vers /comptable/dashboard');
       this.router.navigateByUrl('/comptable/dashboard');
     } else if (roles.includes('ADMIN')) {
+      console.log('Redirection vers /admin/enlevements');
       this.router.navigateByUrl('/admin/enlevements');
     } else {
+      console.log('Redirection vers /client');
       this.router.navigateByUrl('/client');
     }
   }

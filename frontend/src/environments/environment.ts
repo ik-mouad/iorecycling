@@ -1,9 +1,9 @@
 // Environnement de développement
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:88/api',
+  apiUrl: '/api',
   keycloak: {
-    url: 'http://localhost:88/auth',
+    url: '/auth',
     realm: 'iorecycling',
     clientId: 'frontend'
   }
