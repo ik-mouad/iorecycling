@@ -8,7 +8,6 @@ import ma.iorecycling.dto.DemandeEnlevementDTO;
 import ma.iorecycling.dto.ValiderDemandeRequest;
 import ma.iorecycling.service.DemandeEnlevementService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Admin Demandes", description = "API pour traiter les demandes d'enlèvements")
-@PreAuthorize("hasRole('ADMIN')")
+// Autorisations gérées par Casbin via CasbinAuthorizationFilter
 public class AdminDemandeController {
     
     private final DemandeEnlevementService demandeService;

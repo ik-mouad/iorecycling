@@ -1,14 +1,14 @@
 import { inject } from '@angular/core';
 import { Router, CanActivateFn } from '@angular/router';
 import { AuthService } from './auth.service';
-import { RoleService } from '../services/role.service';
+import { CasbinService } from '../services/casbin.service';
 
 /**
- * Guard pour vérifier que l'utilisateur a le rôle COMPTABLE
+ * Guard pour vérifier que l'utilisateur a la permission comptable (basé sur Casbin)
  */
 export const comptableGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
-  const roleService = inject(RoleService);
+  const casbinService = inject(CasbinService);
   const router = inject(Router);
 
   if (!authService.isAuthenticated()) {
@@ -16,8 +16,9 @@ export const comptableGuard: CanActivateFn = (route, state) => {
     return false;
   }
 
-  if (!roleService.isComptable()) {
-    console.log('Accès refusé: rôle COMPTABLE requis');
+  // Vérifier la permission avec Casbin
+  if (!casbinService.canRead('comptabilite') && !casbinService.isComptable()) {
+    console.log('Accès refusé: permission comptable requise');
     router.navigate(['/']);
     return false;
   }

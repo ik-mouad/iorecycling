@@ -18,6 +18,7 @@ import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -33,9 +34,11 @@ import java.util.stream.Collectors;
 public class SecurityConfig {
 
     private final CorsProperties corsProperties;
+    private final CasbinAuthorizationFilter casbinAuthorizationFilter;
 
-    public SecurityConfig(CorsProperties corsProperties) {
+    public SecurityConfig(CorsProperties corsProperties, CasbinAuthorizationFilter casbinAuthorizationFilter) {
         this.corsProperties = corsProperties;
+        this.casbinAuthorizationFilter = casbinAuthorizationFilter;
     }
 
     @Bean
@@ -48,9 +51,8 @@ public class SecurityConfig {
                 .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/api/health").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
-                .requestMatchers("/api/client/**").hasRole("CLIENT")
-                .requestMatchers("/api/swagger-ui/**", "/v3/api-docs/**").hasRole("ADMIN")
-                .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "COMPTABLE")
+                // Toutes les autres routes nécessitent une authentification
+                // Les autorisations sont gérées par Casbin via CasbinAuthorizationFilter
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2
@@ -58,7 +60,9 @@ public class SecurityConfig {
                     .decoder(jwtDecoder())
                     .jwtAuthenticationConverter(jwtAuthenticationConverter())
                 )
-            );
+            )
+            // Ajouter le filtre Casbin après l'authentification
+            .addFilterAfter(casbinAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

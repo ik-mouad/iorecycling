@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
-import { RoleService } from '../services/role.service';
+import { CasbinService } from '../services/casbin.service';
 
 /**
  * Guard pour vérifier les rôles utilisateur
@@ -14,7 +14,7 @@ export class RoleGuard implements CanActivate {
   
   constructor(
     private authService: AuthService,
-    private roleService: RoleService,
+    private casbinService: CasbinService,
     private router: Router
   ) {}
 
@@ -34,10 +34,11 @@ export class RoleGuard implements CanActivate {
       return false;
     }
     
-    const hasRequiredRole = requiredRoles.some(role => this.roleService.hasRole(role));
+    // Vérifier avec Casbin si l'utilisateur a au moins un des rôles requis
+    const hasRequiredRole = requiredRoles.some(role => this.casbinService.hasRole(role));
     
     if (!hasRequiredRole) {
-      console.log('Accès refusé: rôles requis:', requiredRoles, 'rôles utilisateur:', this.roleService.getUserRoles());
+      console.log('Accès refusé: rôles requis:', requiredRoles, 'rôles utilisateur:', this.casbinService.getUserRoles());
       this.router.navigate(['/']);
       return false;
     }

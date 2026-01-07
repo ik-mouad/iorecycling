@@ -11,7 +11,6 @@ import ma.iorecycling.dto.SiteDTO;
 import ma.iorecycling.service.SiteService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Admin Sites", description = "API pour la gestion des sites de collecte")
-@PreAuthorize("hasRole('ADMIN')")
+// Autorisations gérées par Casbin via CasbinAuthorizationFilter
 public class AdminSiteController {
     
     private final SiteService siteService;
@@ -110,7 +109,7 @@ public class AdminSiteController {
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Sociétés - Sites", description = "API pour les sites d'une société")
-@PreAuthorize("hasRole('ADMIN')")
+// Autorisations gérées par Casbin via CasbinAuthorizationFilter
 class SocietesSitesController {
     
     private final SiteService siteService;
@@ -156,7 +155,7 @@ class SocietesSitesController {
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Client Sites", description = "API pour consulter les sites de la société du client")
-@PreAuthorize("hasRole('CLIENT')")
+// Autorisations gérées par Casbin via CasbinAuthorizationFilter
 class ClientSiteController {
     
     private final SiteService siteService;

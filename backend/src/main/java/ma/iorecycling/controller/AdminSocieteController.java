@@ -15,7 +15,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -35,7 +34,7 @@ public class AdminSocieteController {
      * Accessible uniquement aux ADMIN
      */
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    // Autorisations gérées par Casbin via CasbinAuthorizationFilter
     @Operation(summary = "Créer une société", description = "Crée une nouvelle société cliente")
     public ResponseEntity<SocieteDTO> createSociete(@Valid @RequestBody CreateSocieteRequest request) {
         log.info("POST /api/admin/societes - Création société {}", request.getRaisonSociale());
@@ -54,7 +53,7 @@ public class AdminSocieteController {
      * Accessible aux ADMIN et COMPTABLE (lecture seule pour les comptables)
      */
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPTABLE')")
+    // Autorisations gérées par Casbin via CasbinAuthorizationFilter
     @Operation(summary = "Lister les sociétés", description = "Récupère la liste paginée de toutes les sociétés")
     public ResponseEntity<Page<SocieteDTO>> getAllSocietes(
             @PageableDefault(size = 20, sort = "raisonSociale", direction = Sort.Direction.ASC) Pageable pageable) {
@@ -70,7 +69,7 @@ public class AdminSocieteController {
      * Accessible aux ADMIN et COMPTABLE (lecture seule pour les comptables)
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPTABLE')")
+    // Autorisations gérées par Casbin via CasbinAuthorizationFilter
     @Operation(summary = "Détail d'une société", description = "Récupère les détails d'une société par son ID")
     public ResponseEntity<SocieteDTO> getSocieteById(@PathVariable Long id) {
         log.info("GET /api/admin/societes/{}", id);
@@ -89,7 +88,7 @@ public class AdminSocieteController {
      * Accessible uniquement aux ADMIN
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    // Autorisations gérées par Casbin via CasbinAuthorizationFilter
     @Operation(summary = "Mettre à jour une société", description = "Met à jour les informations d'une société (ICE non modifiable)")
     public ResponseEntity<SocieteDTO> updateSociete(
             @PathVariable Long id,
@@ -111,7 +110,7 @@ public class AdminSocieteController {
      * Accessible uniquement aux ADMIN
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    // Autorisations gérées par Casbin via CasbinAuthorizationFilter
     @Operation(summary = "Supprimer une société", description = "Supprime une société et toutes ses données (sites, utilisateurs, enlèvements)")
     public ResponseEntity<Void> deleteSociete(@PathVariable Long id) {
         log.info("DELETE /api/admin/societes/{}", id);

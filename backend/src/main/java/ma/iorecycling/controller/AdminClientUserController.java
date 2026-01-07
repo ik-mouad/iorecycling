@@ -10,7 +10,6 @@ import ma.iorecycling.dto.CreateClientUserRequest;
 import ma.iorecycling.service.ClientUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Admin Utilisateurs", description = "API pour la gestion des utilisateurs clients")
-@PreAuthorize("hasRole('ADMIN')")
+// Autorisations gérées par Casbin via CasbinAuthorizationFilter
 public class AdminClientUserController {
     
     private final ClientUserService clientUserService;
@@ -124,7 +123,7 @@ public class AdminClientUserController {
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Sociétés - Utilisateurs", description = "API pour les utilisateurs d'une société")
-@PreAuthorize("hasRole('ADMIN')")
+    // Autorisations gérées par Casbin via CasbinAuthorizationFilter
 class SocietesUsersController {
     
     private final ClientUserService clientUserService;

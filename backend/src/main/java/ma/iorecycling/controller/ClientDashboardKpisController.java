@@ -9,7 +9,6 @@ import ma.iorecycling.service.ClientContextService;
 import ma.iorecycling.service.DashboardService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +23,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Client Dashboard", description = "API pour les KPIs du portail client")
-@PreAuthorize("hasRole('CLIENT')")
+// Autorisations gérées par Casbin via CasbinAuthorizationFilter
 public class ClientDashboardKpisController {
     
     private final DashboardService dashboardService;

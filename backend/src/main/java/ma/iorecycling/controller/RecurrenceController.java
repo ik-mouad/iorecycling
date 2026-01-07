@@ -10,7 +10,6 @@ import ma.iorecycling.dto.RecurrenceDTO;
 import ma.iorecycling.service.RecurrenceService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Admin Récurrences", description = "API pour la gestion des récurrences d'enlèvements")
-@PreAuthorize("hasRole('ADMIN')")
+// Autorisations gérées par Casbin via CasbinAuthorizationFilter
 public class RecurrenceController {
     
     private final RecurrenceService recurrenceService;

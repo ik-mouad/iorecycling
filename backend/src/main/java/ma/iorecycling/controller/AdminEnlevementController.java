@@ -15,7 +15,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +30,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Admin Enlèvements", description = "API pour la gestion des enlèvements")
-@PreAuthorize("hasRole('ADMIN')")
+// Autorisations gérées par Casbin via CasbinAuthorizationFilter
 public class AdminEnlevementController {
     
     private final EnlevementService enlevementService;

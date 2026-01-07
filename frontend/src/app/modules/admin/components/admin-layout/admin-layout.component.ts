@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from '../../../../auth/auth.service';
 import { DemandeService } from '../../../../services/demande.service';
-import { RoleService } from '../../../../services/role.service';
+import { CasbinService } from '../../../../services/casbin.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -28,12 +28,12 @@ export class AdminLayoutComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private demandeService: DemandeService,
-    private roleService: RoleService
+    private casbinService: CasbinService
   ) {}
 
   ngOnInit(): void {
-    // Vérifier que l'utilisateur est admin
-    if (!this.authService.hasRole('ADMIN')) {
+    // Vérifier que l'utilisateur a la permission d'accéder à l'administration
+    if (!this.casbinService.canRead('enlevements') && !this.casbinService.isAdmin()) {
       this.router.navigate(['/']);
     }
     this.loadPendingDemandesCount();
@@ -63,6 +63,6 @@ export class AdminLayoutComponent implements OnInit {
   }
 
   isComptable(): boolean {
-    return this.roleService.isComptable();
+    return this.casbinService.isComptable();
   }
 }

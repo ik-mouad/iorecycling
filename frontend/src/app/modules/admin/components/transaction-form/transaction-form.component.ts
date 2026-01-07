@@ -18,7 +18,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ComptabiliteService } from '../../../../services/comptabilite.service';
 import { SocieteService } from '../../../../services/societe.service';
 import { EnlevementService } from '../../../../services/enlevement.service';
-import { RoleService } from '../../../../services/role.service';
+import { CasbinService } from '../../../../services/casbin.service';
 import { 
   CreateTransactionRequest, 
   UpdateTransactionRequest,
@@ -79,7 +79,7 @@ export class TransactionFormComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private snackBar: MatSnackBar,
-    private roleService: RoleService,
+    private casbinService: CasbinService,
     private dialog: MatDialog
   ) {}
 
@@ -93,7 +93,7 @@ export class TransactionFormComponent implements OnInit {
     }
     
     // Vérifier si l'utilisateur est comptable
-    this.isComptable = this.roleService.isComptable();
+    this.isComptable = this.casbinService.isComptable();
     
     this.initForm();
     this.loadSocietes();

@@ -8,7 +8,6 @@ import ma.iorecycling.dto.PlanningEnlevementDTO;
 import ma.iorecycling.service.PlanningService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -23,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Admin Planning", description = "API pour la gestion du planning des enlèvements")
-@PreAuthorize("hasRole('ADMIN')")
+// Autorisations gérées par Casbin via CasbinAuthorizationFilter
 public class PlanningController {
     
     private final PlanningService planningService;

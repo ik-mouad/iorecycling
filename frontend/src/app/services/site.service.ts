@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Site } from '../models/societe.model';
 import { environment } from '../../environments/environment';
-import { AuthService } from '../auth/auth.service';
+import { CasbinService } from './casbin.service';
 
 /**
  * Service Angular pour gérer les Sites
@@ -17,7 +17,7 @@ export class SiteService {
 
   constructor(
     private http: HttpClient,
-    private authService: AuthService
+    private casbinService: CasbinService
   ) {}
 
   /**
@@ -25,8 +25,8 @@ export class SiteService {
    * Utilise l'endpoint admin si l'utilisateur est admin, sinon l'endpoint client
    */
   getSitesBySociete(societeId: number): Observable<Site[]> {
-    // Si l'utilisateur est admin, utiliser l'endpoint admin
-    if (this.authService.hasRole('ADMIN')) {
+    // Si l'utilisateur a la permission de lire les sociétés (admin), utiliser l'endpoint admin
+    if (this.casbinService.canRead('societes') || this.casbinService.isAdmin()) {
       return this.http.get<Site[]>(`${this.adminApiUrl}/societes/${societeId}/sites`);
     }
     // Sinon, utiliser l'endpoint client (qui récupère automatiquement les sites de la société du client)

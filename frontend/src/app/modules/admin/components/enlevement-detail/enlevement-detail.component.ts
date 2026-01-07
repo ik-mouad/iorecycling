@@ -13,7 +13,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { EnlevementService } from '../../../../services/enlevement.service';
 import { DocumentService } from '../../../../services/document.service';
 import { ComptabiliteService } from '../../../../services/comptabilite.service';
-import { RoleService } from '../../../../services/role.service';
+import { CasbinService } from '../../../../services/casbin.service';
 import { Enlevement, DocumentInfo } from '../../../../models/enlevement.model';
 import { DocumentUploadComponent, DocumentUploadData } from '../document-upload/document-upload.component';
 import { TypeTraitement } from '../../../../models/destination.model';
@@ -59,14 +59,14 @@ export class EnlevementDetailComponent implements OnInit {
     private enlevementService: EnlevementService,
     private documentService: DocumentService,
     private comptabiliteService: ComptabiliteService,
-    private roleService: RoleService,
+    private casbinService: CasbinService,
     private snackBar: MatSnackBar,
     private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
     // Vérifier si l'utilisateur est comptable
-    this.isComptable = this.roleService.isComptable();
+    this.isComptable = this.casbinService.isComptable();
     
     this.route.params.subscribe(params => {
       const id = +params['id'];

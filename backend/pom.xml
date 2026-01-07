@@ -115,6 +115,13 @@
       <version>5.8</version>
     </dependency>
     
+    <!-- Casbin for authorization -->
+    <dependency>
+      <groupId>org.casbin</groupId>
+      <artifactId>jcasbin</artifactId>
+      <version>1.40.0</version>
+    </dependency>
+    
     <!-- Development -->
     <dependency>
       <groupId>org.springframework.boot</groupId>

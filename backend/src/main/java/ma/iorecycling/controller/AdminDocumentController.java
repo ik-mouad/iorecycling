@@ -10,7 +10,6 @@ import ma.iorecycling.service.DocumentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Admin Documents", description = "API pour la gestion des documents")
-@PreAuthorize("hasRole('ADMIN')")
+// Autorisations gérées par Casbin via CasbinAuthorizationFilter
 public class AdminDocumentController {
     
     private final DocumentService documentService;
@@ -133,7 +132,7 @@ public class AdminDocumentController {
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Client Documents", description = "API pour consulter et télécharger les documents")
-@PreAuthorize("hasRole('CLIENT')")
+// Autorisations gérées par Casbin via CasbinAuthorizationFilter
 class ClientDocumentController {
     
     private final DocumentService documentService;
