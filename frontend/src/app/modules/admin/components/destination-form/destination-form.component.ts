@@ -12,6 +12,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DestinationService } from '../../../../services/destination.service';
 import { CreateDestinationRequest, UpdateDestinationRequest, TypeTraitement } from '../../../../models/destination.model';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
 
 /**
  * Composant : Formulaire de création/édition de destination
@@ -29,7 +30,8 @@ import { CreateDestinationRequest, UpdateDestinationRequest, TypeTraitement } fr
     MatCardModule,
     MatSnackBarModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    TranslatePipe
   ],
   templateUrl: './destination-form.component.html',
   styleUrls: ['./destination-form.component.scss']

@@ -19,6 +19,8 @@ import { EnlevementService } from '../../../../services/enlevement.service';
 import { SocieteService } from '../../../../services/societe.service';
 import { Enlevement } from '../../../../models/enlevement.model';
 import { Societe } from '../../../../models/societe.model';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
+import { I18nService } from '../../../../services/i18n.service';
 
 /**
  * Composant : Liste des enlèvements avec filtres
@@ -41,7 +43,8 @@ import { Societe } from '../../../../models/societe.model';
     MatTooltipModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatMenuModule
+    MatMenuModule,
+    TranslatePipe
   ],
   templateUrl: './enlevements-list.component.html',
   styleUrls: ['./enlevements-list.component.scss']
@@ -66,7 +69,8 @@ export class EnlevementsListComponent implements OnInit {
     private societeService: SocieteService,
     private fb: FormBuilder,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private i18n: I18nService
   ) {}
 
   ngOnInit(): void {

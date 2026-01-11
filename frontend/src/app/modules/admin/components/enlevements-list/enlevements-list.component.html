@@ -3,13 +3,13 @@
   <div class="page-header">
     <div class="header-content">
       <div class="header-left">
-        <h1 class="page-title">Enlèvements</h1>
-        <p class="page-description">Consultez et gérez tous les enlèvements effectués</p>
+        <h1 class="page-title">{{ 'admin.enlevements' | translate }}</h1>
+        <p class="page-description">{{ 'enlevement.description' | translate }}</p>
       </div>
       <div class="header-actions">
         <button mat-raised-button color="primary" class="primary-button" (click)="createEnlevement()">
           <mat-icon>add</mat-icon>
-          <span>Nouvel enlèvement</span>
+          <span>{{ 'enlevement.new' | translate }}</span>
         </button>
       </div>
     </div>
@@ -19,9 +19,9 @@
   <div class="search-filters-card">
     <div class="search-filters-content">
       <mat-form-field appearance="outline" class="filter-field">
-        <mat-label>Société</mat-label>
+        <mat-label>{{ 'enlevement.societe' | translate }}</mat-label>
         <mat-select formControlName="societeId" (selectionChange)="applyFilters()">
-          <mat-option [value]="">Toutes les sociétés</mat-option>
+          <mat-option [value]="">{{ 'enlevement.allSocietes' | translate }}</mat-option>
           <mat-option *ngFor="let societe of societes" [value]="societe.id">
             {{ societe.raisonSociale }}
           </mat-option>
@@ -29,7 +29,7 @@
       </mat-form-field>
       <button mat-button class="reset-button" (click)="resetFilters()">
         <mat-icon>clear</mat-icon>
-        <span>Réinitialiser</span>
+        <span>{{ 'common.reset' | translate }}</span>
       </button>
     </div>
   </div>
@@ -41,7 +41,7 @@
         
         <!-- Numéro -->
         <ng-container matColumnDef="numeroEnlevement">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Numéro</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'enlevement.numero' | translate }}</th>
           <td mat-cell *matCellDef="let enlevement" class="table-cell">
             <span class="badge badge-ice">{{ enlevement.numeroEnlevement }}</span>
           </td>
@@ -49,7 +49,7 @@
 
         <!-- Date -->
         <ng-container matColumnDef="dateEnlevement">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Date</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'enlevement.date' | translate }}</th>
           <td mat-cell *matCellDef="let enlevement" class="table-cell">
             <div class="date-text">{{ enlevement.dateEnlevement | date:'dd/MM/yyyy' }}</div>
           </td>
@@ -57,7 +57,7 @@
 
         <!-- Société -->
         <ng-container matColumnDef="societeNom">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Société</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'enlevement.societe' | translate }}</th>
           <td mat-cell *matCellDef="let enlevement" class="table-cell">
             <div class="company-name">{{ enlevement.societeNom }}</div>
           </td>
@@ -65,7 +65,7 @@
 
         <!-- Site -->
         <ng-container matColumnDef="siteNom">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Site</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'enlevement.site' | translate }}</th>
           <td mat-cell *matCellDef="let enlevement" class="table-cell">
             <div class="site-text">📍 {{ enlevement.siteNom }}</div>
           </td>
@@ -73,7 +73,7 @@
 
         <!-- Poids Total -->
         <ng-container matColumnDef="poidsTotal">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Poids</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'enlevement.poids' | translate }}</th>
           <td mat-cell *matCellDef="let enlevement" class="table-cell">
             <span class="badge badge-weight">{{ enlevement.poidsTotal | number:'1.1-1' }} kg</span>
           </td>
@@ -81,7 +81,7 @@
 
         <!-- Budget Recyclage -->
         <ng-container matColumnDef="budgetRecyclage">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Recyclage</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'enlevement.recyclage' | translate }}</th>
           <td mat-cell *matCellDef="let enlevement" class="table-cell">
             <span class="badge badge-success">+{{ enlevement.budgetRecyclage | number:'1.2-2' }} MAD</span>
           </td>
@@ -89,7 +89,7 @@
 
         <!-- Budget Traitement -->
         <ng-container matColumnDef="budgetTraitement">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Traitement</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'enlevement.traitement' | translate }}</th>
           <td mat-cell *matCellDef="let enlevement" class="table-cell">
             <span class="badge badge-danger">-{{ enlevement.budgetTraitement | number:'1.2-2' }} MAD</span>
           </td>
@@ -97,7 +97,7 @@
 
         <!-- Bilan Net -->
         <ng-container matColumnDef="bilanNet">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Bilan Net</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'enlevement.bilanNet' | translate }}</th>
           <td mat-cell *matCellDef="let enlevement" class="table-cell">
             <span class="bilan" [ngClass]="getBilanClass(enlevement.bilanNet)">
               {{ enlevement.bilanNet > 0 ? '+' : '' }}{{ enlevement.bilanNet | number:'1.2-2' }} MAD
@@ -107,7 +107,7 @@
 
         <!-- Taux Recyclage -->
         <ng-container matColumnDef="tauxRecyclage">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Taux</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'enlevement.taux' | translate }}</th>
           <td mat-cell *matCellDef="let enlevement" class="table-cell">
             <span class="badge" [ngClass]="'badge-taux-' + getTauxClass(enlevement.tauxRecyclage)">
               {{ enlevement.tauxRecyclage | number:'1.0-0' }}%
@@ -117,7 +117,7 @@
 
         <!-- Actions -->
         <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef class="table-header table-header-actions">Actions</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header table-header-actions">{{ 'common.actions' | translate }}</th>
           <td mat-cell *matCellDef="let enlevement" class="table-cell table-cell-actions">
             <button mat-icon-button [matMenuTriggerFor]="actionsMenu" class="actions-button">
               <mat-icon>more_vert</mat-icon>
@@ -125,7 +125,7 @@
             <mat-menu #actionsMenu="matMenu" class="actions-menu">
               <button mat-menu-item (click)="viewEnlevement(enlevement)">
                 <mat-icon>visibility</mat-icon>
-                <span>Voir détails</span>
+                <span>{{ 'common.viewDetails' | translate }}</span>
               </button>
             </mat-menu>
           </td>
@@ -140,7 +140,7 @@
     <div class="pagination-wrapper">
       <div class="pagination-left">
         <mat-form-field appearance="outline" class="page-size-field">
-          <mat-label>Par page</mat-label>
+          <mat-label>{{ 'common.perPage' | translate }}</mat-label>
           <mat-select [value]="pageSize" (selectionChange)="onPageSizeChange($event)">
             <mat-option [value]="10">10</mat-option>
             <mat-option [value]="20">20</mat-option>
@@ -150,7 +150,7 @@
       </div>
       <div class="pagination-right">
         <span class="pagination-info">
-          {{ getDisplayedRange() }} de {{ totalElements }}
+          {{ getDisplayedRange() }} {{ 'common.of' | translate }} {{ totalElements }}
         </span>
         <button mat-icon-button [disabled]="pageIndex === 0" (click)="previousPage()" class="pagination-button">
           <mat-icon>chevron_left</mat-icon>

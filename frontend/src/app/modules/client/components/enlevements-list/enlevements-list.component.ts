@@ -14,6 +14,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { EnlevementService } from '../../../../services/enlevement.service';
 import { Enlevement } from '../../../../models/enlevement.model';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
+import { I18nService } from '../../../../services/i18n.service';
 
 /**
  * Composant : Liste des enlèvements (client)
@@ -33,7 +35,8 @@ import { Enlevement } from '../../../../models/enlevement.model';
     MatSnackBarModule,
     MatFormFieldModule,
     MatSelectModule,
-    MatInputModule
+    MatInputModule,
+    TranslatePipe
   ],
   templateUrl: './enlevements-list.component.html',
   styleUrls: ['./enlevements-list.component.scss']
@@ -50,7 +53,8 @@ export class ClientEnlevementsListComponent implements OnInit {
   constructor(
     private enlevementService: EnlevementService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private i18n: I18nService
   ) {}
 
   ngOnInit(): void {
@@ -67,7 +71,7 @@ export class ClientEnlevementsListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erreur chargement enlèvements:', error);
-        this.snackBar.open('Erreur lors du chargement des enlèvements', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('errors.loadError'), this.i18n.t('common.close'), { duration: 3000 });
         this.loading = false;
       }
     });

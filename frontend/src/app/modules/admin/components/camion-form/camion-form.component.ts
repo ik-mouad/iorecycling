@@ -18,6 +18,7 @@ import { SocieteProprietaireService } from '../../../../services/societe-proprie
 import { CreateCamionRequest, UpdateCamionRequest, TypeCamion } from '../../../../models/camion.model';
 import { SocieteProprietaire } from '../../../../models/societe-proprietaire.model';
 import { CreateSocieteProprietaireDialogComponent } from '../create-societe-proprietaire-dialog/create-societe-proprietaire-dialog.component';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
 
 /**
  * Composant : Formulaire de création/édition de camion
@@ -38,7 +39,8 @@ import { CreateSocieteProprietaireDialogComponent } from '../create-societe-prop
     MatProgressSpinnerModule,
     MatSlideToggleModule,
     MatTooltipModule,
-    MatDialogModule
+    MatDialogModule,
+    TranslatePipe
   ],
   templateUrl: './camion-form.component.html',
   styleUrls: ['./camion-form.component.scss']

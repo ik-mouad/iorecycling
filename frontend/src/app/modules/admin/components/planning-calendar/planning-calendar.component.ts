@@ -12,6 +12,8 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { PlanningService } from '../../../../services/planning.service';
 import { PlanningEnlevement, StatutPlanning } from '../../../../models/planning.model';
+import { I18nService } from '../../../../services/i18n.service';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
 
 /**
  * Composant : Calendrier mensuel du planning
@@ -30,7 +32,8 @@ import { PlanningEnlevement, StatutPlanning } from '../../../../models/planning.
     MatSnackBarModule,
     MatProgressSpinnerModule,
     MatDialogModule,
-    MatTooltipModule
+    MatTooltipModule,
+    TranslatePipe
   ],
   templateUrl: './planning-calendar.component.html',
   styleUrls: ['./planning-calendar.component.scss']
@@ -49,7 +52,8 @@ export class PlanningCalendarComponent implements OnInit {
   constructor(
     private planningService: PlanningService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private i18n: I18nService
   ) {}
 
   ngOnInit(): void {
@@ -162,9 +166,14 @@ export class PlanningCalendarComponent implements OnInit {
   }
 
   getMonthName(): string {
-    const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-                   'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
-    return months[this.currentMonth - 1];
+    const monthKeys = ['january', 'february', 'march', 'april', 'may', 'june',
+                       'july', 'august', 'september', 'october', 'november', 'december'];
+    return this.i18n.t(`planning.months.${monthKeys[this.currentMonth - 1]}`);
+  }
+
+  getDayHeaders(): string[] {
+    const dayKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    return dayKeys.map(key => this.i18n.t(`planning.days.${key}`));
   }
 
   getStatutClass(statut: string): string {

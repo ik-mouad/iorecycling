@@ -4,7 +4,7 @@
     <!-- Header avec informations principales -->
     <div class="detail-header">
       <div class="header-left">
-        <h1>🛒 Détail de la Vente</h1>
+        <h1>{{ 'ventes.detailVente' | translate }}</h1>
         <div class="vente-meta">
           <span class="vente-number">{{ currentVente.numeroVente }}</span>
           <mat-chip [class]="'statut-' + currentVente.statut.toLowerCase()">
@@ -15,7 +15,7 @@
       <div class="header-actions">
         <button mat-stroked-button (click)="cancel()">
           <mat-icon>arrow_back</mat-icon>
-          Retour à la liste
+          {{ 'ventes.retourListe' | translate }}
         </button>
       </div>
     </div>
@@ -25,25 +25,25 @@
       <mat-card-header>
         <mat-card-title>
           <mat-icon>info</mat-icon>
-          Informations générales
+          {{ 'ventes.informationsGenerales' | translate }}
         </mat-card-title>
       </mat-card-header>
       <mat-card-content>
         <div class="info-grid">
           <div class="info-item">
-            <span class="info-label">Date de vente</span>
+            <span class="info-label">{{ 'ventes.dateVente' | translate }}</span>
             <span class="info-value">{{ formatDate(currentVente.dateVente) }}</span>
           </div>
           <div class="info-item" *ngIf="currentVente.acheteurId">
-            <span class="info-label">Acheteur (Société)</span>
+            <span class="info-label">{{ 'ventes.acheteurSociete' | translate }}</span>
             <span class="info-value">{{ getSocieteName(currentVente.acheteurId) }}</span>
           </div>
           <div class="info-item" *ngIf="currentVente.acheteurNom">
-            <span class="info-label">Nom de l'acheteur</span>
+            <span class="info-label">{{ 'ventes.nomAcheteur' | translate }}</span>
             <span class="info-value">{{ currentVente.acheteurNom }}</span>
           </div>
           <div class="info-item" *ngIf="currentVente.observation">
-            <span class="info-label">Observation</span>
+            <span class="info-label">{{ 'ventes.observation' | translate }}</span>
             <span class="info-value">{{ currentVente.observation }}</span>
           </div>
         </div>
@@ -55,7 +55,7 @@
       <mat-card-header>
         <mat-card-title>
           <mat-icon>shopping_cart</mat-icon>
-          Items de vente
+          {{ 'ventes.itemsVente' | translate }}
         </mat-card-title>
       </mat-card-header>
       <mat-card-content>
@@ -63,11 +63,11 @@
           <table class="items-table">
             <thead>
               <tr>
-                <th>Type de déchet</th>
-                <th>Sous-type</th>
-                <th>Quantité</th>
-                <th>Prix unitaire (MAD)</th>
-                <th>Montant (MAD)</th>
+                <th>{{ 'ventes.typeDechet' | translate }}</th>
+                <th>{{ 'ventes.sousType' | translate }}</th>
+                <th>{{ 'ventes.quantite' | translate }}</th>
+                <th>{{ 'ventes.prixUnitaireMAD' | translate }}</th>
+                <th>{{ 'ventes.montantMAD' | translate }}</th>
               </tr>
             </thead>
             <tbody>
@@ -91,7 +91,7 @@
       <div class="total-content">
         <div class="total-label">
           <mat-icon>attach_money</mat-icon>
-          <span>Total de la vente</span>
+          <span>{{ 'ventes.totalVente' | translate }}</span>
         </div>
         <div class="total-amount">
           {{ calculateTotal() | number:'1.2-2' }} <span class="currency">MAD</span>
@@ -104,21 +104,21 @@
       <mat-card-header>
         <mat-card-title>
           <mat-icon>history</mat-icon>
-          Informations système
+          {{ 'ventes.informationsSysteme' | translate }}
         </mat-card-title>
       </mat-card-header>
       <mat-card-content>
         <div class="metadata-grid">
           <div class="info-item" *ngIf="currentVente.createdBy">
-            <span class="info-label">Créé par :</span>
+            <span class="info-label">{{ 'ventes.creePar' | translate }}</span>
             <span class="info-value">{{ currentVente.createdBy }}</span>
           </div>
           <div class="info-item" *ngIf="currentVente.createdAt">
-            <span class="info-label">Date de création :</span>
+            <span class="info-label">{{ 'ventes.dateCreation' | translate }}</span>
             <span class="info-value">{{ formatDateTime(currentVente.createdAt) }}</span>
           </div>
           <div class="info-item" *ngIf="currentVente.updatedAt">
-            <span class="info-label">Dernière modification :</span>
+            <span class="info-label">{{ 'ventes.derniereModification' | translate }}</span>
             <span class="info-value">{{ formatDateTime(currentVente.updatedAt) }}</span>
           </div>
         </div>
@@ -128,25 +128,25 @@
 
   <!-- MODE CRÉATION : Formulaire avec stepper -->
   <div *ngIf="!isViewMode">
-    <h1>🛒 Nouvelle Vente</h1>
+    <h1>{{ 'ventes.nouvelleVenteTitle' | translate }}</h1>
     <mat-card>
     <mat-stepper #stepper>
       <!-- ÉTAPE 1 : Informations générales -->
       <mat-step [stepControl]="step1Form">
         <form [formGroup]="step1Form">
-          <ng-template matStepLabel>Informations générales</ng-template>
+          <ng-template matStepLabel>{{ 'ventes.informationsGeneralesStep' | translate }}</ng-template>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Date de vente</mat-label>
+            <mat-label>{{ 'ventes.dateVente' | translate }}</mat-label>
             <input matInput [matDatepicker]="picker" formControlName="dateVente" required>
             <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Acheteur (Société)</mat-label>
+            <mat-label>{{ 'ventes.acheteurSociete' | translate }}</mat-label>
             <mat-select formControlName="acheteurId" (selectionChange)="onSocieteChange()">
-              <mat-option [value]="null">Acheteur externe</mat-option>
+              <mat-option [value]="null">{{ 'ventes.acheteurExterne' | translate }}</mat-option>
               <mat-option *ngFor="let societe of societes" [value]="societe.id">
                 {{ societe.raisonSociale }}
               </mat-option>
@@ -154,18 +154,18 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Nom de l'acheteur</mat-label>
-            <input matInput formControlName="acheteurNom" placeholder="Si acheteur externe">
+            <mat-label>{{ 'ventes.nomAcheteur' | translate }}</mat-label>
+            <input matInput formControlName="acheteurNom" [placeholder]="'ventes.siAcheteurExterne' | translate">
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Observation</mat-label>
+            <mat-label>{{ 'ventes.observation' | translate }}</mat-label>
             <textarea matInput formControlName="observation" rows="3"></textarea>
           </mat-form-field>
 
           <div class="step-actions">
             <button mat-button matStepperNext [disabled]="step1Form.invalid || isViewMode">
-              Suivant
+              {{ 'ventes.suivant' | translate }}
               <mat-icon>arrow_forward</mat-icon>
             </button>
           </div>
@@ -175,21 +175,21 @@
       <!-- ÉTAPE 2 : Items de vente -->
       <mat-step [stepControl]="step2Form">
         <form [formGroup]="step2Form">
-          <ng-template matStepLabel>Items de vente</ng-template>
+          <ng-template matStepLabel>{{ 'ventes.itemsVenteStep' | translate }}</ng-template>
 
           <div formArrayName="items">
             <div *ngFor="let item of itemsFormArray.controls; let i = index" [formGroupName]="i" class="item-card">
-              <h3>Item {{ i + 1 }}</h3>
+              <h3>{{ 'ventes.item' | translate }} {{ i + 1 }}</h3>
 
               <!-- Sélection depuis stock disponible -->
               <div *ngIf="stocksDisponibles.length > 0 && !isViewMode" class="stock-selection">
                 <mat-form-field appearance="outline">
-                  <mat-label>Sélectionner depuis stock</mat-label>
+                  <mat-label>{{ 'ventes.selectionnerDepuisStock' | translate }}</mat-label>
                   <mat-select (selectionChange)="selectStockFromList($event.value, i)">
-                    <mat-option [value]="null">-- Nouveau --</mat-option>
+                    <mat-option [value]="null">{{ 'ventes.nouveau' | translate }}</mat-option>
                     <mat-option *ngFor="let stock of stocksDisponibles" [value]="stock">
                       {{ stock.numeroEnlevement }} - {{ stock.typeDechet }} {{ stock.sousType || '' }} 
-                      (Reste: {{ stock.resteAVendreKg | number:'1.3-3' }} kg)
+                      ({{ 'ventes.reste' | translate: {reste: getFormattedReste(stock)} }} kg)
                     </mat-option>
                   </mat-select>
                 </mat-form-field>
@@ -197,31 +197,31 @@
 
               <div class="item-fields">
                 <mat-form-field appearance="outline">
-                  <mat-label>Type de déchet</mat-label>
+                  <mat-label>{{ 'ventes.typeDechet' | translate }}</mat-label>
                   <mat-select formControlName="typeDechet" required>
-                    <mat-option value="RECYCLABLE">Recyclable</mat-option>
-                    <mat-option value="BANAL">Banal</mat-option>
-                    <mat-option value="A_DETRUIRE">À détruire</mat-option>
+                    <mat-option value="RECYCLABLE">{{ 'ventes.recyclable' | translate }}</mat-option>
+                    <mat-option value="BANAL">{{ 'ventes.banal' | translate }}</mat-option>
+                    <mat-option value="A_DETRUIRE">{{ 'ventes.aDetruire' | translate }}</mat-option>
                   </mat-select>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
-                  <mat-label>Sous-type</mat-label>
-                  <input matInput formControlName="sousType" placeholder="Ex: CARTON">
+                  <mat-label>{{ 'ventes.sousType' | translate }}</mat-label>
+                  <input matInput formControlName="sousType" [placeholder]="'stocks.exemple' | translate">
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
-                  <mat-label>Quantité vendue (kg)</mat-label>
+                  <mat-label>{{ 'ventes.quantiteVendueKg' | translate }}</mat-label>
                   <input matInput type="number" step="0.001" formControlName="quantiteVendueKg" required>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
-                  <mat-label>Prix de vente unitaire (MAD/kg)</mat-label>
+                  <mat-label>{{ 'ventes.prixVenteUnitaireMADKg' | translate }}</mat-label>
                   <input matInput type="number" step="0.01" formControlName="prixVenteUnitaireMad" required>
                 </mat-form-field>
 
                 <div class="montant-calculé">
-                  <strong>Montant :</strong>
+                  <strong>{{ 'ventes.montant' | translate }}</strong>
                   {{ calculateMontantVente(item.value) | number:'1.2-2' }} MAD
                 </div>
               </div>
@@ -235,28 +235,28 @@
 
           <button mat-stroked-button color="primary" (click)="addItem()" *ngIf="!isViewMode">
             <mat-icon>add</mat-icon>
-            Ajouter un item
+            {{ 'ventes.ajouterItem' | translate }}
           </button>
 
           <div class="total-section">
-            <h3>Total de la vente : {{ calculateTotal() | number:'1.2-2' }} MAD</h3>
+            <h3>{{ 'ventes.totalVenteLabel' | translate: {total: getFormattedTotal()} }} MAD</h3>
           </div>
 
           <div class="step-actions">
             <button mat-button matStepperPrevious *ngIf="!isViewMode">
               <mat-icon>arrow_back</mat-icon>
-              Précédent
+              {{ 'ventes.precedent' | translate }}
             </button>
             <button mat-raised-button color="primary" (click)="onSubmit()" 
                     [disabled]="step2Form.invalid || loading || isViewMode" 
                     *ngIf="!isViewMode">
               <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
               <mat-icon *ngIf="!loading">check</mat-icon>
-              {{ loading ? 'Création...' : 'Créer la vente' }}
+              {{ loading ? ('ventes.creation' | translate) : ('ventes.creerVente' | translate) }}
             </button>
             <button mat-stroked-button (click)="cancel()" *ngIf="isViewMode">
               <mat-icon>arrow_back</mat-icon>
-              Retour à la liste
+              {{ 'ventes.retourListe' | translate }}
             </button>
           </div>
         </form>

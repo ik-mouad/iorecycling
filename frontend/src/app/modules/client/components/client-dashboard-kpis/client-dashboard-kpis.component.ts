@@ -13,6 +13,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { DashboardService } from '../../../../services/dashboard.service';
 import { DashboardKpis } from '../../../../models/dashboard.model';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
+import { I18nService } from '../../../../services/i18n.service';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
 
 // Enregistrer les composants Chart.js
 Chart.register(...registerables);
@@ -39,7 +41,8 @@ Chart.register(...registerables);
     MatInputModule,
     MatButtonModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    TranslatePipe
   ],
   templateUrl: './client-dashboard-kpis.component.html',
   styleUrls: ['./client-dashboard-kpis.component.scss']
@@ -50,20 +53,27 @@ export class ClientDashboardKpisComponent implements OnInit {
   filterForm!: FormGroup;
   pieChart?: Chart;
 
-  periodesPredefinies = [
-    { value: 'mois-en-cours', label: 'Mois en cours' },
-    { value: 'mois-precedent', label: 'Mois précédent' },
-    { value: '3-mois', label: '3 derniers mois' },
-    { value: '6-mois', label: '6 derniers mois' },
-    { value: 'annee-en-cours', label: 'Année en cours' },
-    { value: 'depuis-debut', label: 'Depuis le début de la prestation' },
-    { value: 'personnalise', label: 'Personnalisé' }
-  ];
+  periodesPredefinies: { value: string; label: string }[] = [];
 
   constructor(
     private dashboardService: DashboardService,
-    private fb: FormBuilder
-  ) {}
+    private fb: FormBuilder,
+    private i18n: I18nService
+  ) {
+    this.updatePeriodesLabels();
+  }
+
+  updatePeriodesLabels(): void {
+    this.periodesPredefinies = [
+      { value: 'mois-en-cours', label: this.i18n.t('clientDashboard.periodes.moisEnCours') },
+      { value: 'mois-precedent', label: this.i18n.t('clientDashboard.periodes.moisPrecedent') },
+      { value: '3-mois', label: this.i18n.t('clientDashboard.periodes.3Mois') },
+      { value: '6-mois', label: this.i18n.t('clientDashboard.periodes.6Mois') },
+      { value: 'annee-en-cours', label: this.i18n.t('clientDashboard.periodes.anneeEnCours') },
+      { value: 'depuis-debut', label: this.i18n.t('clientDashboard.periodes.depuisDebut') },
+      { value: 'personnalise', label: this.i18n.t('clientDashboard.periodes.personnalise') }
+    ];
+  }
 
   ngOnInit(): void {
     this.initFilterForm();
@@ -129,7 +139,11 @@ export class ClientDashboardKpisComponent implements OnInit {
     const config: ChartConfiguration = {
       type: 'pie',
       data: {
-        labels: ['Recyclable', 'Banal', 'A détruire'],
+        labels: [
+          this.i18n.t('enlevement.typeRecyclable'),
+          this.i18n.t('enlevement.typeBanal'),
+          this.i18n.t('enlevement.typeADetruire')
+        ],
         datasets: [{
           data: [
             this.kpis.quantites.recyclable,
@@ -201,11 +215,11 @@ export class ClientDashboardKpisComponent implements OnInit {
   }
 
   getTauxLabel(taux: number): string {
-    if (taux >= 85) return '✅ Excellent tri';
-    if (taux >= 70) return '✓✓✓ Très bon tri';
-    if (taux >= 50) return '✓✓ Bon tri';
-    if (taux >= 30) return '✓ Tri correct';
-    return '⚠️ Tri insuffisant';
+    if (taux >= 85) return this.i18n.t('clientDashboard.tauxLabels.excellent');
+    if (taux >= 70) return this.i18n.t('clientDashboard.tauxLabels.tresBon');
+    if (taux >= 50) return this.i18n.t('clientDashboard.tauxLabels.bon');
+    if (taux >= 30) return this.i18n.t('clientDashboard.tauxLabels.correct');
+    return this.i18n.t('clientDashboard.tauxLabels.insuffisant');
   }
 
   // Exposer Math pour le template
@@ -213,4 +227,8 @@ export class ClientDashboardKpisComponent implements OnInit {
 
   // Exposer Object.keys pour le template
   Object = Object;
+
+  getFormattedMoyenne(): string {
+    return (this.kpis?.moyenneParSemaine || 0).toFixed(1);
+  }
 }

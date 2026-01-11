@@ -14,6 +14,8 @@ import { RecurrenceService } from '../../../../services/recurrence.service';
 import { Recurrence, TypeRecurrence } from '../../../../models/planning.model';
 import { RecurrenceFormComponent, RecurrenceFormData } from '../recurrence-form/recurrence-form.component';
 import { DeleteRecurrenceDialogComponent } from '../delete-recurrence-dialog/delete-recurrence-dialog.component';
+import { I18nService } from '../../../../services/i18n.service';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
 
 /**
  * Composant : Liste des récurrences
@@ -32,7 +34,8 @@ import { DeleteRecurrenceDialogComponent } from '../delete-recurrence-dialog/del
     MatSnackBarModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
-    MatMenuModule
+    MatMenuModule,
+    TranslatePipe
   ],
   templateUrl: './recurrences-list.component.html',
   styleUrls: ['./recurrences-list.component.scss']
@@ -45,7 +48,8 @@ export class RecurrencesListComponent implements OnInit {
   constructor(
     private recurrenceService: RecurrenceService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private i18n: I18nService
   ) {}
 
   ngOnInit(): void {
@@ -125,6 +129,12 @@ export class RecurrencesListComponent implements OnInit {
   }
 
   getTypeRecurrenceLabel(type: string): string {
+    // Essayer d'abord avec les traductions i18n
+    const translation = this.i18n.t(`recurrence.type.${type.toLowerCase()}`);
+    if (translation && translation !== `recurrence.type.${type.toLowerCase()}`) {
+      return translation;
+    }
+    // Fallback sur les labels codés en dur si la traduction n'existe pas
     const labels: { [key: string]: string } = {
       'HEBDOMADAIRE': 'Hebdomadaire',
       'BIMENSUELLE': 'Bimensuelle',

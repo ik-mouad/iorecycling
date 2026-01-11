@@ -13,6 +13,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { VenteService } from '../../../../services/vente.service';
 import { Vente, StatutVente } from '../../../../models/vente.model';
 import { Page } from '../../../../models/societe.model';
+import { I18nService } from '../../../../services/i18n.service';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
 
 /**
  * Composant : Liste des ventes
@@ -30,7 +32,8 @@ import { Page } from '../../../../models/societe.model';
     MatChipsModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatMenuModule
+    MatMenuModule,
+    TranslatePipe
   ],
   templateUrl: './ventes-list.component.html',
   styleUrls: ['./ventes-list.component.scss']
@@ -59,7 +62,8 @@ export class VentesListComponent implements OnInit {
     private venteService: VenteService,
     private router: Router,
     private route: ActivatedRoute,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private i18n: I18nService
   ) {}
 
   ngOnInit(): void {
@@ -89,7 +93,7 @@ export class VentesListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erreur chargement ventes:', error);
-        this.snackBar.open('Erreur lors du chargement des ventes', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('errors.loadError'), this.i18n.t('common.close'), { duration: 3000 });
         this.loading = false;
       }
     });
@@ -117,18 +121,18 @@ export class VentesListComponent implements OnInit {
 
   validerVente(vente: Vente): void {
     if (vente.statut !== StatutVente.BROUILLON) {
-      this.snackBar.open('Seules les ventes en brouillon peuvent être validées', 'Fermer', { duration: 3000 });
+      this.snackBar.open(this.i18n.t('ventes.onlyBrouillonCanBeValidated'), this.i18n.t('common.close'), { duration: 3000 });
       return;
     }
 
     this.venteService.validerVente(vente.id).subscribe({
       next: () => {
-        this.snackBar.open(`Vente ${vente.numeroVente} validée avec succès`, 'Fermer', { duration: 5000 });
+        this.snackBar.open(this.i18n.t('ventes.validatedSuccess', { numero: vente.numeroVente }), this.i18n.t('common.close'), { duration: 5000 });
         this.loadVentes();
       },
       error: (error) => {
         console.error('Erreur validation vente:', error);
-        this.snackBar.open('Erreur lors de la validation de la vente', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('ventes.validationError'), this.i18n.t('common.close'), { duration: 3000 });
       }
     });
   }
@@ -149,11 +153,11 @@ export class VentesListComponent implements OnInit {
   getStatutLabel(statut: string): string {
     switch (statut) {
       case StatutVente.BROUILLON:
-        return 'Brouillon';
+        return this.i18n.t('ventes.statuts.brouillon');
       case StatutVente.VALIDEE:
-        return 'Validée';
+        return this.i18n.t('ventes.statuts.validee');
       case StatutVente.ANNULEE:
-        return 'Annulée';
+        return this.i18n.t('ventes.statuts.annulee');
       default:
         return statut;
     }
