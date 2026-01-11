@@ -3,13 +3,13 @@
   <div class="page-header">
     <div class="header-content">
       <div class="header-left">
-        <h1 class="page-title">Gestion des Clients</h1>
-        <p class="page-description">Gérez vos clients et leurs sites associés</p>
+        <h1 class="page-title">{{ 'client.title' | translate }}</h1>
+        <p class="page-description">{{ 'client.description' | translate }}</p>
       </div>
       <div class="header-actions">
         <button mat-raised-button color="primary" class="primary-button" (click)="openClientForm()">
           <mat-icon>add</mat-icon>
-          <span>Nouveau Client</span>
+          <span>{{ 'client.new' | translate }}</span>
         </button>
       </div>
     </div>
@@ -18,11 +18,11 @@
   <!-- Search & Filters Card -->
   <div class="search-filters-card">
     <mat-form-field appearance="outline" class="search-field">
-      <mat-label>Rechercher un client</mat-label>
+      <mat-label>{{ 'client.search' | translate }}</mat-label>
       <input matInput 
              [(ngModel)]="searchTerm" 
              (input)="applyFilter()"
-             placeholder="Nom, code...">
+             [placeholder]="'client.searchPlaceholder' | translate">
       <mat-icon matPrefix>search</mat-icon>
     </mat-form-field>
   </div>
@@ -30,7 +30,7 @@
   <!-- Loading State -->
   <div *ngIf="isLoading" class="loading-container">
     <mat-spinner diameter="50"></mat-spinner>
-    <p class="loading-text">Chargement des clients...</p>
+    <p class="loading-text">{{ 'client.loading' | translate }}</p>
   </div>
 
   <!-- Table Card -->
@@ -40,13 +40,13 @@
         
         <!-- ID Column -->
         <ng-container matColumnDef="id">
-          <th mat-header-cell *matHeaderCellDef class="table-header">ID</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'client.id' | translate }}</th>
           <td mat-cell *matCellDef="let client" class="table-cell">{{ client.id }}</td>
         </ng-container>
 
         <!-- Name Column -->
         <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Nom</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'client.name' | translate }}</th>
           <td mat-cell *matCellDef="let client" class="table-cell">
             <div class="client-name">
               <strong>{{ client.name }}</strong>
@@ -56,7 +56,7 @@
 
         <!-- Code Column -->
         <ng-container matColumnDef="code">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Code</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'client.code' | translate }}</th>
           <td mat-cell *matCellDef="let client" class="table-cell">
             <span class="badge badge-code">{{ client.code }}</span>
           </td>
@@ -64,10 +64,10 @@
 
         <!-- Sites Column -->
         <ng-container matColumnDef="sites">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Sites</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'client.sites' | translate }}</th>
           <td mat-cell *matCellDef="let client" class="table-cell">
             <div class="sites-info">
-              <span class="badge badge-sites">{{ getSitesCount(client.sites) }} site(s)</span>
+              <span class="badge badge-sites">{{ getSitesCount(client.sites) }} {{ 'client.sitesCount' | translate }}</span>
               <button mat-icon-button [matMenuTriggerFor]="sitesMenu" *ngIf="getSitesCount(client.sites) > 0" class="info-button">
                 <mat-icon>info</mat-icon>
               </button>
@@ -82,13 +82,13 @@
 
         <!-- Created At Column -->
         <ng-container matColumnDef="createdAt">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Créé le</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'client.createdAt' | translate }}</th>
           <td mat-cell *matCellDef="let client" class="table-cell">{{ formatDate(client.createdAt) }}</td>
         </ng-container>
 
         <!-- Actions Column -->
         <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef class="table-header text-right">Actions</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header text-right">{{ 'common.actions' | translate }}</th>
           <td mat-cell *matCellDef="let client" class="table-cell text-right">
             <button mat-icon-button [matMenuTriggerFor]="rowMenu" class="action-button">
               <mat-icon>more_horiz</mat-icon>
@@ -96,11 +96,11 @@
             <mat-menu #rowMenu="matMenu">
               <button mat-menu-item (click)="openClientForm(client)">
                 <mat-icon>edit</mat-icon>
-                <span>Modifier</span>
+                <span>{{ 'common.edit' | translate }}</span>
               </button>
               <button mat-menu-item (click)="deleteClient(client)" class="delete-action">
                 <mat-icon>delete</mat-icon>
-                <span>Supprimer</span>
+                <span>{{ 'common.delete' | translate }}</span>
               </button>
             </mat-menu>
           </td>
@@ -122,11 +122,11 @@
   <!-- Empty State -->
   <div *ngIf="!isLoading && dataSource.data.length === 0" class="empty-state">
     <mat-icon class="empty-icon">business_center</mat-icon>
-    <h3 class="empty-title">Aucun client trouvé</h3>
-    <p class="empty-description">Commencez par créer votre premier client.</p>
+    <h3 class="empty-title">{{ 'client.noClientsFound' | translate }}</h3>
+    <p class="empty-description">{{ 'client.noClientsDesc' | translate }}</p>
     <button mat-raised-button color="primary" class="primary-button" (click)="openClientForm()">
       <mat-icon>add</mat-icon>
-      <span>Créer un client</span>
+      <span>{{ 'client.createClient' | translate }}</span>
     </button>
   </div>
 </div>

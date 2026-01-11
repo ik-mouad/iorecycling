@@ -20,6 +20,8 @@ import { CamionService } from '../../../../services/camion.service';
 import { SocieteProprietaireService } from '../../../../services/societe-proprietaire.service';
 import { Camion, TypeCamion } from '../../../../models/camion.model';
 import { SocieteProprietaire } from '../../../../models/societe-proprietaire.model';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
+import { I18nService } from '../../../../services/i18n.service';
 
 /**
  * Composant : Liste des camions
@@ -44,7 +46,8 @@ import { SocieteProprietaire } from '../../../../models/societe-proprietaire.mod
     MatSelectModule,
     MatInputModule,
     MatChipsModule,
-    MatCardModule
+    MatCardModule,
+    TranslatePipe
   ],
   templateUrl: './camions-list.component.html',
   styleUrls: ['./camions-list.component.scss']
@@ -71,7 +74,8 @@ export class CamionsListComponent implements OnInit {
     private camionService: CamionService,
     private societeProprietaireService: SocieteProprietaireService,
     public router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private i18n: I18nService
   ) {}
 
   ngOnInit(): void {
@@ -107,7 +111,7 @@ export class CamionsListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erreur chargement camions:', error);
-        this.snackBar.open('Erreur lors du chargement des camions', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('camion.loadError'), this.i18n.t('common.close'), { duration: 3000 });
         this.loading = false;
       }
     });
@@ -141,29 +145,29 @@ export class CamionsListComponent implements OnInit {
   }
 
   deleteCamion(camion: Camion): void {
-    if (!confirm(`Êtes-vous sûr de vouloir supprimer le camion ${camion.matricule} ?`)) {
+    if (!confirm(this.i18n.t('camion.confirmDelete', { matricule: camion.matricule }))) {
       return;
     }
 
     this.camionService.deleteCamion(camion.id).subscribe({
       next: () => {
-        this.snackBar.open('Camion supprimé avec succès', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('camion.deleted'), this.i18n.t('common.close'), { duration: 3000 });
         this.loadCamions();
       },
       error: (error) => {
         console.error('Erreur suppression camion:', error);
-        this.snackBar.open('Erreur lors de la suppression', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('errors.deleteError'), this.i18n.t('common.close'), { duration: 3000 });
       }
     });
   }
 
   getTypeCamionLabel(type: TypeCamion): string {
     const labels: { [key in TypeCamion]: string } = {
-      [TypeCamion.PLATEAU]: 'Plateau',
-      [TypeCamion.CAISSON]: 'Caisson',
-      [TypeCamion.AMPLIROLL]: 'Ampliroll',
-      [TypeCamion.GRUE]: 'Grue',
-      [TypeCamion.HYDROCUREUR]: 'Hydrocureur'
+      [TypeCamion.PLATEAU]: this.i18n.t('camion.typePlateau'),
+      [TypeCamion.CAISSON]: this.i18n.t('camion.typeCaisson'),
+      [TypeCamion.AMPLIROLL]: this.i18n.t('camion.typeAmpliroll'),
+      [TypeCamion.GRUE]: this.i18n.t('camion.typeGrue'),
+      [TypeCamion.HYDROCUREUR]: this.i18n.t('camion.typeHydrocureur')
     };
     return labels[type] || type;
   }

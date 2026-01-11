@@ -15,6 +15,8 @@ import { ComptabiliteService } from '../../../../services/comptabilite.service';
 import { ComptabiliteDashboard, Transaction, TypeTransaction, TypeRecette } from '../../../../models/comptabilite.model';
 import { SocieteService } from '../../../../services/societe.service';
 import { Societe } from '../../../../models/societe.model';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
+import { I18nService } from '../../../../services/i18n.service';
 
 // Enregistrer les composants Chart.js
 Chart.register(...registerables);
@@ -33,7 +35,8 @@ Chart.register(...registerables);
     MatButtonToggleModule,
     MatProgressSpinnerModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    TranslatePipe
   ],
   templateUrl: './comptabilite-dashboard.component.html',
   styleUrls: ['./comptabilite-dashboard.component.scss']
@@ -65,7 +68,8 @@ export class ComptabiliteDashboardComponent implements OnInit, AfterViewInit, On
   constructor(
     private comptabiliteService: ComptabiliteService,
     private societeService: SocieteService,
-    private router: Router
+    private router: Router,
+    private i18n: I18nService
   ) {}
 
   ngOnInit(): void {

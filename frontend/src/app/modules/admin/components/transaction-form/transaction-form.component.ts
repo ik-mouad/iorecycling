@@ -29,6 +29,8 @@ import {
 import { Societe } from '../../../../models/societe.model';
 import { Enlevement } from '../../../../models/enlevement.model';
 import { AddPaiementDialogComponent } from '../add-paiement-dialog/add-paiement-dialog.component';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
+import { I18nService } from '../../../../services/i18n.service';
 
 /**
  * Composant : Formulaire de création/édition de transaction
@@ -51,7 +53,8 @@ import { AddPaiementDialogComponent } from '../add-paiement-dialog/add-paiement-
     MatNativeDateModule,
     MatCheckboxModule,
     MatChipsModule,
-    MatDialogModule
+    MatDialogModule,
+    TranslatePipe
   ],
   templateUrl: './transaction-form.component.html',
   styleUrls: ['./transaction-form.component.scss']
@@ -80,7 +83,8 @@ export class TransactionFormComponent implements OnInit {
     private route: ActivatedRoute,
     private snackBar: MatSnackBar,
     private roleService: RoleService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private i18n: I18nService
   ) {}
 
   ngOnInit(): void {
@@ -321,14 +325,17 @@ export class TransactionFormComponent implements OnInit {
 
   // Méthodes helper pour la vue consultation
   getTypeLabel(type: TypeTransaction): string {
-    return type === TypeTransaction.RECETTE ? 'Recette' : 'Dépense';
+    return type === TypeTransaction.RECETTE ? this.i18n.t('transaction.recette') : this.i18n.t('transaction.depense');
   }
 
   getStatutLabel(statut: string): string {
     const labels: { [key: string]: string } = {
-      'EN_ATTENTE': 'En attente',
-      'PARTIELLEMENT_PAYEE': 'Partiellement payée',
-      'PAYEE': 'Payée',
+      'EN_ATTENTE': this.i18n.t('transaction.enAttente'),
+      'PARTIELLEMENT_PAYEE': this.i18n.t('transaction.partiellementPaye'),
+      'PARTIELLEMENT_PAYE': this.i18n.t('transaction.partiellementPaye'),
+      'PAYEE': this.i18n.t('transaction.paye'),
+      'PAYE': this.i18n.t('transaction.paye'),
+      'IMPAYE': this.i18n.t('transaction.impaye'),
       'ANNULEE': 'Annulée'
     };
     return labels[statut] || statut;

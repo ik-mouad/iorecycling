@@ -9,6 +9,8 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { DocumentService } from '../../../../services/document.service';
 import { DocumentInfo } from '../../../../models/enlevement.model';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
+import { I18nService } from '../../../../services/i18n.service';
 
 /**
  * Composant : Liste des documents (client)
@@ -26,7 +28,8 @@ import { DocumentInfo } from '../../../../models/enlevement.model';
     MatIconModule,
     MatTableModule,
     MatChipsModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    TranslatePipe
   ],
   templateUrl: './documents-list.component.html',
   styleUrls: ['./documents-list.component.scss']
@@ -38,7 +41,10 @@ export class DocumentsListComponent implements OnInit {
 
   displayedColumns = ['typeDocument', 'fileName', 'enlevementNumero', 'periodeMois', 'uploadedAt', 'actions'];
 
-  constructor(private documentService: DocumentService) {}
+  constructor(
+    private documentService: DocumentService,
+    private i18n: I18nService
+  ) {}
 
   ngOnInit(): void {
     this.loadDocumentsEnlevement();
@@ -78,12 +84,12 @@ export class DocumentsListComponent implements OnInit {
   }
 
   getTypeDocumentLabel(type: string): string {
-    const labels: any = {
-      'BSDI': '📄 BSDI',
-      'PV_DESTRUCTION': '📄 PV Destruction',
-      'ATTESTATION_VALORISATION': '📜 Attestation Recyclage',
-      'ATTESTATION_ELIMINATION': '📜 Attestation Élimination',
-      'FACTURE': '🧾 Facture'
+    const labels: { [key: string]: string } = {
+      'BSDI': this.i18n.t('document.bsdi'),
+      'PV_DESTRUCTION': this.i18n.t('document.pvDestruction'),
+      'ATTESTATION_VALORISATION': this.i18n.t('document.attestationRecyclage'),
+      'ATTESTATION_ELIMINATION': this.i18n.t('document.attestationElimination'),
+      'FACTURE': this.i18n.t('document.facture')
     };
     return labels[type] || type;
   }

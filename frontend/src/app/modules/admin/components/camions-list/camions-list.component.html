@@ -1,9 +1,9 @@
 <div class="camions-list-container">
   <div class="header">
-    <h1>Gestion de la flotte de camions</h1>
+    <h1>{{ 'camion.fleetManagement' | translate }}</h1>
     <button mat-raised-button color="primary" (click)="createCamion()">
       <mat-icon>add</mat-icon>
-      Nouveau camion
+      {{ 'camion.new' | translate }}
     </button>
   </div>
 
@@ -11,18 +11,18 @@
   <mat-card class="filters-card">
     <div class="filters-row">
       <mat-form-field appearance="outline">
-        <mat-label>Statut</mat-label>
+        <mat-label>{{ 'common.status' | translate }}</mat-label>
         <mat-select [(ngModel)]="actifFilter" (selectionChange)="applyFilters()">
-          <mat-option [value]="null">Tous</mat-option>
-          <mat-option [value]="true">Actifs</mat-option>
-          <mat-option [value]="false">Inactifs</mat-option>
+          <mat-option [value]="null">{{ 'common.all' | translate }}</mat-option>
+          <mat-option [value]="true">{{ 'common.active' | translate }}</mat-option>
+          <mat-option [value]="false">{{ 'common.inactive' | translate }}</mat-option>
         </mat-select>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Société propriétaire</mat-label>
+        <mat-label>{{ 'camion.ownerCompany' | translate }}</mat-label>
         <mat-select [(ngModel)]="societeProprietaireFilter" (selectionChange)="applyFilters()">
-          <mat-option [value]="null">Toutes</mat-option>
+          <mat-option [value]="null">{{ 'common.allFem' | translate }}</mat-option>
           <mat-option *ngFor="let societe of societesProprietaires" [value]="societe.id">
             {{ societe.raisonSociale }}
           </mat-option>
@@ -30,9 +30,9 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Type de camion</mat-label>
+        <mat-label>{{ 'camion.type' | translate }}</mat-label>
         <mat-select [(ngModel)]="typeCamionFilter" (selectionChange)="applyFilters()">
-          <mat-option [value]="null">Tous</mat-option>
+          <mat-option [value]="null">{{ 'common.all' | translate }}</mat-option>
           <mat-option *ngFor="let type of typesCamion" [value]="type">
             {{ getTypeCamionLabel(type) }}
           </mat-option>
@@ -41,7 +41,7 @@
 
       <button mat-button (click)="clearFilters()">
         <mat-icon>clear</mat-icon>
-        Réinitialiser
+        {{ 'common.reset' | translate }}
       </button>
     </div>
   </mat-card>
@@ -52,7 +52,7 @@
       <table mat-table [dataSource]="camions" class="camions-table">
         <!-- Colonne Matricule -->
         <ng-container matColumnDef="matricule">
-          <th mat-header-cell *matHeaderCellDef>Matricule</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'camion.registration' | translate }}</th>
           <td mat-cell *matCellDef="let camion">
             <strong>{{ camion.matricule }}</strong>
           </td>
@@ -60,7 +60,7 @@
 
         <!-- Colonne Type -->
         <ng-container matColumnDef="typeCamion">
-          <th mat-header-cell *matHeaderCellDef>Type</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'camion.type' | translate }}</th>
           <td mat-cell *matCellDef="let camion">
             <mat-chip>{{ getTypeCamionLabel(camion.typeCamion) }}</mat-chip>
           </td>
@@ -68,7 +68,7 @@
 
         <!-- Colonne Tonnage -->
         <ng-container matColumnDef="tonnageMaxKg">
-          <th mat-header-cell *matHeaderCellDef>Tonnage max (kg)</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'camion.maxTonnage' | translate }} (kg)</th>
           <td mat-cell *matCellDef="let camion">
             {{ camion.tonnageMaxKg | number:'1.2-2' }}
           </td>
@@ -76,7 +76,7 @@
 
         <!-- Colonne Société -->
         <ng-container matColumnDef="societeProprietaireNom">
-          <th mat-header-cell *matHeaderCellDef>Propriétaire</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'camion.owner' | translate }}</th>
           <td mat-cell *matCellDef="let camion">
             {{ camion.societeProprietaireNom || 'N/A' }}
           </td>
@@ -84,29 +84,29 @@
 
         <!-- Colonne Actif -->
         <ng-container matColumnDef="actif">
-          <th mat-header-cell *matHeaderCellDef>Statut</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'common.status' | translate }}</th>
           <td mat-cell *matCellDef="let camion">
             <mat-chip [color]="camion.actif ? 'primary' : 'warn'">
-              {{ camion.actif ? 'Actif' : 'Inactif' }}
+              {{ camion.actif ? ('common.active' | translate) : ('common.inactive' | translate) }}
             </mat-chip>
           </td>
         </ng-container>
 
         <!-- Colonne Actions -->
         <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'common.actions' | translate }}</th>
           <td mat-cell *matCellDef="let camion">
-            <button mat-icon-button [matMenuTriggerFor]="menu" matTooltip="Actions">
+            <button mat-icon-button [matMenuTriggerFor]="menu" [matTooltip]="'common.actions' | translate">
               <mat-icon>more_vert</mat-icon>
             </button>
             <mat-menu #menu="matMenu">
               <button mat-menu-item (click)="editCamion(camion)">
                 <mat-icon>edit</mat-icon>
-                Modifier
+                {{ 'common.edit' | translate }}
               </button>
               <button mat-menu-item (click)="deleteCamion(camion)" class="delete-action">
                 <mat-icon>delete</mat-icon>
-                Supprimer
+                {{ 'common.delete' | translate }}
               </button>
             </mat-menu>
           </td>
@@ -121,7 +121,7 @@
       </div>
 
       <div *ngIf="!loading && camions.length === 0" class="no-data">
-        <p>Aucun camion trouvé</p>
+        <p>{{ 'camion.noTrucks' | translate }}</p>
       </div>
     </div>
 

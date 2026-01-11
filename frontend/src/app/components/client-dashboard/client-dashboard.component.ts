@@ -19,6 +19,8 @@ import { AuthenticatedLayoutComponent } from '../authenticated-layout/authentica
 import { DashboardService, PickupRecord, ValorSummary } from '../../services/dashboard.service';
 import { ChartService } from '../../services/chart.service';
 import { Chart, ChartConfiguration } from 'chart.js';
+import { TranslatePipe } from '../../pipes/translate.pipe';
+import { I18nService } from '../../services/i18n.service';
 
 @Component({
   selector: 'app-client-dashboard',
@@ -40,7 +42,8 @@ import { Chart, ChartConfiguration } from 'chart.js';
     MatSnackBarModule,
     MatDividerModule,
     FormsModule,
-    AuthenticatedLayoutComponent
+    AuthenticatedLayoutComponent,
+    TranslatePipe
   ],
   templateUrl: './client-dashboard.component.html',
   styleUrls: ['./client-dashboard.component.scss']
@@ -88,7 +91,8 @@ export class ClientDashboardComponent implements OnInit {
   constructor(
     private dashboardService: DashboardService,
     private chartService: ChartService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private i18n: I18nService
   ) {}
 
   ngOnInit(): void {
@@ -190,7 +194,7 @@ export class ClientDashboardComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erreur lors du chargement des enlèvements:', error);
-        this.snackBar.open('Erreur lors du chargement des données', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('errors.loadError'), this.i18n.t('common.close'), { duration: 3000 });
         this.isLoadingTable = false;
       }
     });
@@ -315,7 +319,7 @@ export class ClientDashboardComponent implements OnInit {
     
     setTimeout(() => {
       this.isLoadingReport = false;
-      this.snackBar.open('Rapport téléchargé avec succès', 'Fermer', { duration: 3000 });
+      this.snackBar.open(this.i18n.t('success.saved'), this.i18n.t('common.close'), { duration: 3000 });
     }, 1000);
   }
 
@@ -353,9 +357,9 @@ export class ClientDashboardComponent implements OnInit {
    */
   getTypeLabel(type: string): string {
     switch (type) {
-      case 'recyclables': return 'Recyclables';
-      case 'banals': return 'Banals';
-      case 'dangereux': return 'À détruire';
+      case 'recyclables': return this.i18n.t('dashboard.recyclables');
+      case 'banals': return this.i18n.t('dashboard.banals');
+      case 'dangereux': return this.i18n.t('dashboard.dangereuxFilter');
       default: return type;
     }
   }

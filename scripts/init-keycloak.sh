@@ -79,7 +79,39 @@ CLIENT_EXISTS=$(curl -s -H "Authorization: Bearer $REALM_TOKEN" \
     "$KEYCLOAK_URL/admin/realms/$REALM_NAME/clients?clientId=$CLIENT_ID" | jq -r '.[0].id // empty')
 
 if [ -n "$CLIENT_EXISTS" ]; then
-    echo "ℹ️  Le client '$CLIENT_ID' existe déjà"
+    echo "ℹ️  Le client '$CLIENT_ID' existe déjà, mise à jour de la configuration..."
+    # Mettre à jour le client existant
+    curl -s -X PUT "$KEYCLOAK_URL/admin/realms/$REALM_NAME/clients/$CLIENT_EXISTS" \
+        -H "Authorization: Bearer $REALM_TOKEN" \
+        -H "Content-Type: application/json" \
+        -d '{
+            "clientId": "'$CLIENT_ID'",
+            "enabled": true,
+            "publicClient": true,
+            "standardFlowEnabled": true,
+            "implicitFlowEnabled": false,
+            "directAccessGrantsEnabled": false,
+            "serviceAccountsEnabled": false,
+            "redirectUris": ["http://localhost:88/", "http://localhost:88/*""],
+            "webOrigins": ["http://localhost:88"],
+            "protocol": "openid-connect",
+            "attributes": {
+                "saml.assertion.signature": "false",
+                "saml.force.post.binding": "false",
+                "saml.multivalued.roles": "false",
+                "saml.encrypt": "false",
+                "saml.server.signature": "false",
+                "saml.server.signature.keyinfo.ext": "false",
+                "exclude.session.state.from.auth.response": "false",
+                "saml_force_name_id_format": "false",
+                "saml.client.signature": "false",
+                "tls.client.certificate.bound.access.tokens": "false",
+                "saml.authnstatement": "false",
+                "display.on.consent.screen": "false",
+                "saml.onetimeuse.condition": "false"
+            }
+        }'
+    echo "✅ Client '$CLIENT_ID' mis à jour"
 else
     # Créer le client frontend
     echo "🏗️  Création du client '$CLIENT_ID'..."
@@ -94,8 +126,8 @@ else
             "implicitFlowEnabled": false,
             "directAccessGrantsEnabled": false,
             "serviceAccountsEnabled": false,
-            "redirectUris": ["http://localhost:88/*", "http://146.59.234.174:88/*"],
-            "webOrigins": ["http://localhost:88", "http://146.59.234.174:88"],
+            "redirectUris": ["http://localhost:88/", "http://localhost:88/*"],
+            "webOrigins": ["http://localhost:88"],
             "protocol": "openid-connect",
             "attributes": {
                 "saml.assertion.signature": "false",
@@ -171,5 +203,5 @@ echo "     * client1 / client1 (clientId=1)"
 echo "     * admin / admin"
 echo ""
 echo "🌐 URLs d'accès :"
-echo "   - Keycloak Admin: http://146.59.234.174:88/auth/admin/"
-echo "   - Application: http://146.59.234.174:88/"
+echo "   - Keycloak Admin: http://localhost:88/auth/admin/"
+echo "   - Application: http://localhost:88/"

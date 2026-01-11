@@ -3,17 +3,17 @@
   <div class="page-header">
     <div class="header-content">
       <div class="header-left">
-        <h1 class="page-title">Transactions Comptables</h1>
-        <p class="page-description">Gérez toutes vos transactions financières</p>
+        <h1 class="page-title">{{ 'transaction.title' | translate }}</h1>
+        <p class="page-description">{{ 'transaction.manageAll' | translate }}</p>
       </div>
       <div class="header-actions">
         <button mat-raised-button color="primary" class="primary-button" (click)="createTransaction(TypeTransaction.RECETTE)">
           <mat-icon>add</mat-icon>
-          <span>Nouvelle Recette</span>
+          <span>{{ 'comptabiliteDashboard.newRecette' | translate }}</span>
         </button>
         <button mat-raised-button color="warn" class="primary-button" (click)="createTransaction(TypeTransaction.DEPENSE)">
           <mat-icon>remove</mat-icon>
-          <span>Nouvelle Dépense</span>
+          <span>{{ 'comptabiliteDashboard.newDepense' | translate }}</span>
         </button>
       </div>
     </div>
@@ -24,9 +24,9 @@
     <form [formGroup]="filterForm" (ngSubmit)="onFilterChange()">
       <div class="filters-content">
         <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Société</mat-label>
+          <mat-label>{{ 'transaction.societe' | translate }}</mat-label>
           <mat-select formControlName="societeId" (selectionChange)="onFilterChange()">
-            <mat-option [value]="null">Toutes</mat-option>
+            <mat-option [value]="null">{{ 'common.all' | translate }}</mat-option>
             <mat-option *ngFor="let societe of societes" [value]="societe.id">
               {{ societe.raisonSociale }}
             </mat-option>
@@ -34,23 +34,23 @@
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Type</mat-label>
+          <mat-label>{{ 'transaction.type' | translate }}</mat-label>
           <mat-select formControlName="type" (selectionChange)="onFilterChange()">
-            <mat-option [value]="null">Tous</mat-option>
-            <mat-option [value]="'RECETTE'">Recettes</mat-option>
-            <mat-option [value]="'DEPENSE'">Dépenses</mat-option>
+            <mat-option [value]="null">{{ 'common.all' | translate }}</mat-option>
+            <mat-option [value]="'RECETTE'">{{ 'transaction.recettes' | translate }}</mat-option>
+            <mat-option [value]="'DEPENSE'">{{ 'transaction.depenses' | translate }}</mat-option>
           </mat-select>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Date début</mat-label>
+          <mat-label>{{ 'comptabiliteDashboard.dateDebut' | translate }}</mat-label>
           <input matInput [matDatepicker]="picker1" formControlName="dateDebut" (dateChange)="onFilterChange()">
           <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
           <mat-datepicker #picker1></mat-datepicker>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Date fin</mat-label>
+          <mat-label>{{ 'comptabiliteDashboard.dateFin' | translate }}</mat-label>
           <input matInput [matDatepicker]="picker2" formControlName="dateFin" (dateChange)="onFilterChange()">
           <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
           <mat-datepicker #picker2></mat-datepicker>
@@ -64,7 +64,7 @@
     <!-- Loading State -->
     <div *ngIf="loading" class="loading-container">
       <mat-spinner diameter="50"></mat-spinner>
-      <p>Chargement des transactions...</p>
+      <p>{{ 'transaction.loading' | translate }}</p>
     </div>
 
     <!-- Table -->
@@ -72,7 +72,7 @@
       <table mat-table [dataSource]="transactions" class="premium-table">
         <!-- Date Column -->
         <ng-container matColumnDef="date">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Date</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'transaction.date' | translate }}</th>
           <td mat-cell *matCellDef="let transaction" class="table-cell">
             <div class="date-cell">
               <span class="date-value">{{ transaction.dateTransaction | date:'dd/MM/yyyy' }}</span>
@@ -82,7 +82,7 @@
 
         <!-- Type Column -->
         <ng-container matColumnDef="type">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Type</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'transaction.type' | translate }}</th>
           <td mat-cell *matCellDef="let transaction" class="table-cell">
             <mat-chip [class.chip-recette]="transaction.type === 'RECETTE'" [class.chip-depense]="transaction.type === 'DEPENSE'">
               <mat-icon>{{ transaction.type === 'RECETTE' ? 'trending_up' : 'trending_down' }}</mat-icon>
@@ -93,7 +93,7 @@
 
         <!-- Description Column -->
         <ng-container matColumnDef="description">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Description</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'transaction.description' | translate }}</th>
           <td mat-cell *matCellDef="let transaction" class="table-cell">
             <div class="description-cell">
               <span class="description-text">{{ transaction.description }}</span>
@@ -104,7 +104,7 @@
 
         <!-- Enlèvement Column -->
         <ng-container matColumnDef="enlevement">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Enlèvement</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'transaction.enlevement' | translate }}</th>
           <td mat-cell *matCellDef="let transaction" class="table-cell">
             <div class="enlevement-cell" *ngIf="transaction.enlevementNumero">
               <button mat-button color="primary" class="enlevement-link" (click)="viewEnlevement(transaction.enlevementId!)">
@@ -120,7 +120,7 @@
 
         <!-- Société Column -->
         <ng-container matColumnDef="societe">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Société</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'transaction.societe' | translate }}</th>
           <td mat-cell *matCellDef="let transaction" class="table-cell">
             <div class="societe-cell">{{ transaction.societeNom || '-' }}</div>
           </td>
@@ -128,7 +128,7 @@
 
         <!-- Montant Column -->
         <ng-container matColumnDef="montant">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Montant</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'transaction.montant' | translate }}</th>
           <td mat-cell *matCellDef="let transaction" class="table-cell">
             <div class="amount-cell" [class.amount-recette]="transaction.type === 'RECETTE'" [class.amount-depense]="transaction.type === 'DEPENSE'">
               <span class="amount-value">{{ transaction.montant | number:'1.2-2' }}</span>
@@ -139,7 +139,7 @@
 
         <!-- Montant Payé Column -->
         <ng-container matColumnDef="montantPaye">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Payé</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'transaction.montantPaye' | translate }}</th>
           <td mat-cell *matCellDef="let transaction" class="table-cell">
             <div class="paid-cell">
               <span class="paid-value">{{ transaction.montantPaye || 0 | number:'1.2-2' }}</span>
@@ -150,7 +150,7 @@
 
         <!-- Statut Column -->
         <ng-container matColumnDef="statut">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Statut</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'transaction.statut' | translate }}</th>
           <td mat-cell *matCellDef="let transaction" class="table-cell">
             <mat-chip [class.chip-paye]="transaction.statut === 'PAYE'" [class.chip-partiel]="transaction.statut === 'PARTIELLEMENT_PAYE'" [class.chip-impaye]="transaction.statut === 'IMPAYE'">
               {{ getStatutLabel(transaction.statut) }}
@@ -160,7 +160,7 @@
 
         <!-- Actions Column -->
         <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Actions</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'common.actions' | translate }}</th>
           <td mat-cell *matCellDef="let transaction" class="table-cell actions-cell">
             <button mat-icon-button [matMenuTriggerFor]="menu" class="action-button">
               <mat-icon>more_vert</mat-icon>
@@ -168,15 +168,15 @@
             <mat-menu #menu="matMenu">
               <button mat-menu-item (click)="viewTransaction(transaction.id)">
                 <mat-icon>visibility</mat-icon>
-                <span>Voir</span>
+                <span>{{ 'common.view' | translate }}</span>
               </button>
               <button mat-menu-item (click)="editTransaction(transaction.id)">
                 <mat-icon>edit</mat-icon>
-                <span>Modifier</span>
+                <span>{{ 'common.edit' | translate }}</span>
               </button>
               <button mat-menu-item (click)="deleteTransaction(transaction.id)" class="delete-action">
                 <mat-icon>delete</mat-icon>
-                <span>Supprimer</span>
+                <span>{{ 'common.delete' | translate }}</span>
               </button>
             </mat-menu>
           </td>
@@ -189,8 +189,8 @@
       <!-- Empty State -->
       <div *ngIf="transactions.length === 0" class="empty-state">
         <mat-icon>inbox</mat-icon>
-        <h3>Aucune transaction</h3>
-        <p>Aucune transaction ne correspond à vos critères de recherche</p>
+        <h3>{{ 'transaction.noTransactions' | translate }}</h3>
+        <p>{{ 'transaction.noTransactionsMatch' | translate }}</p>
       </div>
     </div>
 
