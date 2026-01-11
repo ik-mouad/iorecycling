@@ -18,6 +18,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { AdminPickupService, Pickup, PickupFilters } from '../../../../services/admin-pickup.service';
 import { AdminClientService, Client } from '../../../../services/admin-client.service';
 import { PickupFormComponent } from '../pickup-form/pickup-form.component';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-admin-pickups',
@@ -38,7 +39,8 @@ import { PickupFormComponent } from '../pickup-form/pickup-form.component';
     MatChipsModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
-    MatMenuModule
+    MatMenuModule,
+    TranslatePipe
   ],
   providers: [
     AdminPickupService,

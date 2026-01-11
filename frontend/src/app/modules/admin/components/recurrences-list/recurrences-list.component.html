@@ -3,13 +3,13 @@
   <div class="page-header">
     <div class="header-content">
       <div class="header-left">
-        <h1 class="page-title">Gestion des Récurrences</h1>
-        <p class="page-description">Planifiez et gérez les enlèvements récurrents</p>
+        <h1 class="page-title">{{ 'recurrence.management' | translate }}</h1>
+        <p class="page-description">{{ 'recurrence.description' | translate }}</p>
       </div>
       <div class="header-actions">
         <button mat-raised-button color="primary" class="primary-button" (click)="addRecurrence()">
           <mat-icon>add</mat-icon>
-          <span>Nouvelle récurrence</span>
+          <span>{{ 'recurrence.new' | translate }}</span>
         </button>
       </div>
     </div>
@@ -24,14 +24,14 @@
     <div *ngIf="!loading && recurrences.length > 0" class="table-wrapper">
       <table mat-table [dataSource]="recurrences" class="premium-table">
         <ng-container matColumnDef="societeNom">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Société</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'enlevement.societe' | translate }}</th>
           <td mat-cell *matCellDef="let recurrence" class="table-cell">
             <strong>{{ recurrence.societeNom }}</strong>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="siteNom">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Site</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'enlevement.site' | translate }}</th>
           <td mat-cell *matCellDef="let recurrence" class="table-cell">
             <div class="site-info">
               <mat-icon class="site-icon">location_on</mat-icon>
@@ -41,14 +41,14 @@
         </ng-container>
 
         <ng-container matColumnDef="typeRecurrence">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Type</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'enlevement.type' | translate }}</th>
           <td mat-cell *matCellDef="let recurrence" class="table-cell">
             <span class="badge badge-type">{{ getTypeRecurrenceLabel(recurrence.typeRecurrence) }}</span>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="details">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Détails</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'common.details' | translate }}</th>
           <td mat-cell *matCellDef="let recurrence" class="table-cell">
             <div class="details-info">
               <span>{{ getRecurrenceDetails(recurrence) }}</span>
@@ -61,30 +61,30 @@
         </ng-container>
 
         <ng-container matColumnDef="periode">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Période</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'document.period' | translate }}</th>
           <td mat-cell *matCellDef="let recurrence" class="table-cell">
             <div class="periode-info">
               <mat-icon>calendar_today</mat-icon>
               <span>
-                Du {{ recurrence.dateDebut | date:'dd/MM/yyyy' }}
-                <span *ngIf="recurrence.dateFin"> au {{ recurrence.dateFin | date:'dd/MM/yyyy' }}</span>
-                <span *ngIf="!recurrence.dateFin" class="sans-fin"> (sans fin)</span>
+                {{ 'recurrence.from' | translate }} {{ recurrence.dateDebut | date:'dd/MM/yyyy' }}
+                <span *ngIf="recurrence.dateFin"> {{ 'recurrence.to' | translate }} {{ recurrence.dateFin | date:'dd/MM/yyyy' }}</span>
+                <span *ngIf="!recurrence.dateFin" class="sans-fin"> ({{ 'recurrence.withoutEnd' | translate }})</span>
               </span>
             </div>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="active">
-          <th mat-header-cell *matHeaderCellDef class="table-header">Statut</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'common.status' | translate }}</th>
           <td mat-cell *matCellDef="let recurrence" class="table-cell">
             <span class="badge" [ngClass]="recurrence.active ? 'badge-success' : 'badge-danger'">
-              {{ recurrence.active ? 'Active' : 'Inactive' }}
+              {{ recurrence.active ? ('common.active' | translate) : ('common.inactive' | translate) }}
             </span>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef class="table-header text-right">Actions</th>
+          <th mat-header-cell *matHeaderCellDef class="table-header text-right">{{ 'common.actions' | translate }}</th>
           <td mat-cell *matCellDef="let recurrence" class="table-cell text-right">
             <button 
               mat-icon-button 
@@ -99,14 +99,14 @@
                 *ngIf="recurrence.active"
                 class="disable-action">
                 <mat-icon>block</mat-icon>
-                <span>Désactiver</span>
+                <span>{{ 'user.deactivate' | translate }}</span>
               </button>
               <button 
                 mat-menu-item 
                 (click)="supprimerRecurrence(recurrence)"
                 class="delete-action">
                 <mat-icon>delete</mat-icon>
-                <span>Supprimer</span>
+                <span>{{ 'common.delete' | translate }}</span>
               </button>
             </mat-menu>
           </td>
@@ -120,11 +120,11 @@
     <!-- Empty State -->
     <div *ngIf="!loading && recurrences.length === 0" class="empty-state">
       <mat-icon class="empty-icon">schedule</mat-icon>
-      <h3 class="empty-title">Aucune récurrence active</h3>
-      <p class="empty-description">Créez votre première récurrence pour planifier des enlèvements automatiques</p>
+      <h3 class="empty-title">{{ 'recurrence.noActiveRecurrences' | translate }}</h3>
+      <p class="empty-description">{{ 'recurrence.createFirstDescription' | translate }}</p>
       <button mat-raised-button color="primary" class="primary-button" (click)="addRecurrence()">
         <mat-icon>add</mat-icon>
-        <span>Créer la première récurrence</span>
+        <span>{{ 'recurrence.createFirst' | translate }}</span>
       </button>
     </div>
   </div>

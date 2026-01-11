@@ -2,13 +2,13 @@
   <div class="page-header">
     <div class="header-content">
       <div class="header-left">
-        <h1 class="page-title">🛒 Ventes</h1>
-        <p class="page-description">Gestion des ventes de déchets</p>
+        <h1 class="page-title">{{ 'ventes.title' | translate }}</h1>
+        <p class="page-description">{{ 'ventes.description' | translate }}</p>
       </div>
       <div class="header-actions">
         <button class="primary-button" mat-raised-button color="primary" (click)="createVente()">
           <mat-icon>add</mat-icon>
-          Nouvelle vente
+          {{ 'ventes.nouvelleVente' | translate }}
         </button>
       </div>
     </div>
@@ -18,16 +18,16 @@
     <!-- Filtres -->
     <div class="filters">
       <button mat-button [class.active]="statutFilter === null" (click)="filterByStatut(null)">
-        Toutes
+        {{ 'ventes.toutes' | translate }}
       </button>
       <button mat-button [class.active]="statutFilter === StatutVente.BROUILLON" (click)="filterByStatut(StatutVente.BROUILLON)">
-        Brouillons
+        {{ 'ventes.brouillons' | translate }}
       </button>
       <button mat-button [class.active]="statutFilter === StatutVente.VALIDEE" (click)="filterByStatut(StatutVente.VALIDEE)">
-        Validées
+        {{ 'ventes.validees' | translate }}
       </button>
       <button mat-button [class.active]="statutFilter === StatutVente.ANNULEE" (click)="filterByStatut(StatutVente.ANNULEE)">
-        Annulées
+        {{ 'ventes.annulees' | translate }}
       </button>
     </div>
 
@@ -37,7 +37,7 @@
         
         <!-- Colonne Numéro -->
         <ng-container matColumnDef="numeroVente">
-          <th mat-header-cell *matHeaderCellDef>Numéro</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'ventes.numero' | translate }}</th>
           <td mat-cell *matCellDef="let vente">
             <a (click)="viewVente(vente)" class="link-vente">{{ vente.numeroVente }}</a>
           </td>
@@ -45,7 +45,7 @@
 
         <!-- Colonne Date -->
         <ng-container matColumnDef="dateVente">
-          <th mat-header-cell *matHeaderCellDef>Date</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'ventes.date' | translate }}</th>
           <td mat-cell *matCellDef="let vente">
             {{ vente.dateVente | date:'dd/MM/yyyy' }}
           </td>
@@ -53,7 +53,7 @@
 
         <!-- Colonne Acheteur -->
         <ng-container matColumnDef="acheteurNom">
-          <th mat-header-cell *matHeaderCellDef>Acheteur</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'ventes.acheteur' | translate }}</th>
           <td mat-cell *matCellDef="let vente">
             {{ vente.acheteurNom || '-' }}
           </td>
@@ -61,7 +61,7 @@
 
         <!-- Colonne Statut -->
         <ng-container matColumnDef="statut">
-          <th mat-header-cell *matHeaderCellDef>Statut</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'ventes.statut' | translate }}</th>
           <td mat-cell *matCellDef="let vente">
             <mat-chip [class]="getStatutClass(vente.statut)">
               {{ getStatutLabel(vente.statut) }}
@@ -71,7 +71,7 @@
 
         <!-- Colonne Total -->
         <ng-container matColumnDef="total">
-          <th mat-header-cell *matHeaderCellDef>Total</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'ventes.total' | translate }}</th>
           <td mat-cell *matCellDef="let vente">
             <strong>{{ calculateTotal(vente) | number:'1.2-2' }} MAD</strong>
           </td>
@@ -79,7 +79,7 @@
 
         <!-- Colonne Actions -->
         <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'ventes.actions' | translate }}</th>
           <td mat-cell *matCellDef="let vente">
             <button mat-icon-button [matMenuTriggerFor]="menu">
               <mat-icon>more_vert</mat-icon>
@@ -87,13 +87,13 @@
             <mat-menu #menu="matMenu">
               <button mat-menu-item (click)="viewVente(vente)">
                 <mat-icon>visibility</mat-icon>
-                Voir détails
+                {{ 'ventes.voirDetails' | translate }}
               </button>
               <button mat-menu-item 
                       (click)="validerVente(vente)" 
                       *ngIf="vente.statut === 'BROUILLON'">
                 <mat-icon>check_circle</mat-icon>
-                Valider
+                {{ 'ventes.valider' | translate }}
               </button>
             </mat-menu>
           </td>
@@ -105,7 +105,7 @@
 
       <div *ngIf="ventes.length === 0" class="no-data">
         <mat-icon>shopping_cart</mat-icon>
-        <p>Aucune vente trouvée</p>
+        <p>{{ 'ventes.aucuneVenteTrouvee' | translate }}</p>
       </div>
     </div>
 

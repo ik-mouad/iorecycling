@@ -11,6 +11,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AdminPickupService, CreatePickupRequest, PickupItem } from '../../../../services/admin-pickup.service';
 import { Client } from '../../../../services/admin-client.service';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
 
 export interface PickupFormData {
   pickup?: any;
@@ -30,7 +31,8 @@ export interface PickupFormData {
     MatButtonModule,
     MatIconModule,
     MatSelectModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    TranslatePipe
   ],
   providers: [
     AdminPickupService

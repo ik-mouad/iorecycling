@@ -5,6 +5,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from '../../../../auth/auth.service';
+import { LanguageSelectorComponent } from '../../../../components/language-selector/language-selector.component';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-client-layout',
@@ -14,7 +16,9 @@ import { AuthService } from '../../../../auth/auth.service';
     RouterModule,
     MatIconModule,
     MatButtonModule,
-    MatMenuModule
+    MatMenuModule,
+    LanguageSelectorComponent,
+    TranslatePipe
   ],
   template: `
     <div class="client-layout">
@@ -23,10 +27,11 @@ import { AuthService } from '../../../../auth/auth.service';
           <div class="header-left">
             <h1>
               <mat-icon>dashboard</mat-icon>
-              Portail Client IORecycling
+              {{ 'client.portalTitle' | translate }}
             </h1>
           </div>
           <div class="header-right">
+            <app-language-selector></app-language-selector>
             <span class="user-info">
               <mat-icon>person</mat-icon>
               {{ getUserName() }}
@@ -37,7 +42,7 @@ import { AuthService } from '../../../../auth/auth.service';
             <mat-menu #clientMenu="matMenu">
               <button mat-menu-item (click)="logout()">
                 <mat-icon>logout</mat-icon>
-                <span>Se déconnecter</span>
+                <span>{{ 'auth.logout' | translate }}</span>
               </button>
             </mat-menu>
           </div>
@@ -48,23 +53,23 @@ import { AuthService } from '../../../../auth/auth.service';
         <div class="nav-buttons">
           <a mat-button routerLink="/client/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
             <mat-icon>insights</mat-icon>
-            Dashboard
+            {{ 'client.dashboard' | translate }}
           </a>
           <a mat-button routerLink="/client/documents" routerLinkActive="active">
             <mat-icon>folder</mat-icon>
-            Documents
+            {{ 'client.documents' | translate }}
           </a>
           <a mat-button routerLink="/client/demandes" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
             <mat-icon>assignment</mat-icon>
-            Mes demandes
+            {{ 'client.myRequests' | translate }}
           </a>
           <a mat-button routerLink="/client/enlevements" routerLinkActive="active">
             <mat-icon>local_shipping</mat-icon>
-            Mes enlèvements
+            {{ 'client.myPickups' | translate }}
           </a>
           <a mat-stroked-button color="primary" routerLink="/client/demandes/new">
             <mat-icon>add_circle</mat-icon>
-            Nouvelle demande
+            {{ 'client.newRequest' | translate }}
           </a>
         </div>
       </nav>

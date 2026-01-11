@@ -3,8 +3,8 @@
   <div class="page-header">
     <div class="header-content">
       <div class="header-left">
-        <h1 class="page-title">Tableau de bord</h1>
-        <p class="page-description">Vue d'ensemble de vos enlèvements et statistiques</p>
+        <h1 class="page-title">{{ 'clientDashboard.title' | translate }}</h1>
+        <p class="page-description">{{ 'clientDashboard.description' | translate }}</p>
       </div>
     </div>
   </div>
@@ -13,7 +13,7 @@
   <div class="search-filters-card">
     <div class="search-filters-content">
       <mat-form-field appearance="outline" class="filter-field">
-        <mat-label>Période</mat-label>
+        <mat-label>{{ 'clientDashboard.periode' | translate }}</mat-label>
         <mat-select formControlName="periode">
           <mat-option *ngFor="let p of periodesPredefinies" [value]="p.value">
             {{ p.label }}
@@ -22,21 +22,21 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="filter-field" *ngIf="isPersonnalise()">
-        <mat-label>Date de début</mat-label>
+        <mat-label>{{ 'clientDashboard.dateDebut' | translate }}</mat-label>
         <input matInput [matDatepicker]="pickerDebut" formControlName="dateDebut">
         <mat-datepicker-toggle matIconSuffix [for]="pickerDebut"></mat-datepicker-toggle>
         <mat-datepicker #pickerDebut></mat-datepicker>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="filter-field" *ngIf="isPersonnalise()">
-        <mat-label>Date de fin</mat-label>
+        <mat-label>{{ 'clientDashboard.dateFin' | translate }}</mat-label>
         <input matInput [matDatepicker]="pickerFin" formControlName="dateFin">
         <mat-datepicker-toggle matIconSuffix [for]="pickerFin"></mat-datepicker-toggle>
         <mat-datepicker #pickerFin></mat-datepicker>
       </mat-form-field>
 
       <button mat-raised-button color="primary" class="apply-button" (click)="applyCustomPeriod()" *ngIf="isPersonnalise()">
-        Appliquer
+        {{ 'clientDashboard.appliquer' | translate }}
       </button>
     </div>
   </div>
@@ -51,7 +51,7 @@
     <div class="kpi-card kpi-card-prochain">
       <div class="kpi-header">
         <mat-icon class="kpi-icon">event</mat-icon>
-        <h3 class="kpi-title">Prochain enlèvement</h3>
+        <h3 class="kpi-title">{{ 'clientDashboard.prochainEnlevement' | translate }}</h3>
       </div>
       <div class="kpi-content">
         <div *ngIf="kpis.prochainEnlevement; else noProchainEnlevement">
@@ -62,7 +62,7 @@
           </div>
         </div>
         <ng-template #noProchainEnlevement>
-          <div class="kpi-empty">Aucun enlèvement programmé</div>
+          <div class="kpi-empty">{{ 'clientDashboard.aucunEnlevementProgramme' | translate }}</div>
         </ng-template>
       </div>
     </div>
@@ -71,11 +71,11 @@
     <div class="kpi-card kpi-card-count">
       <div class="kpi-header">
         <mat-icon class="kpi-icon">local_shipping</mat-icon>
-        <h3 class="kpi-title">Enlèvements effectués</h3>
+        <h3 class="kpi-title">{{ 'clientDashboard.enlevementsEffectues' | translate }}</h3>
       </div>
       <div class="kpi-content">
         <div class="kpi-value">{{ kpis.nombreEnlevements }}</div>
-        <div class="kpi-subtitle">Moyenne : {{ kpis.moyenneParSemaine | number:'1.1-1' }} / semaine</div>
+        <div class="kpi-subtitle">{{ 'clientDashboard.moyenneParSemaine' | translate: {moyenne: getFormattedMoyenne()} }}</div>
       </div>
     </div>
 
@@ -83,14 +83,14 @@
     <div class="kpi-card kpi-card-recyclage">
       <div class="kpi-header">
         <mat-icon class="kpi-icon">attach_money</mat-icon>
-        <h3 class="kpi-title">Recyclage (Revenus)</h3>
+        <h3 class="kpi-title">{{ 'clientDashboard.recyclageRevenus' | translate }}</h3>
       </div>
       <div class="kpi-content">
         <div class="kpi-value kpi-value-success">+ {{ kpis.budgetRecyclage | number:'1.2-2' }} MAD</div>
         <div class="kpi-subtitle" *ngIf="kpis.evolutionRecyclagePct">
           <span [class]="kpis.evolutionRecyclagePct > 0 ? 'evolution-positive' : 'evolution-negative'">
             {{ kpis.evolutionRecyclagePct > 0 ? '↗' : '↘' }} 
-            {{ kpis.evolutionRecyclagePct | number:'1.0-0' }}% vs période précédente
+            {{ kpis.evolutionRecyclagePct | number:'1.0-0' }}% {{ 'clientDashboard.evolution.vsPeriodePrecedente' | translate }}
           </span>
         </div>
       </div>
@@ -100,7 +100,7 @@
     <div class="kpi-card kpi-card-traitement">
       <div class="kpi-header">
         <mat-icon class="kpi-icon">warning</mat-icon>
-        <h3 class="kpi-title">Traitement (Coûts)</h3>
+        <h3 class="kpi-title">{{ 'clientDashboard.traitementCouts' | translate }}</h3>
       </div>
       <div class="kpi-content">
         <div class="kpi-value kpi-value-danger">- {{ kpis.budgetTraitement | number:'1.2-2' }} MAD</div>
@@ -108,7 +108,7 @@
           <span [class]="kpis.evolutionTraitementPct < 0 ? 'evolution-positive' : 'evolution-negative'">
             {{ kpis.evolutionTraitementPct < 0 ? '↘' : '↗' }} 
             {{ Math.abs(kpis.evolutionTraitementPct) | number:'1.0-0' }}%
-            (↓ = bien)
+            {{ 'clientDashboard.evolution.bien' | translate }}
           </span>
         </div>
       </div>
@@ -118,13 +118,13 @@
     <div class="kpi-card kpi-card-bilan">
       <div class="kpi-header">
         <mat-icon class="kpi-icon">account_balance</mat-icon>
-        <h3 class="kpi-title">Bilan Net</h3>
+        <h3 class="kpi-title">{{ 'clientDashboard.bilanNet' | translate }}</h3>
       </div>
       <div class="kpi-content">
         <div class="kpi-value" [ngClass]="{'kpi-value-success': kpis.bilanNet > 0, 'kpi-value-danger': kpis.bilanNet < 0}">
           {{ kpis.bilanNet > 0 ? '+' : '' }}{{ kpis.bilanNet | number:'1.2-2' }} MAD
         </div>
-        <div class="kpi-subtitle">{{ kpis.bilanNet > 0 ? '✅ Bilan positif' : '⚠️ Bilan négatif' }}</div>
+        <div class="kpi-subtitle">{{ (kpis.bilanNet > 0 ? 'clientDashboard.bilanPositif' : 'clientDashboard.bilanNegatif') | translate }}</div>
       </div>
     </div>
 
@@ -132,7 +132,7 @@
     <div class="kpi-card kpi-card-taux">
       <div class="kpi-header">
         <mat-icon class="kpi-icon">eco</mat-icon>
-        <h3 class="kpi-title">Taux de recyclage</h3>
+        <h3 class="kpi-title">{{ 'clientDashboard.tauxRecyclage' | translate }}</h3>
       </div>
       <div class="kpi-content">
         <div class="kpi-value" [ngClass]="'kpi-value-' + getTauxClass(kpis.tauxRecyclage)">
@@ -146,7 +146,7 @@
   <!-- KPI 2 : Quantités par type (graphique) -->
   <div class="chart-card" *ngIf="kpis && !loading">
     <div class="chart-header">
-      <h3 class="chart-title">📊 Répartition des déchets</h3>
+      <h3 class="chart-title">{{ 'clientDashboard.repartitionDechets' | translate }}</h3>
     </div>
     <div class="chart-content">
       <div class="chart-grid">
@@ -158,29 +158,29 @@
         <!-- Détails textuels -->
         <div class="quantites-details">
           <div class="detail-row detail-recyclable">
-            <span class="label">🔄 RECYCLABLE</span>
+            <span class="label">{{ 'enlevement.typeRecyclable' | translate }}</span>
             <span class="value">{{ kpis.quantites.recyclable | number:'1.3-3' }} kg</span>
             <span class="percentage">({{ kpis.quantites.pourcentageRecyclable | number:'1.1-1' }}%)</span>
           </div>
           <div class="detail-row detail-banal">
-            <span class="label">🗑️ BANAL</span>
+            <span class="label">{{ 'enlevement.typeBanal' | translate }}</span>
             <span class="value">{{ kpis.quantites.banal | number:'1.3-3' }} kg</span>
             <span class="percentage">({{ kpis.quantites.pourcentageBanal | number:'1.1-1' }}%)</span>
           </div>
           <div class="detail-row detail-a-detruire">
-            <span class="label">☣️ A DÉTRUIRE</span>
+            <span class="label">{{ 'enlevement.typeADetruire' | translate }}</span>
             <span class="value">{{ kpis.quantites.aDetruire | number:'1.3-3' }} kg</span>
             <span class="percentage">({{ kpis.quantites.pourcentageADetruire | number:'1.1-1' }}%)</span>
           </div>
           <div class="detail-row detail-total">
-            <span class="label"><strong>📦 TOTAL</strong></span>
+            <span class="label"><strong>{{ 'clientDashboard.total' | translate }}</strong></span>
             <span class="value"><strong>{{ kpis.quantites.total | number:'1.3-3' }} kg</strong></span>
             <span class="percentage"><strong>(100%)</strong></span>
           </div>
 
           <!-- Détail par sous-type pour RECYCLABLE -->
           <div class="sous-types-detail" *ngIf="kpis.quantites.detailRecyclable && Object.keys(kpis.quantites.detailRecyclable).length > 0">
-            <h4>Détail RECYCLABLE par matériau</h4>
+            <h4>{{ 'clientDashboard.detailRecyclableParMateriau' | translate }}</h4>
             <div class="sous-type-row" *ngFor="let sousType of Object.keys(kpis.quantites.detailRecyclable)">
               <span>{{ sousType }}</span>
               <span>{{ kpis.quantites.detailRecyclable[sousType] | number:'1.3-3' }} kg</span>

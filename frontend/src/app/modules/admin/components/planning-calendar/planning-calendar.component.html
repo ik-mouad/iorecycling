@@ -3,17 +3,17 @@
   <div class="page-header">
     <div class="header-content">
       <div class="header-left">
-        <h1 class="page-title">Planning des Enlèvements</h1>
-        <p class="page-description">Vue mensuelle du planning des enlèvements planifiés</p>
+        <h1 class="page-title">{{ 'planning.pickupPlanning' | translate }}</h1>
+        <p class="page-description">{{ 'planning.monthlyView' | translate }}</p>
       </div>
       <div class="header-actions">
-        <button mat-icon-button (click)="previousMonth()" matTooltip="Mois précédent" class="nav-button">
+        <button mat-icon-button (click)="previousMonth()" [matTooltip]="'planning.previousMonth' | translate" class="nav-button">
           <mat-icon>chevron_left</mat-icon>
         </button>
         <button mat-button (click)="goToToday()" class="today-button">
-          Aujourd'hui
+          {{ 'common.today' | translate }}
         </button>
-        <button mat-icon-button (click)="nextMonth()" matTooltip="Mois suivant" class="nav-button">
+        <button mat-icon-button (click)="nextMonth()" [matTooltip]="'planning.nextMonth' | translate" class="nav-button">
           <mat-icon>chevron_right</mat-icon>
         </button>
       </div>
@@ -33,7 +33,7 @@
     <div class="calendar" *ngIf="!loading">
       <!-- En-têtes des jours -->
       <div class="calendar-header">
-        <div class="day-header" *ngFor="let day of ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']">
+        <div class="day-header" *ngFor="let day of getDayHeaders()">
           {{ day }}
         </div>
       </div>

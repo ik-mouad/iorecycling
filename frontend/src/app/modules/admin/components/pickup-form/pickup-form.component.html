@@ -1,7 +1,7 @@
 <div class="pickup-form">
   <h2 mat-dialog-title class="dialog-title">
     <mat-icon>{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
-    <span>{{ isEditMode ? 'Modifier l\'enlèvement' : 'Nouvel enlèvement' }}</span>
+    <span>{{ isEditMode ? ('enlevement.edit' | translate) : ('enlevement.new' | translate) }}</span>
   </h2>
 
   <mat-dialog-content class="dialog-content">

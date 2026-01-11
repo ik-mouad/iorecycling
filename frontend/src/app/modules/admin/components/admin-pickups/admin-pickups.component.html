@@ -3,13 +3,13 @@
   <div class="page-header">
     <div class="header-content">
       <div class="header-left">
-        <h1 class="page-title">Gestion des Enlèvements</h1>
-        <p class="page-description">Consultez et gérez tous les enlèvements</p>
+        <h1 class="page-title">{{ 'admin.enlevements' | translate }}</h1>
+        <p class="page-description">{{ 'enlevement.description' | translate }}</p>
       </div>
       <div class="header-actions">
         <button mat-raised-button color="primary" class="primary-button" (click)="openPickupForm()">
           <mat-icon>add</mat-icon>
-          <span>Nouvel Enlèvement</span>
+          <span>{{ 'enlevement.new' | translate }}</span>
         </button>
       </div>
     </div>

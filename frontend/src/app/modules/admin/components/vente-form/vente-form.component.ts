@@ -24,6 +24,8 @@ import {
   Vente
 } from '../../../../models/vente.model';
 import { Societe } from '../../../../models/societe.model';
+import { I18nService } from '../../../../services/i18n.service';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
 
 /**
  * Composant : Formulaire de création de vente
@@ -46,7 +48,8 @@ import { Societe } from '../../../../models/societe.model';
     MatNativeDateModule,
     MatStepperModule,
     MatTooltipModule,
-    MatChipsModule
+    MatChipsModule,
+    TranslatePipe
   ],
   templateUrl: './vente-form.component.html',
   styleUrls: ['./vente-form.component.scss']
@@ -73,7 +76,8 @@ export class VenteFormComponent implements OnInit {
     private societeService: SocieteService,
     private router: Router,
     private route: ActivatedRoute,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private i18n: I18nService
   ) {}
 
   ngOnInit(): void {
@@ -172,7 +176,7 @@ export class VenteFormComponent implements OnInit {
       },
       error: (err) => {
         console.error('Erreur chargement vente:', err);
-        this.snackBar.open('Erreur lors du chargement de la vente', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('errors.loadError'), this.i18n.t('common.close'), { duration: 3000 });
         this.loading = false;
         this.router.navigate([this.basePath]);
       }
@@ -281,7 +285,7 @@ export class VenteFormComponent implements OnInit {
     }
 
     if (this.step1Form.invalid || this.step2Form.invalid) {
-      this.snackBar.open('Veuillez corriger les erreurs du formulaire', 'Fermer', { duration: 3000 });
+      this.snackBar.open(this.i18n.t('errors.formErrors'), this.i18n.t('common.close'), { duration: 3000 });
       return;
     }
 
@@ -317,7 +321,7 @@ export class VenteFormComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erreur création vente:', error);
-        this.snackBar.open('Erreur lors de la création de la vente', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('ventes.createError'), this.i18n.t('common.close'), { duration: 3000 });
         this.loading = false;
       }
     });
@@ -330,18 +334,18 @@ export class VenteFormComponent implements OnInit {
   // Helper methods for view mode
   getStatutLabel(statut: string): string {
     const labels: { [key: string]: string } = {
-      'BROUILLON': 'Brouillon',
-      'VALIDEE': 'Validée',
-      'ANNULEE': 'Annulée'
+      'BROUILLON': this.i18n.t('ventes.statuts.brouillon'),
+      'VALIDEE': this.i18n.t('ventes.statuts.validee'),
+      'ANNULEE': this.i18n.t('ventes.statuts.annulee')
     };
     return labels[statut] || statut;
   }
 
   getTypeDechetLabel(type: string): string {
     const labels: { [key: string]: string } = {
-      'RECYCLABLE': 'Recyclable',
-      'BANAL': 'Banal',
-      'A_DETRUIRE': 'À détruire'
+      'RECYCLABLE': this.i18n.t('ventes.recyclable'),
+      'BANAL': this.i18n.t('ventes.banal'),
+      'A_DETRUIRE': this.i18n.t('ventes.aDetruire')
     };
     return labels[type] || type;
   }
@@ -371,5 +375,13 @@ export class VenteFormComponent implements OnInit {
       hour: '2-digit',
       minute: '2-digit'
     });
+  }
+
+  getFormattedReste(stock: StockDisponible): string {
+    return (stock.resteAVendreKg || 0).toFixed(3);
+  }
+
+  getFormattedTotal(): string {
+    return this.calculateTotal().toFixed(2);
   }
 }
