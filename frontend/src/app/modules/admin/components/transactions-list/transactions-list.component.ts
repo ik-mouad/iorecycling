@@ -22,6 +22,8 @@ import { SocieteService } from '../../../../services/societe.service';
 import { Transaction, TypeTransaction, StatutTransaction } from '../../../../models/comptabilite.model';
 import { Societe } from '../../../../models/societe.model';
 import { Page } from '../../../../models/societe.model';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
+import { I18nService } from '../../../../services/i18n.service';
 
 /**
  * Composant : Liste des transactions (recettes/dépenses)
@@ -47,7 +49,8 @@ import { Page } from '../../../../models/societe.model';
     MatSnackBarModule,
     MatMenuModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    TranslatePipe
   ],
   templateUrl: './transactions-list.component.html',
   styleUrls: ['./transactions-list.component.scss']
@@ -77,7 +80,8 @@ export class TransactionsListComponent implements OnInit {
     private comptabiliteService: ComptabiliteService,
     private societeService: SocieteService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private i18n: I18nService
   ) {
     this.filterForm = this.fb.group({
       societeId: [null],
@@ -177,10 +181,10 @@ export class TransactionsListComponent implements OnInit {
   }
 
   deleteTransaction(id: number): void {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cette transaction ?')) {
+    if (confirm(this.i18n.t('common.confirmDelete', { item: 'transaction' }))) {
       this.comptabiliteService.deleteTransaction(id).subscribe({
         next: () => {
-          this.snackBar.open('Transaction supprimée avec succès', 'Fermer', { duration: 3000 });
+          this.snackBar.open(this.i18n.t('success.deleted'), this.i18n.t('common.close'), { duration: 3000 });
           this.loadTransactions();
         },
         error: (err) => {
@@ -192,7 +196,7 @@ export class TransactionsListComponent implements OnInit {
   }
 
   getTypeLabel(type: TypeTransaction): string {
-    return type === TypeTransaction.RECETTE ? 'Recette' : 'Dépense';
+    return type === TypeTransaction.RECETTE ? this.i18n.t('transaction.recette') : this.i18n.t('transaction.depense');
   }
 
   getTypeColor(type: TypeTransaction): string {
@@ -201,9 +205,12 @@ export class TransactionsListComponent implements OnInit {
 
   getStatutLabel(statut: StatutTransaction): string {
     const labels: { [key: string]: string } = {
-      'EN_ATTENTE': 'En attente',
-      'PARTIELLEMENT_PAYEE': 'Partiellement payée',
-      'PAYEE': 'Payée',
+      'EN_ATTENTE': this.i18n.t('transaction.enAttente'),
+      'PARTIELLEMENT_PAYEE': this.i18n.t('transaction.partiellementPaye'),
+      'PARTIELLEMENT_PAYE': this.i18n.t('transaction.partiellementPaye'),
+      'PAYEE': this.i18n.t('transaction.paye'),
+      'PAYE': this.i18n.t('transaction.paye'),
+      'IMPAYE': this.i18n.t('transaction.impaye'),
       'ANNULEE': 'Annulée'
     };
     return labels[statut] || statut;

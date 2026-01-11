@@ -14,16 +14,17 @@
             </svg>
           </div>
           <div class="logo-text">
-            <div class="logo-title">Comptabilité</div>
-            <div class="logo-subtitle">IORecycling</div>
+            <div class="logo-title">{{ 'comptable.title' | translate }}</div>
+            <div class="logo-subtitle">{{ 'app.title' | translate }}</div>
           </div>
         </div>
       </div>
       <div class="header-right">
+        <app-language-selector></app-language-selector>
         <div class="user-profile">
           <div class="user-info-text">
             <p class="user-name">{{ getUserName() }}</p>
-            <p class="user-role">Admin</p>
+            <p class="user-role">{{ 'common.admin' | translate }}</p>
           </div>
           <div class="user-avatar">{{ getUserInitials() }}</div>
         </div>
@@ -33,7 +34,7 @@
         <mat-menu #userMenu="matMenu">
           <button mat-menu-item (click)="logout()">
             <mat-icon>logout</mat-icon>
-            <span>Se déconnecter</span>
+            <span>{{ 'auth.logout' | translate }}</span>
           </button>
         </mat-menu>
       </div>
@@ -48,27 +49,27 @@
          routerLinkActive="active"
          [routerLinkActiveOptions]="{exact: true}">
         <mat-icon>dashboard</mat-icon>
-        <span>Dashboard</span>
+        <span>{{ 'comptable.dashboard' | translate }}</span>
       </a>
       <a mat-button 
          routerLink="/comptable/transactions" 
          routerLinkActive="active"
          [routerLinkActiveOptions]="{exact: false}">
         <mat-icon>list_alt</mat-icon>
-        <span>Transactions</span>
+        <span>{{ 'comptable.transactions' | translate }}</span>
       </a>
       <a mat-button 
          routerLink="/comptable/ventes" 
          routerLinkActive="active"
          [routerLinkActiveOptions]="{exact: false}">
         <mat-icon>shopping_cart</mat-icon>
-        <span>Ventes</span>
+        <span>{{ 'comptable.ventes' | translate }}</span>
       </a>
       <a mat-button 
          routerLink="/comptable/stocks" 
          routerLinkActive="active">
         <mat-icon>inventory_2</mat-icon>
-        <span>Stocks</span>
+        <span>{{ 'comptable.stocks' | translate }}</span>
       </a>
     </div>
   </nav>

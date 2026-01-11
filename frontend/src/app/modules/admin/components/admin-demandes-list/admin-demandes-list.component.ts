@@ -14,6 +14,8 @@ import { MatInputModule } from '@angular/material/input';
 import { DemandeService } from '../../../../services/demande.service';
 import { DemandeEnlevement, StatutDemande, STATUT_LABELS } from '../../../../models/demande.model';
 import { ValiderDemandeDialogComponent } from '../valider-demande-dialog/valider-demande-dialog.component';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
+import { I18nService } from '../../../../services/i18n.service';
 
 /**
  * Composant : Liste des demandes d'enlèvements (Admin)
@@ -34,7 +36,8 @@ import { ValiderDemandeDialogComponent } from '../valider-demande-dialog/valider
     MatProgressSpinnerModule,
     MatTooltipModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    TranslatePipe
   ],
   templateUrl: './admin-demandes-list.component.html',
   styleUrls: ['./admin-demandes-list.component.scss']
@@ -48,7 +51,8 @@ export class AdminDemandesListComponent implements OnInit {
   constructor(
     private demandeService: DemandeService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private i18n: I18nService
   ) {}
 
   ngOnInit(): void {
@@ -64,7 +68,7 @@ export class AdminDemandesListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erreur chargement demandes:', error);
-        this.snackBar.open('Erreur lors du chargement des demandes', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('demande.loadError'), this.i18n.t('common.close'), { duration: 3000 });
         this.loading = false;
       }
     });
@@ -83,14 +87,14 @@ export class AdminDemandesListComponent implements OnInit {
         this.demandeService.validerDemande(demande.id, result).subscribe({
           next: () => {
             const message = (result.dateModifiee || result.heureModifiee)
-              ? 'Demande validée avec date/heure modifiées'
-              : 'Demande validée avec succès';
-            this.snackBar.open(message, 'Fermer', { duration: 3000 });
+              ? this.i18n.t('demande.validatedWithChanges')
+              : this.i18n.t('demande.validated');
+            this.snackBar.open(message, this.i18n.t('common.close'), { duration: 3000 });
             this.loadDemandes();
           },
           error: (error) => {
             console.error('Erreur validation demande:', error);
-            this.snackBar.open('Erreur lors de la validation', 'Fermer', { duration: 3000 });
+            this.snackBar.open(this.i18n.t('demande.validationError'), this.i18n.t('common.close'), { duration: 3000 });
           }
         });
       }
@@ -99,23 +103,31 @@ export class AdminDemandesListComponent implements OnInit {
   }
 
   refuserDemande(demande: DemandeEnlevement): void {
-    const motif = prompt('Motif du refus :');
+    const motif = prompt(this.i18n.t('demande.refusalReason'));
     if (motif && motif.trim()) {
       this.demandeService.refuserDemande(demande.id, motif.trim()).subscribe({
         next: () => {
-          this.snackBar.open('Demande refusée', 'Fermer', { duration: 3000 });
+          this.snackBar.open(this.i18n.t('demande.refused'), this.i18n.t('common.close'), { duration: 3000 });
           this.loadDemandes();
         },
         error: (error) => {
           console.error('Erreur refus demande:', error);
-          this.snackBar.open('Erreur lors du refus', 'Fermer', { duration: 3000 });
+          this.snackBar.open(this.i18n.t('demande.refusalError'), this.i18n.t('common.close'), { duration: 3000 });
         }
       });
     }
   }
 
   getStatutLabel(statut: string): string {
-    return STATUT_LABELS[statut] || statut;
+    const labels: { [key: string]: string } = {
+      'EN_ATTENTE': this.i18n.t('demande.statutEnAttente'),
+      'VALIDEE': this.i18n.t('demande.statutValidee'),
+      'PLANIFIEE': this.i18n.t('demande.statutPlanifiee'),
+      'REALISEE': this.i18n.t('demande.statutRealisee'),
+      'REFUSEE': this.i18n.t('demande.statutRefusee'),
+      'ANNULEE': this.i18n.t('demande.statutAnnulee')
+    };
+    return labels[statut] || statut;
   }
 
   getStatutClass(statut: string): string {

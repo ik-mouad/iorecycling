@@ -4,36 +4,41 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../auth/auth.service';
+import { TranslatePipe } from '../../pipes/translate.pipe';
+import { LanguageSelectorComponent } from '../language-selector/language-selector.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule],
+  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule, TranslatePipe, LanguageSelectorComponent],
   template: `
     <div class="login-container">
       <div class="login-content">
         <div class="login-header">
+          <div class="language-selector-wrapper">
+            <app-language-selector></app-language-selector>
+          </div>
           <mat-icon class="logo-icon">recycling</mat-icon>
-          <h1 class="logo-text">IORecycling</h1>
-          <p class="tagline">Plateforme de gestion du recyclage</p>
+          <h1 class="logo-text">{{ 'app.title' | translate }}</h1>
+          <p class="tagline">{{ 'app.tagline' | translate }}</p>
         </div>
         
         <mat-card class="login-card">
           <mat-card-content>
             <div class="login-form">
-              <h2>Connexion</h2>
+              <h2>{{ 'auth.login' | translate }}</h2>
               <p class="login-description">
-                Connectez-vous pour accéder à votre tableau de bord et gérer vos déchets recyclables.
+                {{ 'auth.loginDescription' | translate }}
               </p>
               
               <div class="status-info" *ngIf="authService.isLoggedIn()">
                 <mat-icon class="status-icon success">check_circle</mat-icon>
-                <span>Utilisateur connecté: {{ authService.getUserName() }}</span>
+                <span>{{ 'auth.userConnected' | translate }}: {{ authService.getUserName() }}</span>
               </div>
               
               <div class="error-info" *ngIf="showError">
                 <mat-icon class="status-icon error">error</mat-icon>
-                <span>Erreur de connexion. Vérifiez que Keycloak est accessible.</span>
+                <span>{{ 'auth.loginError' | translate }}</span>
               </div>
             </div>
           </mat-card-content>
@@ -41,13 +46,13 @@ import { AuthService } from '../../auth/auth.service';
           <mat-card-actions>
             <button mat-raised-button color="primary" (click)="login()" class="login-button">
               <mat-icon>login</mat-icon>
-              <span>Se connecter</span>
+              <span>{{ 'auth.login' | translate }}</span>
             </button>
           </mat-card-actions>
         </mat-card>
         
         <div class="login-footer">
-          <p class="muted">© 2024 IORecycling - Tous droits réservés</p>
+          <p class="muted">{{ 'app.copyright' | translate }}</p>
         </div>
       </div>
     </div>
@@ -71,6 +76,13 @@ import { AuthService } from '../../auth/auth.service';
     .login-header {
       margin-bottom: var(--spacing-2xl);
       color: white;
+      position: relative;
+    }
+    
+    .language-selector-wrapper {
+      position: absolute;
+      top: 0;
+      right: 0;
     }
 
     .logo-icon {

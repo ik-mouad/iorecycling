@@ -17,12 +17,12 @@
                   <mat-spinner [diameter]="40"></mat-spinner>
                 </ng-template>
               </span>
-              enlèvements effectués
+              {{ 'dashboard.pickupsCompleted' | translate }}
             </h1>
-            <p class="hero-subtitle">Depuis le début du partenariat</p>
+            <p class="hero-subtitle">{{ 'dashboard.sincePartnership' | translate }}</p>
             <div class="last-refresh" *ngIf="lastRefreshTime">
               <mat-icon>schedule</mat-icon>
-              <span>Dernière mise à jour: {{ lastRefreshTime | date:'short' }}</span>
+              <span>{{ 'dashboard.lastUpdate' | translate }}: {{ lastRefreshTime | date:'short' }}</span>
             </div>
           </div>
         </div>
@@ -36,7 +36,7 @@
         <div class="kpi-content">
           <div class="kpi-header">
             <mat-icon class="kpi-icon">autorenew</mat-icon>
-            <span class="kpi-label">Recyclables</span>
+            <span class="kpi-label">{{ 'dashboard.recyclables' | translate }}</span>
           </div>
           <div class="kpi-value" data-testid="kpi-recyclables">
             <ng-container *ngIf="!showKPISkeletons; else recyclablesSpinner">
@@ -46,7 +46,7 @@
               <mat-spinner [diameter]="30"></mat-spinner>
             </ng-template>
           </div>
-          <div class="kpi-subtitle">Tonnes recyclables</div>
+          <div class="kpi-subtitle">{{ 'dashboard.tonnesRecyclables' | translate }}</div>
         </div>
       </mat-card>
 
@@ -55,7 +55,7 @@
         <div class="kpi-content">
           <div class="kpi-header">
             <mat-icon class="kpi-icon">inventory</mat-icon>
-            <span class="kpi-label">Banals</span>
+            <span class="kpi-label">{{ 'dashboard.banals' | translate }}</span>
           </div>
           <div class="kpi-value" data-testid="kpi-banals">
             <ng-container *ngIf="!showKPISkeletons; else banalsSpinner">
@@ -65,7 +65,7 @@
               <mat-spinner [diameter]="30"></mat-spinner>
             </ng-template>
           </div>
-          <div class="kpi-subtitle">Tonnes banales</div>
+          <div class="kpi-subtitle">{{ 'dashboard.tonnesBanales' | translate }}</div>
         </div>
       </mat-card>
 
@@ -74,7 +74,7 @@
         <div class="kpi-content">
           <div class="kpi-header">
             <mat-icon class="kpi-icon">warning</mat-icon>
-            <span class="kpi-label">Dangereux</span>
+            <span class="kpi-label">{{ 'dashboard.dangereux' | translate }}</span>
           </div>
           <div class="kpi-value" data-testid="kpi-dangereux">
             <ng-container *ngIf="!showKPISkeletons; else dangereuxSpinner">
@@ -84,7 +84,7 @@
               <mat-spinner [diameter]="30"></mat-spinner>
             </ng-template>
           </div>
-          <div class="kpi-subtitle">Tonnes à détruire</div>
+          <div class="kpi-subtitle">{{ 'dashboard.tonnesADetruire' | translate }}</div>
         </div>
       </mat-card>
     </div>
@@ -92,7 +92,7 @@
     <!-- Revenue Card -->
     <mat-card class="revenue-card">
       <div class="revenue-header">
-        <h3>Produits recyclables (MAD)</h3>
+        <h3>{{ 'dashboard.recyclableProducts' | translate }}</h3>
         <div class="revenue-value" data-testid="kpi-revenue">
           {{ formatCurrency(totalRevenue) }}
         </div>
@@ -105,10 +105,10 @@
     <!-- Filters -->
     <div class="filters-section">
       <mat-button-toggle-group [(ngModel)]="selectedFilter" (change)="onFilterChange($event.value)">
-        <mat-button-toggle value="all" data-testid="filter-all">Tous</mat-button-toggle>
-        <mat-button-toggle value="recyclables" data-testid="filter-recyclables">Recyclables</mat-button-toggle>
-        <mat-button-toggle value="banals" data-testid="filter-banals">Banals</mat-button-toggle>
-        <mat-button-toggle value="dangereux" data-testid="filter-dangereux">À détruire</mat-button-toggle>
+        <mat-button-toggle value="all" data-testid="filter-all">{{ 'dashboard.all' | translate }}</mat-button-toggle>
+        <mat-button-toggle value="recyclables" data-testid="filter-recyclables">{{ 'dashboard.recyclablesFilter' | translate }}</mat-button-toggle>
+        <mat-button-toggle value="banals" data-testid="filter-banals">{{ 'dashboard.banalsFilter' | translate }}</mat-button-toggle>
+        <mat-button-toggle value="dangereux" data-testid="filter-dangereux">{{ 'dashboard.dangereuxFilter' | translate }}</mat-button-toggle>
       </mat-button-toggle-group>
     </div>
 
@@ -116,33 +116,33 @@
     <div *ngIf="showValorizationDetails && valorizationReport" class="valorization-section">
       <mat-card class="valorization-card">
         <div class="valorization-header">
-          <h3>Détails recyclables (mois en cours)</h3>
+          <h3>{{ 'dashboard.recyclablesDetails' | translate }}</h3>
           <button mat-raised-button color="primary" (click)="downloadReport()" 
                   [disabled]="isLoadingReport" data-testid="btn-download-pdf">
             <mat-icon>download</mat-icon>
-            Télécharger rapport PDF
+            {{ 'dashboard.downloadPDFReport' | translate }}
           </button>
         </div>
         
         <div class="valorization-table" *ngIf="valorizationReport.rows.length > 0">
           <table mat-table [dataSource]="valorizationReport.rows" class="mat-elevation-z2">
             <ng-container matColumnDef="material">
-              <th mat-header-cell *matHeaderCellDef>Matériau</th>
+              <th mat-header-cell *matHeaderCellDef>{{ 'dashboard.material' | translate }}</th>
               <td mat-cell *matCellDef="let row">{{ row.material }}</td>
             </ng-container>
             
             <ng-container matColumnDef="quantity">
-              <th mat-header-cell *matHeaderCellDef>Quantité (t)</th>
+              <th mat-header-cell *matHeaderCellDef>{{ 'dashboard.quantity' | translate }}</th>
               <td mat-cell *matCellDef="let row">{{ formatNumber(row.qtyKg / 1000) }}</td>
             </ng-container>
             
             <ng-container matColumnDef="price">
-              <th mat-header-cell *matHeaderCellDef>Prix/kg</th>
+              <th mat-header-cell *matHeaderCellDef>{{ 'dashboard.pricePerKg' | translate }}</th>
               <td mat-cell *matCellDef="let row">{{ formatCurrency(row.pricePerKg) }}</td>
             </ng-container>
             
             <ng-container matColumnDef="total">
-              <th mat-header-cell *matHeaderCellDef>Total</th>
+              <th mat-header-cell *matHeaderCellDef>{{ 'dashboard.total' | translate }}</th>
               <td mat-cell *matCellDef="let row">{{ formatCurrency(row.totalMad) }}</td>
             </ng-container>
             
@@ -151,13 +151,13 @@
           </table>
           
           <div class="valorization-total">
-            <strong>Total: {{ formatCurrency(valorizationReport.grandTotalMad) }}</strong>
+            <strong>{{ 'dashboard.total' | translate }}: {{ formatCurrency(valorizationReport.grandTotalMad) }}</strong>
           </div>
         </div>
         
         <div *ngIf="valorizationReport.rows.length === 0" class="no-data">
           <mat-icon>inbox</mat-icon>
-          <p>Aucune donnée de recyclage disponible pour ce mois</p>
+          <p>{{ 'dashboard.noRecyclablesData' | translate }}</p>
         </div>
       </mat-card>
     </div>
@@ -165,17 +165,17 @@
     <!-- Pickups Table -->
     <mat-card class="table-card">
       <div class="table-header">
-        <h3>Historique des enlèvements</h3>
+        <h3>{{ 'dashboard.pickupsHistory' | translate }}</h3>
         <div class="table-actions">
           <mat-form-field appearance="outline" class="search-field">
-            <mat-label>Rechercher</mat-label>
+            <mat-label>{{ 'dashboard.search' | translate }}</mat-label>
             <input matInput [(ngModel)]="searchTerm" (input)="onSearchChange()" 
-                   placeholder="Site, type...">
+                   [placeholder]="'dashboard.searchPlaceholder' | translate">
             <mat-icon matSuffix>search</mat-icon>
           </mat-form-field>
           <button mat-stroked-button>
             <mat-icon>download</mat-icon>
-            Export CSV
+            {{ 'dashboard.exportCSV' | translate }}
           </button>
         </div>
       </div>
@@ -184,19 +184,19 @@
         <table mat-table [dataSource]="filteredDataSource" class="records-table">
           <!-- Date Column -->
           <ng-container matColumnDef="date">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'dashboard.date' | translate }}</th>
             <td mat-cell *matCellDef="let row">{{ row.date }}</td>
           </ng-container>
 
           <!-- Heure Column -->
           <ng-container matColumnDef="heure">
-            <th mat-header-cell *matHeaderCellDef>Heure</th>
+            <th mat-header-cell *matHeaderCellDef>{{ 'dashboard.heure' | translate }}</th>
             <td mat-cell *matCellDef="let row">{{ row.heure }}</td>
           </ng-container>
 
           <!-- Type Column -->
           <ng-container matColumnDef="type">
-            <th mat-header-cell *matHeaderCellDef>Type</th>
+            <th mat-header-cell *matHeaderCellDef>{{ 'dashboard.type' | translate }}</th>
             <td mat-cell *matCellDef="let row">
               <span class="type-chip" [ngClass]="getTypeClass(row.type)">
                 {{ getTypeLabel(row.type) }}
@@ -206,19 +206,19 @@
 
           <!-- Tonnage Column -->
           <ng-container matColumnDef="tonnage">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Tonnage</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'dashboard.tonnage' | translate }}</th>
             <td mat-cell *matCellDef="let row">{{ formatNumber(row.tonnage) }} t</td>
           </ng-container>
 
           <!-- Site Column -->
           <ng-container matColumnDef="site">
-            <th mat-header-cell *matHeaderCellDef>Site</th>
+            <th mat-header-cell *matHeaderCellDef>{{ 'dashboard.site' | translate }}</th>
             <td mat-cell *matCellDef="let row">{{ row.site }}</td>
           </ng-container>
 
           <!-- Documents Column -->
           <ng-container matColumnDef="documents">
-            <th mat-header-cell *matHeaderCellDef>Documents</th>
+            <th mat-header-cell *matHeaderCellDef>{{ 'dashboard.documents' | translate }}</th>
             <td mat-cell *matCellDef="let row">
               <div class="documents-container">
                 <button *ngFor="let doc of row.docs" 
@@ -239,24 +239,24 @@
         <!-- Loading State -->
         <div *ngIf="isLoadingTable" class="loading-container">
           <mat-spinner diameter="40"></mat-spinner>
-          <p>Chargement des données...</p>
+          <p>{{ 'dashboard.loadingData' | translate }}</p>
         </div>
 
         <!-- Empty State -->
         <div *ngIf="!isLoadingTable && filteredDataSource.data.length === 0" class="empty-state">
           <mat-icon>inbox</mat-icon>
-          <h3>Aucun enlèvement trouvé</h3>
-          <p>Vérifiez vos filtres ou contactez le support</p>
+          <h3>{{ 'dashboard.noPickupsFound' | translate }}</h3>
+          <p>{{ 'dashboard.checkFilters' | translate }}</p>
           <button mat-raised-button color="primary">
             <mat-icon>refresh</mat-icon>
-            Actualiser
+            {{ 'dashboard.refresh' | translate }}
           </button>
         </div>
 
         <!-- Paginator -->
         <mat-paginator [pageSizeOptions]="[10, 25, 50]" 
                        showFirstLastButtons 
-                       aria-label="Sélectionner la page des enlèvements">
+                       [attr.aria-label]="'dashboard.selectPage' | translate">
         </mat-paginator>
       </div>
     </mat-card>

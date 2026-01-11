@@ -4,8 +4,8 @@
   <section class="dashboard-header">
     <!-- Title Group -->
     <div class="header-title-group">
-      <h1 class="dashboard-title">Dashboard Comptabilité</h1>
-      <p class="dashboard-subtitle">Vue d'ensemble financière et suivi des transactions</p>
+      <h1 class="dashboard-title">{{ 'comptabiliteDashboard.title' | translate }}</h1>
+      <p class="dashboard-subtitle">{{ 'comptabiliteDashboard.subtitle' | translate }}</p>
     </div>
     <!-- Action Buttons -->
     <div class="header-actions">
@@ -14,18 +14,18 @@
         <div class="btn-icon-wrapper">
           <mat-icon>add</mat-icon>
         </div>
-        Nouvelle Recette
+        {{ 'comptabiliteDashboard.newRecette' | translate }}
       </button>
       <!-- New Expense Button -->
       <button class="btn btn-orange" [routerLink]="basePath + '/transactions/new'" [queryParams]="{type: 'DEPENSE'}">
         <div class="btn-icon-wrapper">
           <mat-icon>remove</mat-icon>
         </div>
-        Nouvelle Dépense
+        {{ 'comptabiliteDashboard.newDepense' | translate }}
       </button>
       <!-- View All Button -->
       <button class="btn btn-secondary" [routerLink]="basePath + '/transactions'">
-        Voir toutes
+        {{ 'comptabiliteDashboard.viewAll' | translate }}
       </button>
     </div>
   </section>
@@ -38,7 +38,7 @@
         <!-- Company Select -->
         <div class="select-wrapper">
           <select class="select-field" [(ngModel)]="societeId" (change)="onSocieteChange()">
-            <option [value]="null">Toutes les sociétés</option>
+            <option [value]="null">{{ 'comptabiliteDashboard.allSocietes' | translate }}</option>
             <option *ngFor="let societe of societes" [value]="societe.id">
               {{ societe.raisonSociale }}
             </option>
@@ -53,14 +53,14 @@
             type="date" 
             [(ngModel)]="dateDebut" 
             (change)="loadDashboard()"
-            title="Date début">
+            [title]="'comptabiliteDashboard.dateDebut' | translate">
           <span class="date-separator">–</span>
           <input 
             class="date-input" 
             type="date" 
             [(ngModel)]="dateFin" 
             (change)="loadDashboard()"
-            title="Date fin">
+            [title]="'comptabiliteDashboard.dateFin' | translate">
         </div>
       </div>
       <!-- Period Segmented Control -->
@@ -69,19 +69,19 @@
           class="period-btn" 
           [class.active]="periode === 'mensuel'"
           (click)="onPeriodeChange('mensuel')">
-          Mensuel
+          {{ 'comptabiliteDashboard.mensuel' | translate }}
         </button>
         <button 
           class="period-btn" 
           [class.active]="periode === 'trimestriel'"
           (click)="onPeriodeChange('trimestriel')">
-          Trimestriel
+          {{ 'comptabiliteDashboard.trimestriel' | translate }}
         </button>
         <button 
           class="period-btn" 
           [class.active]="periode === 'annuel'"
           (click)="onPeriodeChange('annuel')">
-          Annuel
+          {{ 'comptabiliteDashboard.annuel' | translate }}
         </button>
       </div>
     </div>
@@ -91,7 +91,7 @@
   <!-- Loading State -->
   <div *ngIf="loading" class="loading-container">
     <mat-spinner diameter="50"></mat-spinner>
-    <p>Chargement des données...</p>
+    <p>{{ 'comptabiliteDashboard.loadingData' | translate }}</p>
   </div>
 
   <!-- Error State -->
@@ -107,16 +107,16 @@
       <!-- Main Chart Card (Left - 2/3 width on LG screens) -->
       <div class="chart-card">
         <div class="chart-header">
-          <h2 class="chart-title">Aperçu Financier</h2>
+          <h2 class="chart-title">{{ 'comptabiliteDashboard.financialOverview' | translate }}</h2>
           <!-- Legend -->
           <div class="chart-legend">
             <div class="legend-item">
               <span class="legend-dot legend-recettes"></span>
-              <span class="legend-label">Recettes</span>
+              <span class="legend-label">{{ 'comptabiliteDashboard.recettes' | translate }}</span>
             </div>
             <div class="legend-item">
               <span class="legend-dot legend-depenses"></span>
-              <span class="legend-label">Dépenses</span>
+              <span class="legend-label">{{ 'comptabiliteDashboard.depenses' | translate }}</span>
             </div>
           </div>
         </div>
@@ -129,8 +129,8 @@
       <!-- Recent Activity Card (Right - 1/3 width on LG screens) -->
       <div class="activity-card">
         <div class="activity-header">
-          <h2 class="activity-title">Activité Récente</h2>
-          <button class="activity-link" [routerLink]="basePath + '/transactions'">Voir tout</button>
+          <h2 class="activity-title">{{ 'comptabiliteDashboard.recentActivity' | translate }}</h2>
+          <button class="activity-link" [routerLink]="basePath + '/transactions'">{{ 'comptabiliteDashboard.viewAllTransactions' | translate }}</button>
         </div>
         <div class="activity-list">
           <!-- Loading transactions -->
@@ -171,7 +171,7 @@
           </div>
           <!-- Empty state -->
           <div *ngIf="!loadingRecentTransactions && recentTransactions.length === 0" class="activity-empty">
-            <p>Aucune transaction récente</p>
+            <p>{{ 'comptabiliteDashboard.noRecentTransactions' | translate }}</p>
           </div>
         </div>
       </div>
@@ -187,7 +187,7 @@
             <mat-icon>local_shipping</mat-icon>
           </div>
           <div class="summary-text">
-            <p class="summary-label">CA PRESTATION</p>
+            <p class="summary-label">{{ 'comptabiliteDashboard.caPrestation' | translate }}</p>
             <p class="summary-value">{{ (dashboard.caPrestation || 0) | number:'1.2-2' }} MAD</p>
           </div>
         </div>
@@ -206,7 +206,7 @@
             <mat-icon>shopping_cart</mat-icon>
           </div>
           <div class="summary-text">
-            <p class="summary-label">CA VENTE MATIÈRE</p>
+            <p class="summary-label">{{ 'comptabiliteDashboard.caVenteMatiere' | translate }}</p>
             <p class="summary-value">{{ (dashboard.caVenteMatiere || 0) | number:'1.2-2' }} MAD</p>
           </div>
         </div>
@@ -224,7 +224,7 @@
             <mat-icon>trending_up</mat-icon>
           </div>
           <div class="summary-text">
-            <p class="summary-label">TOTAL RECETTES</p>
+            <p class="summary-label">{{ 'comptabiliteDashboard.totalRecettes' | translate }}</p>
             <p class="summary-value">{{ dashboard.totalRecettes | number:'1.2-2' }} MAD</p>
           </div>
         </div>
@@ -242,7 +242,7 @@
             <mat-icon>trending_down</mat-icon>
           </div>
           <div class="summary-text">
-            <p class="summary-label">TOTAL DÉPENSES</p>
+            <p class="summary-label">{{ 'comptabiliteDashboard.totalDepenses' | translate }}</p>
             <p class="summary-value">{{ dashboard.totalDepenses | number:'1.2-2' }} MAD</p>
           </div>
         </div>

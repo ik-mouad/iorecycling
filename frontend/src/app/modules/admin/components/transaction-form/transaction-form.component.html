@@ -31,13 +31,13 @@
       <mat-card-header>
         <mat-card-title>
           <mat-icon>info</mat-icon>
-          Informations générales
+          {{ 'transaction.generalInfo' | translate }}
         </mat-card-title>
       </mat-card-header>
       <mat-card-content>
         <div class="info-grid">
           <div class="info-item">
-            <span class="info-label">Type :</span>
+            <span class="info-label">{{ 'transaction.type' | translate }} :</span>
             <span class="info-value">
               <mat-chip [class]="currentTransaction.type === TypeTransaction.RECETTE ? 'chip-recette' : 'chip-depense'">
                 {{ getTypeLabel(currentTransaction.type) }}
@@ -45,17 +45,17 @@
             </span>
           </div>
           <div class="info-item">
-            <span class="info-label">Montant :</span>
+            <span class="info-label">{{ 'transaction.montant' | translate }} :</span>
             <span class="info-value amount-value" [class.amount-recette]="currentTransaction.type === TypeTransaction.RECETTE" [class.amount-depense]="currentTransaction.type === TypeTransaction.DEPENSE">
               {{ currentTransaction.type === TypeTransaction.RECETTE ? '+' : '-' }}{{ currentTransaction.montant | number:'1.2-2' }} <span class="currency">MAD</span>
             </span>
           </div>
           <div class="info-item">
-            <span class="info-label">Date de transaction :</span>
+            <span class="info-label">{{ 'transaction.dateTransaction' | translate }} :</span>
             <span class="info-value">{{ formatDate(currentTransaction.dateTransaction) }}</span>
           </div>
           <div class="info-item">
-            <span class="info-label">Statut :</span>
+            <span class="info-label">{{ 'transaction.statut' | translate }} :</span>
             <span class="info-value">
               <mat-chip [class]="'statut-' + currentTransaction.statut.toLowerCase()">
                 {{ getStatutLabel(currentTransaction.statut) }}
@@ -63,23 +63,23 @@
             </span>
           </div>
           <div class="info-item">
-            <span class="info-label">Description :</span>
+            <span class="info-label">{{ 'transaction.description' | translate }} :</span>
             <span class="info-value">{{ currentTransaction.description }}</span>
           </div>
           <div class="info-item" *ngIf="currentTransaction.categorie">
-            <span class="info-label">Catégorie :</span>
+            <span class="info-label">{{ 'transaction.categorie' | translate }} :</span>
             <span class="info-value">{{ currentTransaction.categorie }}</span>
           </div>
           <div class="info-item" *ngIf="currentTransaction.numeroReference">
-            <span class="info-label">Numéro de référence :</span>
+            <span class="info-label">{{ 'transaction.numeroReference' | translate }} :</span>
             <span class="info-value">{{ currentTransaction.numeroReference }}</span>
           </div>
           <div class="info-item">
-            <span class="info-label">Société :</span>
+            <span class="info-label">{{ 'transaction.societe' | translate }} :</span>
             <span class="info-value">{{ getSocieteName(currentTransaction.societeId) }}</span>
           </div>
           <div class="info-item" *ngIf="currentTransaction.enlevementNumero">
-            <span class="info-label">Enlèvement :</span>
+            <span class="info-label">{{ 'transaction.enlevement' | translate }} :</span>
             <span class="info-value">
               <button mat-button color="primary" (click)="viewEnlevement(currentTransaction.enlevementId!)">
                 <mat-icon>local_shipping</mat-icon>
@@ -88,7 +88,7 @@
             </span>
           </div>
           <div class="info-item" *ngIf="currentTransaction.notes">
-            <span class="info-label">Notes :</span>
+            <span class="info-label">{{ 'transaction.notes' | translate }} :</span>
             <span class="info-value">{{ currentTransaction.notes }}</span>
           </div>
         </div>
@@ -100,21 +100,21 @@
       <mat-card-header>
         <mat-card-title>
           <mat-icon>account_balance</mat-icon>
-          Informations financières
+          {{ 'transaction.financialInfo' | translate }}
         </mat-card-title>
       </mat-card-header>
       <mat-card-content>
         <div class="financial-grid">
           <div class="financial-item">
-            <span class="financial-label">Montant total :</span>
+            <span class="financial-label">{{ 'transaction.montantTotal' | translate }} :</span>
             <span class="financial-value">{{ currentTransaction.montant | number:'1.2-2' }} MAD</span>
           </div>
           <div class="financial-item" *ngIf="currentTransaction.montantPaye !== undefined">
-            <span class="financial-label">Montant payé :</span>
+            <span class="financial-label">{{ 'transaction.montantPaye' | translate }} :</span>
             <span class="financial-value paid-value">{{ currentTransaction.montantPaye | number:'1.2-2' }} MAD</span>
           </div>
           <div class="financial-item" *ngIf="currentTransaction.montantRestant !== undefined">
-            <span class="financial-label">Montant restant :</span>
+            <span class="financial-label">{{ 'transaction.montantRestant' | translate }} :</span>
             <span class="financial-value remaining-value">{{ currentTransaction.montantRestant | number:'1.2-2' }} MAD</span>
           </div>
         </div>
@@ -126,7 +126,7 @@
       <mat-card-header>
         <mat-card-title>
           <mat-icon>payment</mat-icon>
-          Paiements ({{ currentTransaction.paiements?.length || 0 }})
+          {{ 'transaction.paiements' | translate }} ({{ currentTransaction.paiements?.length || 0 }})
         </mat-card-title>
         <div class="spacer"></div>
         <button 
@@ -135,7 +135,7 @@
           color="primary" 
           (click)="openAddPaiementDialog()">
           <mat-icon>add</mat-icon>
-          Ajouter un paiement
+          {{ 'transaction.addPaiement' | translate }}
         </button>
       </mat-card-header>
       <mat-card-content>
@@ -143,10 +143,10 @@
           <table class="paiements-table">
             <thead>
               <tr>
-                <th>Date</th>
-                <th>Montant</th>
-                <th>Méthode</th>
-                <th>Référence</th>
+                <th>{{ 'transaction.datePaiement' | translate }}</th>
+                <th>{{ 'transaction.montant' | translate }}</th>
+                <th>{{ 'transaction.modePaiement' | translate }}</th>
+                <th>{{ 'transaction.reference' | translate }}</th>
               </tr>
             </thead>
             <tbody>
@@ -160,7 +160,7 @@
           </table>
         </div>
         <div *ngIf="!currentTransaction.paiements || currentTransaction.paiements.length === 0" class="empty-state">
-          <p>Aucun paiement enregistré</p>
+          <p>{{ 'transaction.noPaiements' | translate }}</p>
         </div>
       </mat-card-content>
     </mat-card>
@@ -170,7 +170,7 @@
       <mat-card-header>
         <mat-card-title>
           <mat-icon>schedule</mat-icon>
-          Échéances ({{ currentTransaction.echeances.length }})
+          {{ 'transaction.echeances' | translate }} ({{ currentTransaction.echeances.length }})
         </mat-card-title>
       </mat-card-header>
       <mat-card-content>
@@ -178,9 +178,9 @@
           <table class="echeances-table">
             <thead>
               <tr>
-                <th>Date d'échéance</th>
-                <th>Montant</th>
-                <th>Statut</th>
+                <th>{{ 'transaction.dateEcheance' | translate }}</th>
+                <th>{{ 'transaction.montant' | translate }}</th>
+                <th>{{ 'transaction.statut' | translate }}</th>
               </tr>
             </thead>
             <tbody>
@@ -204,21 +204,21 @@
       <mat-card-header>
         <mat-card-title>
           <mat-icon>history</mat-icon>
-          Informations système
+          {{ 'transaction.systemInfo' | translate }}
         </mat-card-title>
       </mat-card-header>
       <mat-card-content>
         <div class="metadata-grid">
           <div class="info-item" *ngIf="currentTransaction.createdBy">
-            <span class="info-label">Créé par :</span>
+            <span class="info-label">{{ 'transaction.createdBy' | translate }} :</span>
             <span class="info-value">{{ currentTransaction.createdBy }}</span>
           </div>
           <div class="info-item" *ngIf="currentTransaction.createdAt">
-            <span class="info-label">Date de création :</span>
+            <span class="info-label">{{ 'transaction.createdAt' | translate }} :</span>
             <span class="info-value">{{ formatDateTime(currentTransaction.createdAt) }}</span>
           </div>
           <div class="info-item" *ngIf="currentTransaction.updatedAt">
-            <span class="info-label">Dernière modification :</span>
+            <span class="info-label">{{ 'transaction.updatedAt' | translate }} :</span>
             <span class="info-value">{{ formatDateTime(currentTransaction.updatedAt) }}</span>
           </div>
         </div>
@@ -228,32 +228,32 @@
 
   <!-- MODE CRÉATION/ÉDITION : Formulaire -->
   <div *ngIf="!isViewMode">
-    <h1>{{ isEditMode ? 'Modifier la transaction' : 'Nouvelle transaction' }}</h1>
+    <h1>{{ isEditMode ? ('transaction.edit' | translate) : ('transaction.new' | translate) }}</h1>
 
     <mat-card>
       <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
         <div class="form-row">
           <mat-form-field>
-            <mat-label>Type</mat-label>
+            <mat-label>{{ 'transaction.type' | translate }}</mat-label>
             <mat-select formControlName="type" [disabled]="isEditMode || typeFixe">
-              <mat-option value="RECETTE">Recette</mat-option>
-              <mat-option value="DEPENSE">Dépense</mat-option>
+              <mat-option value="RECETTE">{{ 'transaction.recette' | translate }}</mat-option>
+              <mat-option value="DEPENSE">{{ 'transaction.depense' | translate }}</mat-option>
             </mat-select>
           </mat-form-field>
 
           <mat-form-field>
-            <mat-label>Montant (MAD)</mat-label>
+            <mat-label>{{ 'transaction.montantMAD' | translate }}</mat-label>
             <input matInput type="number" formControlName="montant" step="0.01" min="0.01">
             <mat-error *ngIf="transactionForm.get('montant')?.hasError('required')">
-              Le montant est obligatoire
+              {{ 'transaction.montantRequired' | translate }}
             </mat-error>
             <mat-error *ngIf="transactionForm.get('montant')?.hasError('min')">
-              Le montant doit être supérieur à 0
+              {{ 'transaction.montantMin' | translate }}
             </mat-error>
           </mat-form-field>
 
           <mat-form-field>
-            <mat-label>Date</mat-label>
+            <mat-label>{{ 'transaction.date' | translate }}</mat-label>
             <input matInput [matDatepicker]="picker" formControlName="dateTransaction">
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
@@ -261,42 +261,42 @@
         </div>
 
         <mat-form-field class="full-width">
-          <mat-label>Description *</mat-label>
+          <mat-label>{{ 'transaction.description' | translate }} *</mat-label>
           <textarea matInput formControlName="description" rows="3"></textarea>
           <mat-error *ngIf="transactionForm.get('description')?.hasError('required')">
-            La description est obligatoire
+            {{ 'transaction.descriptionRequired' | translate }}
           </mat-error>
         </mat-form-field>
 
         <div class="form-row">
           <mat-form-field>
-            <mat-label>Catégorie</mat-label>
+            <mat-label>{{ 'transaction.categorie' | translate }}</mat-label>
             <input matInput formControlName="categorie" placeholder="Ex: Frais généraux, Facturation client...">
           </mat-form-field>
 
           <mat-form-field>
-            <mat-label>Numéro de référence</mat-label>
+            <mat-label>{{ 'transaction.numeroReference' | translate }}</mat-label>
             <input matInput formControlName="numeroReference" placeholder="Ex: FACT-2024-001">
           </mat-form-field>
         </div>
 
         <div class="form-row">
           <mat-form-field>
-            <mat-label>Société *</mat-label>
+            <mat-label>{{ 'transaction.societe' | translate }} *</mat-label>
             <mat-select formControlName="societeId" (selectionChange)="onSocieteChange($event.value)">
               <mat-option *ngFor="let societe of societes" [value]="societe.id">
                 {{ societe.raisonSociale }}
               </mat-option>
             </mat-select>
             <mat-error *ngIf="transactionForm.get('societeId')?.hasError('required')">
-              La société est obligatoire
+              {{ 'transaction.societeRequired' | translate }}
             </mat-error>
           </mat-form-field>
 
           <mat-form-field>
-            <mat-label>Enlèvement (optionnel)</mat-label>
+            <mat-label>{{ 'transaction.enlevement' | translate }} ({{ 'common.optional' | translate }})</mat-label>
             <mat-select formControlName="enlevementId">
-              <mat-option [value]="null">Aucun</mat-option>
+              <mat-option [value]="null">{{ 'transaction.none' | translate }}</mat-option>
               <mat-option *ngFor="let enlevement of enlevements" [value]="enlevement.id">
                 {{ enlevement.numeroEnlevement }} - {{ enlevement.dateEnlevement | date:'dd/MM/yyyy' }}
               </mat-option>
@@ -305,26 +305,26 @@
         </div>
 
         <mat-form-field class="full-width">
-          <mat-label>Notes</mat-label>
+          <mat-label>{{ 'transaction.notes' | translate }}</mat-label>
           <textarea matInput formControlName="notes" rows="3"></textarea>
         </mat-form-field>
 
         <!-- Échéances -->
         <div class="echeances-section">
           <mat-checkbox formControlName="hasEcheances">
-            Ajouter des échéances de paiement
+            {{ 'transaction.hasEcheances' | translate }}
           </mat-checkbox>
 
           <div *ngIf="transactionForm.get('hasEcheances')?.value" class="echeances-list">
             <div *ngFor="let echeance of echeancesFormArray.controls; let i = index" class="echeance-item">
               <div class="form-row">
                 <mat-form-field>
-                  <mat-label>Montant échéance</mat-label>
+                  <mat-label>{{ 'transaction.montantEcheance' | translate }}</mat-label>
                   <input matInput type="number" [formControl]="$any(echeance.get('montant'))" step="0.01" min="0.01">
                 </mat-form-field>
 
                 <mat-form-field>
-                  <mat-label>Date échéance</mat-label>
+                  <mat-label>{{ 'transaction.dateEcheance' | translate }}</mat-label>
                   <input matInput [matDatepicker]="echeancePicker" [formControl]="$any(echeance.get('dateEcheance'))">
                   <mat-datepicker-toggle matSuffix [for]="echeancePicker"></mat-datepicker-toggle>
                   <mat-datepicker #echeancePicker></mat-datepicker>
@@ -338,16 +338,16 @@
 
             <button mat-button type="button" (click)="addEcheance()">
               <mat-icon>add</mat-icon>
-              Ajouter une échéance
+              {{ 'transaction.addEcheance' | translate }}
             </button>
           </div>
         </div>
 
         <div class="form-actions">
-          <button mat-button type="button" (click)="cancel()">Annuler</button>
+          <button mat-button type="button" (click)="cancel()">{{ 'common.cancel' | translate }}</button>
           <button mat-raised-button color="primary" type="submit" [disabled]="loading || transactionForm.invalid">
             <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
-            <span *ngIf="!loading">{{ isEditMode ? 'Modifier' : 'Créer' }}</span>
+            <span *ngIf="!loading">{{ isEditMode ? ('common.edit' | translate) : ('common.create' | translate) }}</span>
           </button>
         </div>
       </form>

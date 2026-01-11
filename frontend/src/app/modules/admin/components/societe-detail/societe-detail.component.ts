@@ -17,6 +17,8 @@ import { Societe, Site, ClientUser } from '../../../../models/societe.model';
 import { Enlevement } from '../../../../models/enlevement.model';
 import { ClientUserFormComponent } from '../client-user-form/client-user-form.component';
 import { SiteFormComponent, SiteFormData } from '../site-form/site-form.component';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
+import { I18nService } from '../../../../services/i18n.service';
 
 /**
  * Composant : Détail d'une société avec onglets
@@ -39,7 +41,8 @@ import { SiteFormComponent, SiteFormData } from '../site-form/site-form.componen
     MatTooltipModule,
     MatSnackBarModule,
     ClientUserFormComponent,
-    SiteFormComponent
+    SiteFormComponent,
+    TranslatePipe
   ],
   templateUrl: './societe-detail.component.html',
   styleUrls: ['./societe-detail.component.scss']
@@ -63,7 +66,8 @@ export class SocieteDetailComponent implements OnInit {
     private clientUserService: ClientUserService,
     private enlevementService: EnlevementService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private i18n: I18nService
   ) {}
 
   ngOnInit(): void {
@@ -87,7 +91,7 @@ export class SocieteDetailComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erreur chargement société:', error);
-        this.snackBar.open('Erreur lors du chargement', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('errors.loadError'), this.i18n.t('common.close'), { duration: 3000 });
         this.loading = false;
       }
     });
@@ -130,6 +134,18 @@ export class SocieteDetailComponent implements OnInit {
     this.router.navigate(['/admin/enlevements', enlevement.id]);
   }
 
+  getSitesTabLabel(): string {
+    return `${this.i18n.t('site.title')} (${this.sites.length})`;
+  }
+
+  getUsersTabLabel(): string {
+    return `${this.i18n.t('societe.users')} (${this.utilisateurs.length})`;
+  }
+
+  getEnlevementsTabLabel(): string {
+    return `${this.i18n.t('societe.pickups')} (${this.enlevements.length})`;
+  }
+
   editSociete(): void {
     if (this.societe) {
       this.router.navigate(['/admin/societes', this.societe.id, 'edit']);
@@ -150,7 +166,7 @@ export class SocieteDetailComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result && this.societe) {
-        this.snackBar.open('Site créé', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('site.created'), this.i18n.t('common.close'), { duration: 3000 });
         this.loadSites(this.societe.id);
         this.loadSociete(this.societe.id);
       }
@@ -172,7 +188,7 @@ export class SocieteDetailComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result && this.societe) {
-        this.snackBar.open('Site modifié', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('site.updated'), this.i18n.t('common.close'), { duration: 3000 });
         this.loadSites(this.societe.id);
         this.loadSociete(this.societe.id);
       }
@@ -180,17 +196,17 @@ export class SocieteDetailComponent implements OnInit {
   }
 
   deleteSite(site: Site): void {
-    if (confirm(`Supprimer le site "${site.name}" ?`)) {
+    if (confirm(this.i18n.t('site.confirmDelete', { name: site.name }))) {
       this.siteService.deleteSite(site.id).subscribe({
         next: () => {
-          this.snackBar.open('Site supprimé', 'Fermer', { duration: 3000 });
+          this.snackBar.open(this.i18n.t('site.deleted'), this.i18n.t('common.close'), { duration: 3000 });
           if (this.societe) {
             this.loadSites(this.societe.id);
           }
         },
         error: (error) => {
           console.error('Erreur suppression site:', error);
-          this.snackBar.open('Erreur lors de la suppression', 'Fermer', { duration: 3000 });
+          this.snackBar.open(this.i18n.t('errors.deleteError'), this.i18n.t('common.close'), { duration: 3000 });
         }
       });
     }
@@ -211,7 +227,7 @@ export class SocieteDetailComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result && this.societe) {
-        this.snackBar.open('Utilisateur créé', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('user.created'), this.i18n.t('common.close'), { duration: 3000 });
         this.loadUtilisateurs(this.societe.id);
         this.loadSociete(this.societe.id);
       }
@@ -234,7 +250,7 @@ export class SocieteDetailComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result && this.societe) {
-        this.snackBar.open('Utilisateur mis à jour', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('user.updated'), this.i18n.t('common.close'), { duration: 3000 });
         this.loadUtilisateurs(this.societe.id);
         this.loadSociete(this.societe.id);
       }
@@ -245,8 +261,8 @@ export class SocieteDetailComponent implements OnInit {
     this.clientUserService.toggleActive(user.id).subscribe({
       next: () => {
         this.snackBar.open(
-          `Utilisateur ${user.active ? 'désactivé' : 'activé'}`,
-          'Fermer',
+          user.active ? this.i18n.t('user.deactivated') : this.i18n.t('user.activated'),
+          this.i18n.t('common.close'),
           { duration: 3000 }
         );
         if (this.societe) {
@@ -255,23 +271,23 @@ export class SocieteDetailComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erreur toggle active:', error);
-        this.snackBar.open('Erreur', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('errors.generic'), this.i18n.t('common.close'), { duration: 3000 });
       }
     });
   }
 
   deleteUser(user: ClientUser): void {
-    if (confirm(`Supprimer l'utilisateur "${user.prenom} ${user.nom}" ?`)) {
+    if (confirm(this.i18n.t('user.confirmDelete', { name: `${user.prenom} ${user.nom}` }))) {
       this.clientUserService.deleteUser(user.id).subscribe({
         next: () => {
-          this.snackBar.open('Utilisateur supprimé', 'Fermer', { duration: 3000 });
+          this.snackBar.open(this.i18n.t('user.deleted'), this.i18n.t('common.close'), { duration: 3000 });
           if (this.societe) {
             this.loadUtilisateurs(this.societe.id);
           }
         },
         error: (error) => {
           console.error('Erreur suppression utilisateur:', error);
-          this.snackBar.open('Erreur lors de la suppression', 'Fermer', { duration: 3000 });
+          this.snackBar.open(this.i18n.t('errors.deleteError'), this.i18n.t('common.close'), { duration: 3000 });
         }
       });
     }

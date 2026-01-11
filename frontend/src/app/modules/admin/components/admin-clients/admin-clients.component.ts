@@ -16,6 +16,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatMenuModule } from '@angular/material/menu';
 import { AdminClientService, Client, Site } from '../../../../services/admin-client.service';
 import { ClientFormComponent } from '../client-form/client-form.component';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
+import { I18nService } from '../../../../services/i18n.service';
 
 @Component({
   selector: 'app-admin-clients',
@@ -35,7 +37,8 @@ import { ClientFormComponent } from '../client-form/client-form.component';
     MatChipsModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
-    MatMenuModule
+    MatMenuModule,
+    TranslatePipe
   ],
   providers: [
     AdminClientService
@@ -57,7 +60,8 @@ export class AdminClientsComponent implements OnInit {
   constructor(
     private adminClientService: AdminClientService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private i18n: I18nService
   ) {}
 
   ngOnInit(): void {
@@ -78,7 +82,7 @@ export class AdminClientsComponent implements OnInit {
       },
       error: (error: any) => {
         console.error('Erreur lors du chargement des clients:', error);
-        this.snackBar.open('Erreur lors du chargement des clients', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('errors.generic'), this.i18n.t('common.close'), { duration: 3000 });
         this.isLoading = false;
       }
     });

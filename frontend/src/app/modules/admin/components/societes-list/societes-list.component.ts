@@ -16,6 +16,8 @@ import { MatInputModule } from '@angular/material/input';
 import { Router } from '@angular/router';
 import { SocieteService } from '../../../../services/societe.service';
 import { Societe } from '../../../../models/societe.model';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
+import { I18nService } from '../../../../services/i18n.service';
 
 /**
  * Composant : Liste des sociétés
@@ -38,7 +40,8 @@ import { Societe } from '../../../../models/societe.model';
     MatMenuModule,
     MatFormFieldModule,
     MatSelectModule,
-    MatInputModule
+    MatInputModule,
+    TranslatePipe
   ],
   templateUrl: './societes-list.component.html',
   styleUrls: ['./societes-list.component.scss']
@@ -62,7 +65,8 @@ export class SocietesListComponent implements OnInit {
     private societeService: SocieteService,
     private router: Router,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private i18n: I18nService
   ) {}
 
   ngOnInit(): void {
@@ -80,7 +84,7 @@ export class SocietesListComponent implements OnInit {
         },
         error: (error) => {
           console.error('Erreur chargement sociétés:', error);
-          this.snackBar.open('Erreur lors du chargement des sociétés', 'Fermer', { duration: 3000 });
+          this.snackBar.open(this.i18n.t('errors.loadError'), this.i18n.t('common.close'), { duration: 3000 });
           this.loading = false;
         }
       });

@@ -19,6 +19,8 @@ import { DocumentUploadComponent, DocumentUploadData } from '../document-upload/
 import { TypeTraitement } from '../../../../models/destination.model';
 import { Transaction, TypeTransaction } from '../../../../models/comptabilite.model';
 import { AddPaiementDialogComponent } from '../add-paiement-dialog/add-paiement-dialog.component';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
+import { I18nService } from '../../../../services/i18n.service';
 
 /**
  * Composant : Détail d'un enlèvement
@@ -36,7 +38,8 @@ import { AddPaiementDialogComponent } from '../add-paiement-dialog/add-paiement-
     MatSnackBarModule,
     MatProgressSpinnerModule,
     MatDialogModule,
-    MatTooltipModule
+    MatTooltipModule,
+    TranslatePipe
   ],
   templateUrl: './enlevement-detail.component.html',
   styleUrls: ['./enlevement-detail.component.scss']
@@ -61,7 +64,8 @@ export class EnlevementDetailComponent implements OnInit {
     private comptabiliteService: ComptabiliteService,
     private roleService: RoleService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private i18n: I18nService
   ) {}
 
   ngOnInit(): void {
@@ -119,14 +123,17 @@ export class EnlevementDetailComponent implements OnInit {
   }
 
   getTransactionTypeLabel(type: TypeTransaction): string {
-    return type === TypeTransaction.RECETTE ? 'Recette' : 'Dépense';
+    return type === TypeTransaction.RECETTE ? this.i18n.t('transaction.recette') : this.i18n.t('transaction.depense');
   }
 
   getStatutLabel(statut: string): string {
     const labels: { [key: string]: string } = {
-      'EN_ATTENTE': 'En attente',
-      'PARTIELLEMENT_PAYEE': 'Partiellement payée',
-      'PAYEE': 'Payée',
+      'EN_ATTENTE': this.i18n.t('transaction.enAttente'),
+      'PARTIELLEMENT_PAYEE': this.i18n.t('transaction.partiellementPaye'),
+      'PAYEE': this.i18n.t('transaction.paye'),
+      'PAYE': this.i18n.t('transaction.paye'),
+      'IMPAYE': this.i18n.t('transaction.impaye'),
+      'PARTIELLEMENT_PAYE': this.i18n.t('transaction.partiellementPaye'),
       'ANNULEE': 'Annulée'
     };
     return labels[statut] || statut;
@@ -208,6 +215,7 @@ export class EnlevementDetailComponent implements OnInit {
   }
 
   getTypeDechetLabel(type: string): string {
+    // Ces labels peuvent être traduits si nécessaire
     const labels: { [key: string]: string } = {
       'RECYCLABLE': 'Recyclable',
       'A_DETRUIRE': 'À détruire',
@@ -218,13 +226,13 @@ export class EnlevementDetailComponent implements OnInit {
 
   getTreatmentTypeLabel(type: string): string {
     const labels: { [key: string]: string } = {
-      [TypeTraitement.RECYCLAGE]: '♻️ Recyclage',
-      [TypeTraitement.REUTILISATION]: '🔄 Réutilisation',
-      [TypeTraitement.ENFOUISSEMENT]: '🗑️ Enfouissement',
-      [TypeTraitement.INCINERATION]: '🔥 Incinération',
-      [TypeTraitement.VALORISATION_ENERGETIQUE]: '⚡ Valorisation Énergétique',
-      [TypeTraitement.DENATURATION_DESTRUCTION]: '☣️ Dénaturation/Destruction',
-      [TypeTraitement.TRAITEMENT]: '🧪 Traitement'
+      [TypeTraitement.RECYCLAGE]: this.i18n.t('enlevement.recyclageType'),
+      [TypeTraitement.REUTILISATION]: this.i18n.t('enlevement.reutilisationType'),
+      [TypeTraitement.ENFOUISSEMENT]: this.i18n.t('enlevement.enfouissementType'),
+      [TypeTraitement.INCINERATION]: this.i18n.t('enlevement.incinerationType'),
+      [TypeTraitement.VALORISATION_ENERGETIQUE]: this.i18n.t('enlevement.valorisationEnergetiqueType'),
+      [TypeTraitement.DENATURATION_DESTRUCTION]: this.i18n.t('enlevement.denaturationDestructionType'),
+      [TypeTraitement.TRAITEMENT]: this.i18n.t('enlevement.traitementType')
     };
     return labels[type] || type;
   }

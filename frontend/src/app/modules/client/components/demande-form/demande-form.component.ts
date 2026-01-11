@@ -17,6 +17,8 @@ import { SiteService } from '../../../../services/site.service';
 import { AuthService } from '../../../../auth/auth.service';
 import { CreateDemandeRequest } from '../../../../models/demande.model';
 import { Site } from '../../../../models/societe.model';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
+import { I18nService } from '../../../../services/i18n.service';
 
 /**
  * Composant : Formulaire de demande d'enlèvement (client)
@@ -36,7 +38,8 @@ import { Site } from '../../../../models/societe.model';
     MatNativeDateModule,
     MatSnackBarModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    TranslatePipe
   ],
   templateUrl: './demande-form.component.html',
   styleUrls: ['./demande-form.component.scss']
@@ -53,7 +56,8 @@ export class DemandeFormComponent implements OnInit {
     private siteService: SiteService,
     private authService: AuthService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private i18n: I18nService
   ) {}
 
   ngOnInit(): void {
@@ -61,7 +65,7 @@ export class DemandeFormComponent implements OnInit {
     this.societeId = this.authService.getSocieteId();
     
     if (!this.societeId) {
-      this.snackBar.open('Erreur: Impossible de récupérer votre société', 'Fermer', { duration: 5000 });
+      this.snackBar.open(this.i18n.t('errors.generic'), this.i18n.t('common.close'), { duration: 5000 });
       this.router.navigate(['/client']);
       return;
     }
@@ -101,7 +105,7 @@ export class DemandeFormComponent implements OnInit {
 
   onSubmit(): void {
     if (this.demandeForm.invalid) {
-      this.snackBar.open('Veuillez corriger les erreurs', 'Fermer', { duration: 3000 });
+      this.snackBar.open(this.i18n.t('errors.formErrors'), this.i18n.t('common.close'), { duration: 3000 });
       return;
     }
 
@@ -113,7 +117,7 @@ export class DemandeFormComponent implements OnInit {
       : dateSouhaitee;
 
     if (!this.societeId) {
-      this.snackBar.open('Erreur: Impossible de récupérer votre société', 'Fermer', { duration: 3000 });
+      this.snackBar.open(this.i18n.t('errors.generic'), this.i18n.t('common.close'), { duration: 3000 });
       this.loading = false;
       return;
     }
@@ -131,15 +135,15 @@ export class DemandeFormComponent implements OnInit {
     this.demandeService.createDemande(request).subscribe({
       next: (demande) => {
         this.snackBar.open(
-          `Demande ${demande.numeroDemande} créée avec succès`,
-          'Fermer',
+          this.i18n.t('demande.createdSuccess', { numero: demande.numeroDemande }),
+          this.i18n.t('common.close'),
           { duration: 5000 }
         );
         this.router.navigate(['/client/demandes']);
       },
       error: (error) => {
         console.error('Erreur création demande:', error);
-        this.snackBar.open('Erreur lors de la création', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('errors.generic'), this.i18n.t('common.close'), { duration: 3000 });
         this.loading = false;
       }
     });

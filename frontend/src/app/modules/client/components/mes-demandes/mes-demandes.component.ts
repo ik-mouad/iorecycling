@@ -15,6 +15,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { DemandeService } from '../../../../services/demande.service';
 import { DemandeEnlevement, STATUT_LABELS } from '../../../../models/demande.model';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
+import { I18nService } from '../../../../services/i18n.service';
 
 /**
  * Composant : Liste de mes demandes d'enlèvements (client)
@@ -35,7 +37,8 @@ import { DemandeEnlevement, STATUT_LABELS } from '../../../../models/demande.mod
     MatFormFieldModule,
     MatSelectModule,
     MatInputModule,
-    MatMenuModule
+    MatMenuModule,
+    TranslatePipe
   ],
   templateUrl: './mes-demandes.component.html',
   styleUrls: ['./mes-demandes.component.scss']
@@ -52,7 +55,8 @@ export class MesDemandesComponent implements OnInit {
   constructor(
     private demandeService: DemandeService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private i18n: I18nService
   ) {}
 
   ngOnInit(): void {
@@ -69,7 +73,7 @@ export class MesDemandesComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erreur chargement demandes:', error);
-        this.snackBar.open('Erreur lors du chargement', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('errors.loadError'), this.i18n.t('common.close'), { duration: 3000 });
         this.loading = false;
       }
     });
@@ -86,22 +90,30 @@ export class MesDemandesComponent implements OnInit {
   }
 
   annulerDemande(demande: DemandeEnlevement): void {
-    if (confirm(`Annuler la demande ${demande.numeroDemande} ?`)) {
+    if (confirm(this.i18n.t('demande.confirmCancel', { numero: demande.numeroDemande }))) {
       this.demandeService.annulerDemande(demande.id).subscribe({
         next: () => {
-          this.snackBar.open('Demande annulée', 'Fermer', { duration: 3000 });
+          this.snackBar.open(this.i18n.t('demande.cancelled'), this.i18n.t('common.close'), { duration: 3000 });
           this.loadDemandes();
         },
         error: (error) => {
           console.error('Erreur annulation:', error);
-          this.snackBar.open('Impossible d\'annuler cette demande', 'Fermer', { duration: 3000 });
+          this.snackBar.open(this.i18n.t('demande.cancelError'), this.i18n.t('common.close'), { duration: 3000 });
         }
       });
     }
   }
 
   getStatutLabel(statut: string): string {
-    return STATUT_LABELS[statut] || statut;
+    const labels: { [key: string]: string } = {
+      'EN_ATTENTE': this.i18n.t('demande.statutEnAttente'),
+      'VALIDEE': this.i18n.t('demande.statutValidee'),
+      'PLANIFIEE': this.i18n.t('demande.statutPlanifiee'),
+      'REALISEE': this.i18n.t('demande.statutRealisee'),
+      'REFUSEE': this.i18n.t('demande.statutRefusee'),
+      'ANNULEE': this.i18n.t('demande.statutAnnulee')
+    };
+    return labels[statut] || statut;
   }
 
   getStatutClass(statut: string): string {

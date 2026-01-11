@@ -5,6 +5,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from '../../../../auth/auth.service';
+import { LanguageSelectorComponent } from '../../../../components/language-selector/language-selector.component';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
+import { I18nService } from '../../../../services/i18n.service';
 import { filter, map } from 'rxjs/operators';
 
 interface Breadcrumb {
@@ -21,7 +24,9 @@ interface Breadcrumb {
     RouterModule,
     MatIconModule,
     MatButtonModule,
-    MatMenuModule
+    MatMenuModule,
+    LanguageSelectorComponent,
+    TranslatePipe
   ],
   templateUrl: './comptable-layout.component.html',
   styleUrls: ['./comptable-layout.component.scss']
@@ -32,7 +37,8 @@ export class ComptableLayoutComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private i18n: I18nService
   ) {}
 
   ngOnInit(): void {
@@ -81,16 +87,16 @@ export class ComptableLayoutComponent implements OnInit {
     if (breadcrumbs.length === 0) {
       const url = this.router.url;
       if (url.includes('/dashboard')) {
-        breadcrumbs.push({ label: 'Dashboard', url: '/comptable/dashboard', icon: 'dashboard' });
+        breadcrumbs.push({ label: this.i18n.t('comptable.dashboard'), url: '/comptable/dashboard', icon: 'dashboard' });
       } else if (url.includes('/transactions')) {
-        breadcrumbs.push({ label: 'Dashboard', url: '/comptable/dashboard', icon: 'dashboard' });
-        breadcrumbs.push({ label: 'Transactions', url: '/admin/comptabilite/transactions', icon: 'list_alt' });
+        breadcrumbs.push({ label: this.i18n.t('comptable.dashboard'), url: '/comptable/dashboard', icon: 'dashboard' });
+        breadcrumbs.push({ label: this.i18n.t('comptable.transactions'), url: '/admin/comptabilite/transactions', icon: 'list_alt' });
       } else if (url.includes('/ventes')) {
-        breadcrumbs.push({ label: 'Dashboard', url: '/comptable/dashboard', icon: 'dashboard' });
-        breadcrumbs.push({ label: 'Ventes', url: '/admin/ventes', icon: 'shopping_cart' });
+        breadcrumbs.push({ label: this.i18n.t('comptable.dashboard'), url: '/comptable/dashboard', icon: 'dashboard' });
+        breadcrumbs.push({ label: this.i18n.t('comptable.ventes'), url: '/admin/ventes', icon: 'shopping_cart' });
       } else if (url.includes('/stocks')) {
-        breadcrumbs.push({ label: 'Dashboard', url: '/comptable/dashboard', icon: 'dashboard' });
-        breadcrumbs.push({ label: 'Stocks', url: '/admin/ventes/stocks', icon: 'inventory_2' });
+        breadcrumbs.push({ label: this.i18n.t('comptable.dashboard'), url: '/comptable/dashboard', icon: 'dashboard' });
+        breadcrumbs.push({ label: this.i18n.t('comptable.stocks'), url: '/admin/ventes/stocks', icon: 'inventory_2' });
       }
     }
 

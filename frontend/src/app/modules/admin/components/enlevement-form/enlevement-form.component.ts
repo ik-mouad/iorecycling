@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -22,6 +22,8 @@ import { CreateEnlevementRequest, TypeDechet, SousTypeRecyclable } from '../../.
 import { Societe, Site } from '../../../../models/societe.model';
 import { Camion } from '../../../../models/camion.model';
 import { Destination, TypeTraitement } from '../../../../models/destination.model';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
+import { I18nService } from '../../../../services/i18n.service';
 
 /**
  * Composant : Formulaire de création d'enlèvement (multi-étapes)
@@ -45,8 +47,10 @@ import { Destination, TypeTraitement } from '../../../../models/destination.mode
     MatDatepickerModule,
     MatNativeDateModule,
     MatSnackBarModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    TranslatePipe
   ],
+  providers: [DecimalPipe],
   templateUrl: './enlevement-form.component.html',
   styleUrls: ['./enlevement-form.component.scss']
 })
@@ -81,7 +85,9 @@ export class EnlevementFormComponent implements OnInit {
     private destinationService: DestinationService,
     private router: Router,
     private route: ActivatedRoute,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private i18n: I18nService,
+    private decimalPipe: DecimalPipe
   ) {}
 
   ngOnInit(): void {
@@ -335,7 +341,7 @@ export class EnlevementFormComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erreur chargement sites:', error);
-        this.snackBar.open('Impossible de charger les sites de la société sélectionnée', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('errors.loadError'), this.i18n.t('common.close'), { duration: 3000 });
         this.sitesLoading = false;
       }
     });
@@ -404,7 +410,7 @@ export class EnlevementFormComponent implements OnInit {
 
   onSubmit(): void {
     if (this.step1Form.invalid || this.step2Form.invalid) {
-      this.snackBar.open('Veuillez corriger les erreurs du formulaire', 'Fermer', { duration: 3000 });
+      this.snackBar.open(this.i18n.t('errors.formErrors'), this.i18n.t('common.close'), { duration: 3000 });
       return;
     }
 
@@ -446,7 +452,7 @@ export class EnlevementFormComponent implements OnInit {
 
     // Vérifier que siteId est bien défini
     if (!formValue.siteId) {
-      this.snackBar.open('Veuillez sélectionner un site', 'Fermer', { duration: 3000 });
+      this.snackBar.open(this.i18n.t('enlevement.siteRequired'), this.i18n.t('common.close'), { duration: 3000 });
       this.loading = false;
       return;
     }
@@ -478,15 +484,15 @@ export class EnlevementFormComponent implements OnInit {
     this.enlevementService.createEnlevement(request).subscribe({
       next: (enlevement) => {
         this.snackBar.open(
-          `Enlèvement ${enlevement.numeroEnlevement} créé avec succès`, 
-          'Fermer', 
+          this.i18n.t('enlevement.createdSuccess', { numero: enlevement.numeroEnlevement }), 
+          this.i18n.t('common.close'), 
           { duration: 5000 }
         );
         this.router.navigate(['/admin/enlevements']);
       },
       error: (error) => {
         console.error('Erreur création enlèvement:', error);
-        this.snackBar.open('Erreur lors de la création de l\'enlèvement', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('errors.generic'), this.i18n.t('common.close'), { duration: 3000 });
         this.loading = false;
       }
     });
@@ -516,10 +522,18 @@ export class EnlevementFormComponent implements OnInit {
 
   getTypeDechetLabel(type: string): string {
     switch (type) {
-      case 'RECYCLABLE': return '🔄 Recyclable';
-      case 'BANAL': return '🗑️ Banal';
-      case 'A_DETRUIRE': return '☣️ A détruire';
+      case 'RECYCLABLE': return this.i18n.t('enlevement.typeRecyclable');
+      case 'BANAL': return this.i18n.t('enlevement.typeBanal');
+      case 'A_DETRUIRE': return this.i18n.t('enlevement.typeADetruire');
       default: return type;
     }
+  }
+
+  getFormattedPoidsTotal(): string {
+    return this.decimalPipe.transform(this.poidsTotal, '1.2-2') ?? '0.00';
+  }
+
+  getFormattedTonnageMax(): string {
+    return this.decimalPipe.transform(this.tonnageMaxCamion ?? 0, '1.0-0') ?? '0';
   }
 }
