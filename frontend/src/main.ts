@@ -1,7 +1,3 @@
-// Polyfill for Buffer (Node.js API not available in browsers)
-import { Buffer } from 'buffer';
-(window as any).Buffer = Buffer;
-
 import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app/app.component';
 import { provideRouter } from '@angular/router';

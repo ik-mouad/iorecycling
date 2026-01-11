@@ -22,7 +22,6 @@
     "@angular/platform-browser-dynamic": "^17.0.0",
     "@angular/router": "^17.0.0",
     "angular-oauth2-oidc": "^17.0.0",
-    "buffer": "^6.0.3",
     "chart.js": "^4.4.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",

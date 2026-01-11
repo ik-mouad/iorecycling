@@ -80,24 +80,7 @@ CLIENT_EXISTS=$(curl -s -H "Authorization: Bearer $TOKEN" \
     "$KEYCLOAK_URL/admin/realms/$REALM_NAME/clients?clientId=$CLIENT_ID" | jq -r 'if type=="array" and length>0 and (.[0]|has("id")) then .[0].id else empty end')
 
 if [ -n "$CLIENT_EXISTS" ]; then
-    echo "ℹ️  Le client '$CLIENT_ID' existe déjà, mise à jour de la configuration..."
-    # Mettre à jour le client existant
-    curl -s -X PUT "$KEYCLOAK_URL/admin/realms/$REALM_NAME/clients/$CLIENT_EXISTS" \
-        -H "Authorization: Bearer $TOKEN" \
-        -H "Content-Type: application/json" \
-        -d '{
-            "clientId": "'$CLIENT_ID'",
-            "enabled": true,
-            "publicClient": true,
-            "standardFlowEnabled": true,
-            "implicitFlowEnabled": false,
-            "directAccessGrantsEnabled": false,
-            "serviceAccountsEnabled": false,
-            "redirectUris": ["http://localhost:88/", "http://localhost:88/*", "http://146.59.234.174:88/", "http://146.59.234.174:88/*"],
-            "webOrigins": ["http://146.59.234.174:88", "http://localhost:88"],
-            "protocol": "openid-connect"
-        }'
-    echo "✅ Client '$CLIENT_ID' mis à jour"
+    echo "ℹ️  Le client '$CLIENT_ID' existe déjà"
 else
     # Créer le client frontend
     echo "🏗️  Création du client '$CLIENT_ID'..."
@@ -112,7 +95,7 @@ else
             "implicitFlowEnabled": false,
             "directAccessGrantsEnabled": false,
             "serviceAccountsEnabled": false,
-            "redirectUris": ["http://localhost:88/", "http://localhost:88/*", "http://146.59.234.174:88/", "http://146.59.234.174:88/*"],
+            "redirectUris": ["http://146.59.234.174:88/*", "http://localhost:88/*"],
             "webOrigins": ["http://146.59.234.174:88", "http://localhost:88"],
             "protocol": "openid-connect"
         }'
