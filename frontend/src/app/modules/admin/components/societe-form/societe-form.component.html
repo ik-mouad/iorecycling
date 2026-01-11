@@ -15,7 +15,7 @@
       
       <!-- Raison Sociale -->
       <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Raison Sociale *</mat-label>
+        <mat-label>{{ 'societe.raisonSociale' | translate }} *</mat-label>
         <input matInput formControlName="raisonSociale" placeholder="YAZAKI MOROCCO KENITRA">
         <mat-icon matPrefix>business</mat-icon>
         <mat-error *ngIf="societeForm.get('raisonSociale')?.invalid">
@@ -25,10 +25,10 @@
 
       <!-- ICE -->
       <mat-form-field appearance="outline" class="form-field">
-        <mat-label>ICE (15 chiffres) *</mat-label>
+        <mat-label>{{ 'societe.ice' | translate }} (15 {{ 'common.digits' | translate }}) *</mat-label>
         <input matInput formControlName="ice" placeholder="002345678901234" maxlength="15">
         <mat-icon matPrefix>badge</mat-icon>
-        <mat-hint *ngIf="isEditMode">L'ICE n'est pas modifiable</mat-hint>
+        <mat-hint *ngIf="isEditMode">{{ 'societe.iceHint' | translate }}</mat-hint>
         <mat-error *ngIf="societeForm.get('ice')?.invalid">
           {{ getErrorMessage('ice') }}
         </mat-error>
@@ -36,7 +36,7 @@
 
       <!-- Email -->
       <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Email *</mat-label>
+        <mat-label>{{ 'societe.email' | translate }} *</mat-label>
         <input matInput type="email" formControlName="email" placeholder="contact@entreprise.ma">
         <mat-icon matPrefix>email</mat-icon>
         <mat-error *ngIf="societeForm.get('email')?.invalid">
@@ -46,7 +46,7 @@
 
       <!-- Téléphone -->
       <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Téléphone</mat-label>
+        <mat-label>{{ 'societe.telephone' | translate }}</mat-label>
         <input matInput formControlName="telephone" placeholder="0537123456">
         <mat-icon matPrefix>phone</mat-icon>
         <mat-error *ngIf="societeForm.get('telephone')?.invalid">
@@ -56,7 +56,7 @@
 
       <!-- Commentaire -->
       <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Commentaire</mat-label>
+        <mat-label>{{ 'societe.commentaire' | translate }}</mat-label>
         <textarea 
           matInput 
           formControlName="commentaire" 
@@ -69,12 +69,12 @@
       <!-- Form Actions -->
       <div class="form-actions">
         <button mat-button type="button" (click)="cancel()" [disabled]="loading" class="cancel-button">
-          Annuler
+          {{ 'common.cancel' | translate }}
         </button>
         <button mat-raised-button color="primary" type="submit" [disabled]="societeForm.invalid || loading" class="submit-button">
           <mat-spinner *ngIf="loading" diameter="20" class="button-spinner"></mat-spinner>
-          <span *ngIf="!loading">{{ isEditMode ? 'Enregistrer' : 'Créer' }}</span>
-          <span *ngIf="loading">Enregistrement...</span>
+          <span *ngIf="!loading">{{ isEditMode ? ('common.save' | translate) : ('common.create' | translate) }}</span>
+          <span *ngIf="loading">{{ 'common.saving' | translate }}</span>
         </button>
       </div>
     </form>

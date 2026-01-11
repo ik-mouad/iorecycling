@@ -5,10 +5,11 @@
       <div class="header-left">
         <h1 class="admin-title">
           <mat-icon>admin_panel_settings</mat-icon>
-          Administration IORecycling
+          {{ 'admin.title' | translate }}
         </h1>
       </div>
       <div class="header-right">
+        <app-language-selector></app-language-selector>
         <span class="user-info">
           <mat-icon>person</mat-icon>
           {{ getUserName() }}
@@ -19,7 +20,7 @@
         <mat-menu #userMenu="matMenu">
           <button mat-menu-item (click)="logout()">
             <mat-icon>logout</mat-icon>
-            <span>Se déconnecter</span>
+            <span>{{ 'auth.logout' | translate }}</span>
           </button>
         </mat-menu>
       </div>
@@ -34,54 +35,54 @@
          routerLinkActive="active"
          [routerLinkActiveOptions]="{exact: false}">
         <mat-icon>business</mat-icon>
-        Sociétés
+        {{ 'admin.societes' | translate }}
       </a>
       <a mat-button 
          routerLink="/admin/enlevements" 
          routerLinkActive="active"
          [routerLinkActiveOptions]="{exact: false}">
         <mat-icon>local_shipping</mat-icon>
-        Enlèvements
+        {{ 'admin.enlevements' | translate }}
       </a>
       <a mat-button 
          routerLink="/admin/demandes" 
          routerLinkActive="active">
         <mat-icon>assignment</mat-icon>
-        Demandes
+        {{ 'admin.demandes' | translate }}
         <span class="badge" *ngIf="getPendingDemandesCount() > 0">{{ getPendingDemandesCount() }}</span>
       </a>
       <a mat-button 
          routerLink="/admin/planning" 
          routerLinkActive="active">
         <mat-icon>calendar_month</mat-icon>
-        Planning
+        {{ 'admin.planning' | translate }}
       </a>
       <a mat-button 
          routerLink="/admin/recurrences" 
          routerLinkActive="active">
         <mat-icon>schedule</mat-icon>
-        Récurrences
+        {{ 'admin.recurrences' | translate }}
       </a>
       <a mat-button 
          routerLink="/admin/camions" 
          routerLinkActive="active"
          [routerLinkActiveOptions]="{exact: false}">
         <mat-icon>local_shipping</mat-icon>
-        Flotte de camions
+        {{ 'admin.camions' | translate }}
       </a>
       <a mat-button 
          routerLink="/admin/destinations" 
          routerLinkActive="active"
          [routerLinkActiveOptions]="{exact: false}">
         <mat-icon>location_on</mat-icon>
-        Destinations
+        {{ 'admin.destinations' | translate }}
       </a>
       <a mat-button 
          *ngIf="isComptable()"
          routerLink="/admin/comptabilite" 
          routerLinkActive="active">
         <mat-icon>account_balance</mat-icon>
-        Comptabilité
+        {{ 'admin.comptabilite' | translate }}
       </a>
       <a mat-button 
          *ngIf="isComptable()"
@@ -89,14 +90,14 @@
          routerLinkActive="active"
          [routerLinkActiveOptions]="{exact: false}">
         <mat-icon>shopping_cart</mat-icon>
-        Ventes
+        {{ 'admin.ventes' | translate }}
       </a>
       <a mat-button 
          *ngIf="isComptable()"
          routerLink="/admin/ventes/stocks" 
          routerLinkActive="active">
         <mat-icon>inventory_2</mat-icon>
-        Stocks
+        {{ 'admin.stocks' | translate }}
       </a>
     </div>
   </nav>

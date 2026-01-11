@@ -17,6 +17,8 @@ import { MatCardModule } from '@angular/material/card';
 import { Router } from '@angular/router';
 import { DestinationService } from '../../../../services/destination.service';
 import { Destination, TypeTraitement } from '../../../../models/destination.model';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
+import { I18nService } from '../../../../services/i18n.service';
 
 /**
  * Composant : Liste des destinations
@@ -40,7 +42,8 @@ import { Destination, TypeTraitement } from '../../../../models/destination.mode
     MatFormFieldModule,
     MatInputModule,
     MatChipsModule,
-    MatCardModule
+    MatCardModule,
+    TranslatePipe
   ],
   templateUrl: './destinations-list.component.html',
   styleUrls: ['./destinations-list.component.scss']
@@ -62,7 +65,8 @@ export class DestinationsListComponent implements OnInit {
   constructor(
     private destinationService: DestinationService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private i18n: I18nService
   ) {}
 
   ngOnInit(): void {
@@ -84,7 +88,7 @@ export class DestinationsListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erreur chargement destinations:', error);
-        this.snackBar.open('Erreur lors du chargement des destinations', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('destination.loadError'), this.i18n.t('common.close'), { duration: 3000 });
         this.loading = false;
       }
     });
@@ -116,31 +120,31 @@ export class DestinationsListComponent implements OnInit {
   }
 
   deleteDestination(destination: Destination): void {
-    if (!confirm(`Êtes-vous sûr de vouloir supprimer la destination ${destination.raisonSociale} - ${destination.site} ?`)) {
+    if (!confirm(this.i18n.t('destination.confirmDelete', { raisonSociale: destination.raisonSociale, site: destination.site }))) {
       return;
     }
 
     this.destinationService.deleteDestination(destination.id).subscribe({
       next: () => {
-        this.snackBar.open('Destination supprimée avec succès', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('destination.deleted'), this.i18n.t('common.close'), { duration: 3000 });
         this.loadDestinations();
       },
       error: (error) => {
         console.error('Erreur suppression destination:', error);
-        this.snackBar.open('Erreur lors de la suppression', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('errors.deleteError'), this.i18n.t('common.close'), { duration: 3000 });
       }
     });
   }
 
   getTypeTraitementLabel(type: TypeTraitement): string {
     const labels: { [key in TypeTraitement]: string } = {
-      [TypeTraitement.RECYCLAGE]: 'Recyclage',
-      [TypeTraitement.REUTILISATION]: 'Réutilisation',
-      [TypeTraitement.ENFOUISSEMENT]: 'Enfouissement',
-      [TypeTraitement.INCINERATION]: 'Incinération',
-      [TypeTraitement.VALORISATION_ENERGETIQUE]: 'Valorisation énergétique',
-      [TypeTraitement.DENATURATION_DESTRUCTION]: 'Dénaturation/Destruction',
-      [TypeTraitement.TRAITEMENT]: 'Traitement'
+      [TypeTraitement.RECYCLAGE]: this.i18n.t('destination.typeRecyclage'),
+      [TypeTraitement.REUTILISATION]: this.i18n.t('destination.typeReutilisation'),
+      [TypeTraitement.ENFOUISSEMENT]: this.i18n.t('destination.typeEnfouissement'),
+      [TypeTraitement.INCINERATION]: this.i18n.t('destination.typeIncineration'),
+      [TypeTraitement.VALORISATION_ENERGETIQUE]: this.i18n.t('destination.typeValorisationEnergetique'),
+      [TypeTraitement.DENATURATION_DESTRUCTION]: this.i18n.t('destination.typeDenaturationDestruction'),
+      [TypeTraitement.TRAITEMENT]: this.i18n.t('destination.typeTraitement')
     };
     return labels[type] || type;
   }

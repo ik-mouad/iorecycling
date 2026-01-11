@@ -7,6 +7,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from '../../../../auth/auth.service';
 import { DemandeService } from '../../../../services/demande.service';
 import { RoleService } from '../../../../services/role.service';
+import { LanguageSelectorComponent } from '../../../../components/language-selector/language-selector.component';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-admin-layout',
@@ -16,7 +18,9 @@ import { RoleService } from '../../../../services/role.service';
     RouterModule,
     MatIconModule,
     MatButtonModule,
-    MatMenuModule
+    MatMenuModule,
+    LanguageSelectorComponent,
+    TranslatePipe
   ],
   templateUrl: './admin-layout.component.html',
   styleUrls: ['./admin-layout.component.scss']

@@ -17,6 +17,8 @@ import { VenteService } from '../../../../services/vente.service';
 import { SocieteService } from '../../../../services/societe.service';
 import { StockDisponible, StatutStock } from '../../../../models/vente.model';
 import { Societe } from '../../../../models/societe.model';
+import { I18nService } from '../../../../services/i18n.service';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
 
 /**
  * Composant : Stocks disponibles à la vente (écran "À vendre / Non vendu")
@@ -37,7 +39,8 @@ import { Societe } from '../../../../models/societe.model';
     MatChipsModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatTooltipModule
+    MatTooltipModule,
+    TranslatePipe
   ],
   templateUrl: './stocks-disponibles.component.html',
   styleUrls: ['./stocks-disponibles.component.scss']
@@ -64,7 +67,8 @@ export class StocksDisponiblesComponent implements OnInit {
     private venteService: VenteService,
     private societeService: SocieteService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private i18n: I18nService
   ) {}
   
   ngOnInit(): void {
@@ -136,11 +140,11 @@ export class StocksDisponiblesComponent implements OnInit {
   getStatutStockLabel(statut: string): string {
     switch (statut) {
       case StatutStock.NON_VENDU:
-        return 'Non vendu';
+        return this.i18n.t('stocks.statuts.nonVendu');
       case StatutStock.PARTIELLEMENT_VENDU:
-        return 'Partiellement vendu';
+        return this.i18n.t('stocks.statuts.partiellementVendu');
       case StatutStock.VENDU:
-        return 'Vendu';
+        return this.i18n.t('stocks.statuts.vendu');
       default:
         return statut;
     }

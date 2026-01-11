@@ -8,13 +8,13 @@
         </button>
         <div class="header-title-group">
           <h1 class="page-title">{{ societe.raisonSociale }}</h1>
-          <p class="page-description">Détails et gestion de la société</p>
+          <p class="page-description">{{ 'societe.details' | translate }}</p>
         </div>
       </div>
       <div class="header-actions">
         <button mat-raised-button color="primary" class="primary-button" (click)="editSociete()">
           <mat-icon>edit</mat-icon>
-          <span>Modifier</span>
+          <span>{{ 'common.edit' | translate }}</span>
         </button>
       </div>
     </div>
@@ -23,46 +23,46 @@
   <!-- Tabs Premium -->
   <mat-tab-group class="premium-tabs">
     <!-- ONGLET 1 : Informations -->
-    <mat-tab label="Informations">
+    <mat-tab [label]="'societe.information' | translate">
       <div class="tab-content">
         <div class="info-card">
           <div class="info-grid">
             <div class="info-item">
-              <label class="info-label">Raison Sociale</label>
+              <label class="info-label">{{ 'societe.raisonSociale' | translate }}</label>
               <div class="info-value">{{ societe.raisonSociale }}</div>
             </div>
             <div class="info-item">
-              <label class="info-label">ICE</label>
+              <label class="info-label">{{ 'societe.ice' | translate }}</label>
               <div class="info-value">
                 <span class="badge badge-ice">{{ societe.ice }}</span>
               </div>
             </div>
             <div class="info-item">
-              <label class="info-label">Email</label>
+              <label class="info-label">{{ 'societe.email' | translate }}</label>
               <div class="info-value">{{ societe.email }}</div>
             </div>
             <div class="info-item">
-              <label class="info-label">Téléphone</label>
+              <label class="info-label">{{ 'societe.telephone' | translate }}</label>
               <div class="info-value">{{ societe.telephone || '-' }}</div>
             </div>
             <div class="info-item full-width" *ngIf="societe.commentaire">
-              <label class="info-label">Commentaire</label>
+              <label class="info-label">{{ 'societe.commentaire' | translate }}</label>
               <div class="info-value">{{ societe.commentaire }}</div>
             </div>
             <div class="info-item">
-              <label class="info-label">Nombre de sites</label>
+              <label class="info-label">{{ 'societe.nbSites' | translate }}</label>
               <div class="info-value">
                 <span class="badge badge-sites">{{ societe.nbSites || 0 }}</span>
               </div>
             </div>
             <div class="info-item">
-              <label class="info-label">Nombre d'utilisateurs</label>
+              <label class="info-label">{{ 'societe.nbUsers' | translate }}</label>
               <div class="info-value">
                 <span class="badge badge-users">{{ societe.nbUtilisateurs || 0 }}</span>
               </div>
             </div>
             <div class="info-item">
-              <label class="info-label">Nombre d'enlèvements</label>
+              <label class="info-label">{{ 'societe.nbPickups' | translate }}</label>
               <div class="info-value">
                 <span class="badge badge-enlevements">{{ societe.nbEnlevements || 0 }}</span>
               </div>
@@ -73,13 +73,13 @@
     </mat-tab>
 
     <!-- ONGLET 2 : Sites -->
-    <mat-tab label="Sites ({{ sites.length }})">
+    <mat-tab [label]="getSitesTabLabel()">
       <div class="tab-content">
         <div class="tab-header">
-          <h3 class="tab-title">Sites de collecte</h3>
+          <h3 class="tab-title">{{ 'site.collectionSites' | translate }}</h3>
           <button mat-raised-button color="primary" class="primary-button" (click)="addSite()">
             <mat-icon>add</mat-icon>
-            <span>Ajouter un site</span>
+            <span>{{ 'site.addSite' | translate }}</span>
           </button>
         </div>
 
@@ -87,26 +87,26 @@
           <div class="table-wrapper">
             <table mat-table [dataSource]="sites" class="premium-table">
               <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef class="table-header">Nom du site</th>
+                <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'site.siteName' | translate }}</th>
                 <td mat-cell *matCellDef="let site" class="table-cell">
                   <strong>{{ site.name }}</strong>
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="adresse">
-                <th mat-header-cell *matHeaderCellDef class="table-header">Adresse</th>
+                <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'site.adresse' | translate }}</th>
                 <td mat-cell *matCellDef="let site" class="table-cell">{{ site.adresse || '-' }}</td>
               </ng-container>
 
               <ng-container matColumnDef="nbEnlevements">
-                <th mat-header-cell *matHeaderCellDef class="table-header">Enlèvements</th>
+                <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'site.pickups' | translate }}</th>
                 <td mat-cell *matCellDef="let site" class="table-cell">
                   <span class="badge badge-enlevements">{{ site.nbEnlevements || 0 }}</span>
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef class="table-header table-header-actions">Actions</th>
+                <th mat-header-cell *matHeaderCellDef class="table-header table-header-actions">{{ 'common.actions' | translate }}</th>
                 <td mat-cell *matCellDef="let site" class="table-cell table-cell-actions">
                   <button mat-icon-button color="accent" (click)="editSite(site)" class="action-button">
                     <mat-icon>edit</mat-icon>
@@ -125,23 +125,23 @@
 
         <div class="empty-state" *ngIf="sites.length === 0">
           <mat-icon class="empty-icon">location_off</mat-icon>
-          <h3 class="empty-title">Aucun site pour cette société</h3>
-          <p class="empty-description">Ajoutez le premier site de collecte</p>
+          <h3 class="empty-title">{{ 'site.noSites' | translate }}</h3>
+          <p class="empty-description">{{ 'site.noSitesDesc' | translate }}</p>
           <button mat-raised-button color="primary" class="primary-button" (click)="addSite()">
-            Ajouter le premier site
+            {{ 'site.addFirstSite' | translate }}
           </button>
         </div>
       </div>
     </mat-tab>
 
     <!-- ONGLET 3 : Utilisateurs -->
-    <mat-tab label="Utilisateurs ({{ utilisateurs.length }})">
+    <mat-tab [label]="getUsersTabLabel()">
       <div class="tab-content">
         <div class="tab-header">
-          <h3 class="tab-title">Utilisateurs</h3>
+          <h3 class="tab-title">{{ 'user.title' | translate }}</h3>
           <button mat-raised-button color="primary" class="primary-button" (click)="addUser()">
             <mat-icon>person_add</mat-icon>
-            <span>Ajouter un utilisateur</span>
+            <span>{{ 'user.addUser' | translate }}</span>
           </button>
         </div>
 
@@ -149,47 +149,47 @@
           <div class="table-wrapper">
             <table mat-table [dataSource]="utilisateurs" class="premium-table">
               <ng-container matColumnDef="nom">
-                <th mat-header-cell *matHeaderCellDef class="table-header">Nom</th>
+                <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'user.lastName' | translate }}</th>
                 <td mat-cell *matCellDef="let user" class="table-cell">{{ user.nom }}</td>
               </ng-container>
 
               <ng-container matColumnDef="prenom">
-                <th mat-header-cell *matHeaderCellDef class="table-header">Prénom</th>
+                <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'user.firstName' | translate }}</th>
                 <td mat-cell *matCellDef="let user" class="table-cell">{{ user.prenom }}</td>
               </ng-container>
 
               <ng-container matColumnDef="posteOccupe">
-                <th mat-header-cell *matHeaderCellDef class="table-header">Poste</th>
+                <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'user.position' | translate }}</th>
                 <td mat-cell *matCellDef="let user" class="table-cell">{{ user.posteOccupe || '-' }}</td>
               </ng-container>
 
               <ng-container matColumnDef="email">
-                <th mat-header-cell *matHeaderCellDef class="table-header">Email</th>
+                <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'societe.email' | translate }}</th>
                 <td mat-cell *matCellDef="let user" class="table-cell">{{ user.email }}</td>
               </ng-container>
 
               <ng-container matColumnDef="active">
-                <th mat-header-cell *matHeaderCellDef class="table-header">Statut</th>
+                <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'user.status' | translate }}</th>
                 <td mat-cell *matCellDef="let user" class="table-cell">
                   <span class="badge" [ngClass]="user.active ? 'badge-success' : 'badge-danger'">
-                    {{ user.active ? 'Actif' : 'Inactif' }}
+                    {{ user.active ? ('common.active' | translate) : ('common.inactive' | translate) }}
                   </span>
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef class="table-header table-header-actions">Actions</th>
+                <th mat-header-cell *matHeaderCellDef class="table-header table-header-actions">{{ 'common.actions' | translate }}</th>
                 <td mat-cell *matCellDef="let user" class="table-cell table-cell-actions">
-                  <button mat-icon-button color="accent" (click)="editUser(user)" matTooltip="Modifier" class="action-button">
+                  <button mat-icon-button color="accent" (click)="editUser(user)" [matTooltip]="'common.edit' | translate" class="action-button">
                     <mat-icon>edit</mat-icon>
                   </button>
                   <button mat-icon-button [color]="user.active ? 'warn' : 'primary'" 
                           (click)="toggleUserActive(user)"
-                          [matTooltip]="user.active ? 'Désactiver' : 'Activer'"
+                          [matTooltip]="user.active ? ('user.deactivate' | translate) : ('user.activate' | translate)"
                           class="action-button">
                     <mat-icon>{{ user.active ? 'block' : 'check_circle' }}</mat-icon>
                   </button>
-                  <button mat-icon-button color="warn" (click)="deleteUser(user)" matTooltip="Supprimer" class="action-button">
+                  <button mat-icon-button color="warn" (click)="deleteUser(user)" [matTooltip]="'common.delete' | translate" class="action-button">
                     <mat-icon>delete</mat-icon>
                   </button>
                 </td>
@@ -203,23 +203,23 @@
 
         <div class="empty-state" *ngIf="utilisateurs.length === 0">
           <mat-icon class="empty-icon">people_off</mat-icon>
-          <h3 class="empty-title">Aucun utilisateur pour cette société</h3>
-          <p class="empty-description">Ajoutez le premier utilisateur</p>
+          <h3 class="empty-title">{{ 'user.noUsers' | translate }}</h3>
+          <p class="empty-description">{{ 'user.noUsersDesc' | translate }}</p>
           <button mat-raised-button color="primary" class="primary-button" (click)="addUser()">
-            Ajouter le premier utilisateur
+            {{ 'user.addFirstUser' | translate }}
           </button>
         </div>
       </div>
     </mat-tab>
 
     <!-- ONGLET 4 : Enlèvements -->
-    <mat-tab label="Enlèvements ({{ enlevements.length }})">
+    <mat-tab [label]="getEnlevementsTabLabel()">
       <div class="tab-content">
         <div class="tab-header">
-          <h3 class="tab-title">Historique des enlèvements</h3>
+          <h3 class="tab-title">{{ 'societe.pickupHistory' | translate }}</h3>
           <button mat-raised-button color="primary" class="primary-button" (click)="createEnlevement()">
             <mat-icon>add</mat-icon>
-            <span>Nouvel enlèvement</span>
+            <span>{{ 'societe.newPickup' | translate }}</span>
           </button>
         </div>
 
@@ -227,46 +227,46 @@
           <div class="table-wrapper">
             <table mat-table [dataSource]="enlevements" class="premium-table">
               <ng-container matColumnDef="numeroEnlevement">
-                <th mat-header-cell *matHeaderCellDef class="table-header">Numéro</th>
+                <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'enlevement.numero' | translate }}</th>
                 <td mat-cell *matCellDef="let enlevement" class="table-cell">
                   <span class="badge badge-ice">{{ enlevement.numeroEnlevement }}</span>
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="dateEnlevement">
-                <th mat-header-cell *matHeaderCellDef class="table-header">Date</th>
+                <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'enlevement.date' | translate }}</th>
                 <td mat-cell *matCellDef="let enlevement" class="table-cell">
                   {{ enlevement.dateEnlevement | date:'dd/MM/yyyy' }}
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="siteNom">
-                <th mat-header-cell *matHeaderCellDef class="table-header">Site</th>
+                <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'enlevement.site' | translate }}</th>
                 <td mat-cell *matCellDef="let enlevement" class="table-cell">
                   <div class="site-text">📍 {{ enlevement.siteNom }}</div>
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="poidsTotal">
-                <th mat-header-cell *matHeaderCellDef class="table-header">Poids total</th>
+                <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'societe.totalWeight' | translate }}</th>
                 <td mat-cell *matCellDef="let enlevement" class="table-cell">
                   <span class="badge badge-weight">{{ enlevement.poidsTotal | number:'1.1-1' }} kg</span>
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="bilanNet">
-                <th mat-header-cell *matHeaderCellDef class="table-header">Bilan net</th>
+                <th mat-header-cell *matHeaderCellDef class="table-header">{{ 'societe.netBalance' | translate }}</th>
                 <td mat-cell *matCellDef="let enlevement" class="table-cell">
                   <span class="bilan" [ngClass]="enlevement.bilanNet >= 0 ? 'bilan-positif' : 'bilan-negatif'">
-                    {{ enlevement.bilanNet > 0 ? '+' : '' }}{{ enlevement.bilanNet | number:'1.2-2' }} MAD
+                    <ng-container *ngIf="enlevement.bilanNet > 0">+</ng-container>{{ enlevement.bilanNet | number:'1.2-2' }} MAD
                   </span>
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef class="table-header table-header-actions">Actions</th>
+                <th mat-header-cell *matHeaderCellDef class="table-header table-header-actions">{{ 'common.actions' | translate }}</th>
                 <td mat-cell *matCellDef="let enlevement" class="table-cell table-cell-actions">
-                  <button mat-icon-button color="primary" (click)="viewEnlevement(enlevement)" matTooltip="Voir détails" class="action-button">
+                  <button mat-icon-button color="primary" (click)="viewEnlevement(enlevement)" [matTooltip]="'common.viewDetails' | translate" class="action-button">
                     <mat-icon>visibility</mat-icon>
                   </button>
                 </td>
@@ -280,10 +280,10 @@
 
         <div class="empty-state" *ngIf="enlevements.length === 0">
           <mat-icon class="empty-icon">inventory_2</mat-icon>
-          <h3 class="empty-title">Aucun enlèvement pour cette société</h3>
-          <p class="empty-description">Créez le premier enlèvement</p>
+          <h3 class="empty-title">{{ 'societe.noPickups' | translate }}</h3>
+          <p class="empty-description">{{ 'societe.noPickupsDesc' | translate }}</p>
           <button mat-raised-button color="primary" class="primary-button" (click)="createEnlevement()">
-            Créer le premier enlèvement
+            {{ 'societe.createFirstPickup' | translate }}
           </button>
         </div>
       </div>

@@ -11,6 +11,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SocieteService } from '../../../../services/societe.service';
 import { CreateSocieteRequest, UpdateSocieteRequest } from '../../../../models/societe.model';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
+import { I18nService } from '../../../../services/i18n.service';
 
 /**
  * Composant : Formulaire de création/édition de société
@@ -27,7 +29,8 @@ import { CreateSocieteRequest, UpdateSocieteRequest } from '../../../../models/s
     MatCardModule,
     MatSnackBarModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    TranslatePipe
   ],
   templateUrl: './societe-form.component.html',
   styleUrls: ['./societe-form.component.scss']
@@ -43,7 +46,8 @@ export class SocieteFormComponent implements OnInit {
     private societeService: SocieteService,
     private router: Router,
     private route: ActivatedRoute,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private i18n: I18nService
   ) {}
 
   ngOnInit(): void {
@@ -97,7 +101,7 @@ export class SocieteFormComponent implements OnInit {
 
   onSubmit(): void {
     if (this.societeForm.invalid) {
-      this.snackBar.open('Veuillez corriger les erreurs du formulaire', 'Fermer', { duration: 3000 });
+      this.snackBar.open(this.i18n.t('errors.formErrors'), this.i18n.t('common.close'), { duration: 3000 });
       return;
     }
 
@@ -114,12 +118,12 @@ export class SocieteFormComponent implements OnInit {
 
       this.societeService.updateSociete(this.societeId, request).subscribe({
         next: () => {
-          this.snackBar.open('Société modifiée avec succès', 'Fermer', { duration: 3000 });
+          this.snackBar.open(this.i18n.t('success.updated'), this.i18n.t('common.close'), { duration: 3000 });
           this.router.navigate(['/admin/societes']);
         },
         error: (error) => {
           console.error('Erreur modification société:', error);
-          this.snackBar.open('Erreur lors de la modification', 'Fermer', { duration: 3000 });
+          this.snackBar.open(this.i18n.t('errors.generic'), this.i18n.t('common.close'), { duration: 3000 });
           this.loading = false;
         }
       });
@@ -129,13 +133,13 @@ export class SocieteFormComponent implements OnInit {
 
       this.societeService.createSociete(request).subscribe({
         next: () => {
-          this.snackBar.open('Société créée avec succès', 'Fermer', { duration: 3000 });
+          this.snackBar.open(this.i18n.t('success.created'), this.i18n.t('common.close'), { duration: 3000 });
           this.router.navigate(['/admin/societes']);
         },
         error: (error) => {
           console.error('Erreur création société:', error);
-          const message = error.error?.message || 'Erreur lors de la création (ICE déjà utilisé ?)';
-          this.snackBar.open(message, 'Fermer', { duration: 5000 });
+          const message = error.error?.message || this.i18n.t('errors.generic');
+          this.snackBar.open(message, this.i18n.t('common.close'), { duration: 5000 });
           this.loading = false;
         }
       });
@@ -151,16 +155,19 @@ export class SocieteFormComponent implements OnInit {
     if (!control) return '';
 
     if (control.hasError('required')) {
-      return 'Ce champ est obligatoire';
+      if (fieldName === 'raisonSociale') return this.i18n.t('societe.raisonSocialeRequired');
+      if (fieldName === 'ice') return this.i18n.t('societe.iceRequired');
+      if (fieldName === 'email') return this.i18n.t('societe.emailRequired');
+      return this.i18n.t('common.fieldRequired');
     }
     if (control.hasError('email')) {
-      return 'Email invalide';
+      return this.i18n.t('societe.emailInvalid');
     }
     if (control.hasError('pattern')) {
-      return 'L\'ICE doit contenir exactement 15 chiffres';
+      return this.i18n.t('societe.iceInvalid');
     }
     if (control.hasError('maxlength')) {
-      return `Maximum ${control.errors?.['maxlength'].requiredLength} caractères`;
+      return this.i18n.t('common.maxLength', { length: control.errors?.['maxlength'].requiredLength });
     }
     return '';
   }
