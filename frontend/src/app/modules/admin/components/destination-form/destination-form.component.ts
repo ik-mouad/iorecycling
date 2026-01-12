@@ -68,7 +68,7 @@ export class DestinationFormComponent implements OnInit {
     this.destinationForm = this.fb.group({
       raisonSociale: ['', [Validators.required, Validators.maxLength(255)]],
       site: ['', [Validators.required, Validators.maxLength(255)]],
-      typesTraitement: [[], [Validators.required, Validators.minLength(1)]],
+      typesTraitement: [[]], // Facultatif
       nomInterlocuteur: ['', [Validators.maxLength(100)]],
       telInterlocuteur: ['', [Validators.maxLength(20)]],
       posteInterlocuteur: ['', [Validators.maxLength(100)]],

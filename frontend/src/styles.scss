@@ -559,6 +559,20 @@ a {
   box-shadow: var(--elevation-5) !important;
 }
 
+/* ===== FIX Z-INDEX POUR MENUS MATERIAL ===== */
+/* Assure que les menus (langue, déconnexion) apparaissent au-dessus des headers */
+.cdk-overlay-container {
+  z-index: 1100 !important;
+}
+
+.cdk-overlay-pane {
+  z-index: 1100 !important;
+}
+
+.mat-mdc-menu-panel {
+  z-index: 1100 !important;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .container {

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import ma.iorecycling.dto.CreateEnlevementRequest;
 import ma.iorecycling.dto.CreatePickupItemRequest;
 import ma.iorecycling.dto.EnlevementDTO;
+import ma.iorecycling.dto.UpdateEnlevementRequest;
 import ma.iorecycling.entity.Enlevement;
 import ma.iorecycling.entity.PickupItem;
 import ma.iorecycling.entity.Site;
@@ -226,6 +227,105 @@ public class EnlevementService {
         return enlevements.stream()
                 .map(enlevementMapper::toDTO)
                 .toList();
+    }
+    
+    /**
+     * Met à jour un enlèvement existant
+     */
+    public EnlevementDTO updateEnlevement(Long id, UpdateEnlevementRequest request, String updatedBy) {
+        log.info("Modification de l'enlèvement ID {}", id);
+        
+        // Récupérer l'enlèvement existant avec ses items
+        Enlevement enlevement = enlevementRepository.findByIdWithItems(id)
+                .orElseThrow(() -> new IllegalArgumentException("Enlèvement non trouvé avec l'ID : " + id));
+        
+        // Récupérer la société de l'enlèvement existant (ne peut pas être modifiée)
+        Societe societe = enlevement.getSociete();
+        
+        // Vérifier que le site existe et appartient à la société
+        Site site = siteRepository.findById(request.getSiteId())
+                .orElseThrow(() -> new IllegalArgumentException("Site non trouvé"));
+        
+        if (!site.getSociete().getId().equals(societe.getId())) {
+            throw new IllegalArgumentException("Le site ne correspond pas à la société");
+        }
+        
+        // Vérifier le camion si fourni
+        ma.iorecycling.entity.Camion camion = null;
+        if (request.getCamionId() != null) {
+            camion = camionRepository.findById(request.getCamionId())
+                    .orElseThrow(() -> new IllegalArgumentException("Camion non trouvé avec l'ID : " + request.getCamionId()));
+            
+            // Vérifier que le camion est actif
+            if (!camion.getActif()) {
+                throw new IllegalArgumentException("Le camion sélectionné n'est pas actif et ne peut pas être utilisé pour un enlèvement");
+            }
+        }
+        
+        // Vérifier si des items A_DETRUIRE sont présents
+        boolean hasDechetsDangereux = request.getItems().stream()
+                .anyMatch(item -> "A_DETRUIRE".equals(item.getTypeDechet()));
+        
+        // Vérifier la destination
+        ma.iorecycling.entity.Destination destination = null;
+        if (request.getDestinationId() != null) {
+            destination = destinationRepository.findById(request.getDestinationId())
+                    .orElseThrow(() -> new IllegalArgumentException("Destination non trouvée avec l'ID : " + request.getDestinationId()));
+        }
+        
+        // Règle métier : Si des déchets dangereux sont présents, la destination est obligatoire et doit être compatible
+        if (hasDechetsDangereux) {
+            if (destination == null) {
+                throw new IllegalArgumentException("Une destination est obligatoire lorsque l'enlèvement contient des déchets dangereux (A_DETRUIRE)");
+            }
+            
+            if (!destination.peutTraiterDechetsDangereux()) {
+                throw new IllegalArgumentException("La destination sélectionnée ne peut pas traiter les déchets dangereux. " +
+                        "Elle doit avoir au moins un des types de traitement suivants : INCINERATION, ENFOUISSEMENT, DENATURATION_DESTRUCTION, TRAITEMENT");
+            }
+        }
+        
+        // Mettre à jour les champs de l'enlèvement
+        enlevement.setDateEnlevement(request.getDateEnlevement());
+        enlevement.setHeureEnlevement(request.getHeureEnlevement());
+        enlevement.setDateDestination(request.getDateDestination());
+        enlevement.setHeureDestination(request.getHeureDestination());
+        enlevement.setSite(site);
+        enlevement.setObservation(request.getObservation());
+        enlevement.setCamion(camion);
+        enlevement.setChauffeurNom(request.getChauffeurNom());
+        enlevement.setDestination(destination);
+        
+        // Supprimer les anciens items
+        if (enlevement.getItems() != null && !enlevement.getItems().isEmpty()) {
+            pickupItemRepository.deleteAll(enlevement.getItems());
+            enlevement.getItems().clear();
+        }
+        
+        // Créer les nouveaux items
+        for (CreatePickupItemRequest itemRequest : request.getItems()) {
+            PickupItem item = createPickupItem(enlevement, itemRequest);
+            pickupItemRepository.save(item);
+        }
+        
+        // Sauvegarder l'enlèvement mis à jour
+        Enlevement savedEnlevement = enlevementRepository.save(enlevement);
+        
+        // Recharger l'enlèvement avec ses items
+        savedEnlevement = enlevementRepository.findById(savedEnlevement.getId())
+                .orElseThrow();
+        
+        // Régénérer automatiquement les transactions comptables
+        try {
+            transactionGenerationService.generateTransactionsFromEnlevement(savedEnlevement);
+        } catch (Exception e) {
+            log.warn("Erreur lors de la génération des transactions pour l'enlèvement {}: {}", 
+                    savedEnlevement.getNumeroEnlevement(), e.getMessage());
+            // On continue même si la génération échoue (l'enlèvement est mis à jour)
+        }
+        
+        log.info("Enlèvement modifié avec succès : {}", savedEnlevement.getNumeroEnlevement());
+        return enlevementMapper.toDTO(savedEnlevement);
     }
     
     /**

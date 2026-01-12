@@ -83,11 +83,32 @@ export class AuthService {
     this.isAuthenticatedSubject.next(false);
     console.log('Déconnexion');
     
-    // Rediriger vers Keycloak pour la déconnexion
-    const base = `${window.location.origin}${environment.keycloak.url}/realms/${environment.keycloak.realm}/protocol/openid-connect`;
-    const logoutUrl = `${base}/logout?redirect_uri=` + encodeURIComponent(window.location.origin + '/');
+    // Déconnecter la session Keycloak en arrière-plan via iframe invisible (optionnel)
+    try {
+      const base = `${window.location.origin}/auth/realms/iorecycling/protocol/openid-connect`;
+      const logoutUrl = `${base}/logout?redirect_uri=` + encodeURIComponent(window.location.origin + '/login');
+      
+      // Créer une iframe invisible pour déconnecter Keycloak sans rediriger la page
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.src = logoutUrl;
+      document.body.appendChild(iframe);
+      
+      // Nettoyer l'iframe après un court délai
+      setTimeout(() => {
+        if (iframe.parentNode) {
+          document.body.removeChild(iframe);
+        }
+      }, 2000);
+    } catch (error) {
+      console.warn('Erreur lors de la déconnexion Keycloak:', error);
+    }
     
-    window.location.href = logoutUrl;
+    // Rediriger immédiatement vers la page de login
+    // Utiliser window.location.href pour forcer une navigation complète
+    window.location.href = '/login';
   }
 
   isLoggedIn(): boolean {
