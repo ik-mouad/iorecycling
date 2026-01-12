@@ -26,14 +26,14 @@
 
         <div class="form-row">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Types de traitement *</mat-label>
+            <mat-label>Types de traitement</mat-label>
             <mat-select formControlName="typesTraitement" multiple>
               <mat-option *ngFor="let type of typesTraitement" [value]="type">
                 {{ getTypeTraitementLabel(type) }}
               </mat-option>
             </mat-select>
             <mat-error>{{ getErrorMessage('typesTraitement') }}</mat-error>
-            <mat-hint>Sélectionnez au moins un type de traitement</mat-hint>
+            <mat-hint>Sélectionnez un ou plusieurs types de traitement (optionnel)</mat-hint>
           </mat-form-field>
         </div>
 

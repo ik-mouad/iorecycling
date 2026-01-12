@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ma.iorecycling.dto.CreateEnlevementRequest;
 import ma.iorecycling.dto.EnlevementDTO;
+import ma.iorecycling.dto.UpdateEnlevementRequest;
 import ma.iorecycling.service.EnlevementService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -71,6 +72,28 @@ public class AdminEnlevementController {
         } catch (IllegalArgumentException e) {
             log.error("Enlèvement non trouvé : {}", e.getMessage());
             return ResponseEntity.notFound().build();
+        }
+    }
+    
+    /**
+     * Met à jour un enlèvement existant
+     */
+    @PutMapping("/{id}")
+    @Operation(summary = "Modifier un enlèvement", description = "Met à jour un enlèvement existant et régénère automatiquement les transactions")
+    public ResponseEntity<EnlevementDTO> updateEnlevement(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateEnlevementRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+        
+        log.info("PUT /api/admin/enlevements/{} - Modification enlèvement", id);
+        
+        try {
+            String username = jwt != null ? jwt.getClaimAsString("preferred_username") : "admin";
+            EnlevementDTO enlevement = enlevementService.updateEnlevement(id, request, username);
+            return ResponseEntity.ok(enlevement);
+        } catch (IllegalArgumentException e) {
+            log.error("Erreur modification enlèvement : {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
     
