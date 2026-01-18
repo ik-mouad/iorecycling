@@ -68,9 +68,9 @@
 
         <!-- Colonne Tonnage -->
         <ng-container matColumnDef="tonnageMaxKg">
-          <th mat-header-cell *matHeaderCellDef>{{ 'camion.maxTonnage' | translate }} (kg)</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'camion.tonnage' | translate }} (kg)</th>
           <td mat-cell *matCellDef="let camion">
-            {{ camion.tonnageMaxKg | number:'1.2-2' }}
+            {{ camion.tonnageMaxKg | number:'1.2-2' }} kg
           </td>
         </ng-container>
 
@@ -104,7 +104,7 @@
                 <mat-icon>edit</mat-icon>
                 {{ 'common.edit' | translate }}
               </button>
-              <button mat-menu-item (click)="deleteCamion(camion)" class="delete-action">
+              <button *ngIf="canDelete()" mat-menu-item (click)="deleteCamion(camion)" class="delete-action">
                 <mat-icon>delete</mat-icon>
                 {{ 'common.delete' | translate }}
               </button>

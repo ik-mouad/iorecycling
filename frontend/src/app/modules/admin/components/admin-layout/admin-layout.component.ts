@@ -36,8 +36,8 @@ export class AdminLayoutComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Vérifier que l'utilisateur est admin
-    if (!this.authService.hasRole('ADMIN')) {
+    // Vérifier que l'utilisateur est admin ou backoffice
+    if (!this.authService.hasRole('ADMIN') && !this.authService.hasRole('BACKOFFICE')) {
       this.router.navigate(['/']);
     }
     this.loadPendingDemandesCount();

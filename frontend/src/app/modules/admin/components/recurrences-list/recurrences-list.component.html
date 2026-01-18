@@ -102,6 +102,7 @@
                 <span>{{ 'user.deactivate' | translate }}</span>
               </button>
               <button 
+                *ngIf="canDelete()"
                 mat-menu-item 
                 (click)="supprimerRecurrence(recurrence)"
                 class="delete-action">

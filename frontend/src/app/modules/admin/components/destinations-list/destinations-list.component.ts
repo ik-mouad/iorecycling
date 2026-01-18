@@ -19,6 +19,7 @@ import { DestinationService } from '../../../../services/destination.service';
 import { Destination, TypeTraitement } from '../../../../models/destination.model';
 import { TranslatePipe } from '../../../../pipes/translate.pipe';
 import { I18nService } from '../../../../services/i18n.service';
+import { RoleService } from '../../../../services/role.service';
 
 /**
  * Composant : Liste des destinations
@@ -66,8 +67,13 @@ export class DestinationsListComponent implements OnInit {
     private destinationService: DestinationService,
     private router: Router,
     private snackBar: MatSnackBar,
-    private i18n: I18nService
+    private i18n: I18nService,
+    private roleService: RoleService
   ) {}
+  
+  canDelete(): boolean {
+    return this.roleService.hasRole('ADMIN');
+  }
 
   ngOnInit(): void {
     this.loadDestinations();

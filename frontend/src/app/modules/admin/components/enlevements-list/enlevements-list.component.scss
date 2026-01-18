@@ -199,13 +199,29 @@ $shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   overflow: hidden;
 
   .table-wrapper {
-    overflow-x: auto;
+    overflow-x: visible;
+    width: 100%;
   }
 
   .premium-table {
     width: 100%;
+    table-layout: fixed;
     border-collapse: separate;
     border-spacing: 0;
+
+    // Column widths
+    colgroup {
+      .col-numero { width: 8%; }
+      .col-date { width: 8%; }
+      .col-societe { width: 12%; }
+      .col-site { width: 15%; }
+      .col-poids { width: 8%; }
+      .col-recyclage { width: 10%; }
+      .col-traitement { width: 10%; }
+      .col-bilan { width: 10%; }
+      .col-taux { width: 7%; }
+      .col-actions { width: 10%; }
+    }
 
     // Header
     .table-header-row {
@@ -213,20 +229,21 @@ $shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
     }
 
     .table-header {
-      padding: 16px 24px;
+      padding: 16px 12px;
       text-align: left;
       font-weight: 600;
-      font-size: 13px;
+      font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: $gray-600;
       border-bottom: 1px solid $gray-200;
       background: $gray-50;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
 
       &.table-header-actions {
         text-align: right;
-        width: 80px;
       }
     }
 
@@ -245,9 +262,12 @@ $shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
     }
 
     .table-cell {
-      padding: 20px 24px;
+      padding: 16px 12px;
       border-bottom: none;
       vertical-align: middle;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
 
       &.table-cell-actions {
         text-align: right;
@@ -256,26 +276,32 @@ $shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 
     // Content Styles
     .company-name {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
       color: $gray-900;
       line-height: 1.4;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .date-text,
     .site-text {
-      font-size: 14px;
+      font-size: 13px;
       color: $gray-500;
       line-height: 1.5;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     // Badges Premium
     .badge {
       display: inline-flex;
       align-items: center;
-      padding: 4px 12px;
+      padding: 4px 8px;
       border-radius: 6px;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 500;
       line-height: 1.4;
       white-space: nowrap;
@@ -337,8 +363,9 @@ $shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 
     .bilan {
       font-weight: 700;
-      font-size: 15px;
+      font-size: 13px;
       font-family: 'Inter', sans-serif;
+      white-space: nowrap;
 
       &.bilan-positif {
         color: $green-600;

@@ -35,7 +35,7 @@ public class AdminSocieteController {
      * Accessible uniquement aux ADMIN
      */
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('BACKOFFICE')")
     @Operation(summary = "Créer une société", description = "Crée une nouvelle société cliente")
     public ResponseEntity<SocieteDTO> createSociete(@Valid @RequestBody CreateSocieteRequest request) {
         log.info("POST /api/admin/societes - Création société {}", request.getRaisonSociale());
@@ -54,7 +54,7 @@ public class AdminSocieteController {
      * Accessible aux ADMIN et COMPTABLE (lecture seule pour les comptables)
      */
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPTABLE')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('BACKOFFICE') or hasRole('COMPTABLE')")
     @Operation(summary = "Lister les sociétés", description = "Récupère la liste paginée de toutes les sociétés")
     public ResponseEntity<Page<SocieteDTO>> getAllSocietes(
             @PageableDefault(size = 20, sort = "raisonSociale", direction = Sort.Direction.ASC) Pageable pageable) {
@@ -70,7 +70,7 @@ public class AdminSocieteController {
      * Accessible aux ADMIN et COMPTABLE (lecture seule pour les comptables)
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('COMPTABLE')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('BACKOFFICE') or hasRole('COMPTABLE')")
     @Operation(summary = "Détail d'une société", description = "Récupère les détails d'une société par son ID")
     public ResponseEntity<SocieteDTO> getSocieteById(@PathVariable Long id) {
         log.info("GET /api/admin/societes/{}", id);
@@ -89,7 +89,7 @@ public class AdminSocieteController {
      * Accessible uniquement aux ADMIN
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('BACKOFFICE')")
     @Operation(summary = "Mettre à jour une société", description = "Met à jour les informations d'une société (ICE non modifiable)")
     public ResponseEntity<SocieteDTO> updateSociete(
             @PathVariable Long id,

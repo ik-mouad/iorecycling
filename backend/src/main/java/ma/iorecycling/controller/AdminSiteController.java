@@ -26,7 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Admin Sites", description = "API pour la gestion des sites de collecte")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMIN') or hasRole('BACKOFFICE')")
 public class AdminSiteController {
     
     private final SiteService siteService;
@@ -110,7 +110,7 @@ public class AdminSiteController {
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Sociétés - Sites", description = "API pour les sites d'une société")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMIN') or hasRole('BACKOFFICE')")
 class SocietesSitesController {
     
     private final SiteService siteService;

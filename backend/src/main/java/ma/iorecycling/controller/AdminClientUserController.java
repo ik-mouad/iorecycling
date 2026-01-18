@@ -23,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Admin Utilisateurs", description = "API pour la gestion des utilisateurs clients")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMIN') or hasRole('BACKOFFICE')")
 public class AdminClientUserController {
     
     private final ClientUserService clientUserService;
@@ -124,7 +124,7 @@ public class AdminClientUserController {
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Sociétés - Utilisateurs", description = "API pour les utilisateurs d'une société")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMIN') or hasRole('BACKOFFICE')")
 class SocietesUsersController {
     
     private final ClientUserService clientUserService;

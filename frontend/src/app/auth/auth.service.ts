@@ -233,10 +233,10 @@ export class AuthService {
     const claims = this.getClaims();
     const roles: string[] = claims?.realm_access?.roles || [];
     
-    // Priorité : COMPTABLE > ADMIN > CLIENT
+    // Priorité : COMPTABLE > ADMIN/BACKOFFICE > CLIENT
     if (roles.includes('COMPTABLE')) {
       this.router.navigateByUrl('/comptable/dashboard');
-    } else if (roles.includes('ADMIN')) {
+    } else if (roles.includes('ADMIN') || roles.includes('BACKOFFICE')) {
       this.router.navigateByUrl('/admin/enlevements');
     } else {
       this.router.navigateByUrl('/client');

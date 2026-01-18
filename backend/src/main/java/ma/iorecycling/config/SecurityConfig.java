@@ -49,8 +49,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/health").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers("/api/client/**").hasRole("CLIENT")
-                .requestMatchers("/api/swagger-ui/**", "/v3/api-docs/**").hasRole("ADMIN")
-                .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "COMPTABLE")
+                .requestMatchers("/api/swagger-ui/**", "/v3/api-docs/**").hasAnyRole("ADMIN", "BACKOFFICE")
+                .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "BACKOFFICE", "COMPTABLE")
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2

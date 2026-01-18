@@ -16,6 +16,8 @@ import { SocieteService } from '../../../../services/societe.service';
 import { SiteService } from '../../../../services/site.service';
 import { CreateRecurrenceRequest, TypeRecurrence } from '../../../../models/planning.model';
 import { Societe, Site } from '../../../../models/societe.model';
+import { TranslatePipe } from '../../../../pipes/translate.pipe';
+import { I18nService } from '../../../../services/i18n.service';
 
 export interface RecurrenceFormData {
   societeId?: number;
@@ -36,7 +38,8 @@ export interface RecurrenceFormData {
     MatButtonModule,
     MatIconModule,
     MatSnackBarModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    TranslatePipe
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './recurrence-form.component.html',
@@ -49,21 +52,8 @@ export class RecurrenceFormComponent implements OnInit {
   loading = false;
   loadingSites = false;
 
-  typeRecurrenceOptions = [
-    { value: TypeRecurrence.HEBDOMADAIRE, label: 'Hebdomadaire' },
-    { value: TypeRecurrence.BIMENSUELLE, label: 'Bimensuelle' },
-    { value: TypeRecurrence.MENSUELLE, label: 'Mensuelle' }
-  ];
-
-  jourSemaineOptions = [
-    { value: 'LUNDI', label: 'Lundi' },
-    { value: 'MARDI', label: 'Mardi' },
-    { value: 'MERCREDI', label: 'Mercredi' },
-    { value: 'JEUDI', label: 'Jeudi' },
-    { value: 'VENDREDI', label: 'Vendredi' },
-    { value: 'SAMEDI', label: 'Samedi' },
-    { value: 'DIMANCHE', label: 'Dimanche' }
-  ];
+  typeRecurrenceOptions: { value: TypeRecurrence; label: string }[] = [];
+  jourSemaineOptions: { value: string; label: string }[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -72,8 +62,29 @@ export class RecurrenceFormComponent implements OnInit {
     private siteService: SiteService,
     private snackBar: MatSnackBar,
     private dialogRef: MatDialogRef<RecurrenceFormComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: RecurrenceFormData
-  ) {}
+    @Inject(MAT_DIALOG_DATA) public data: RecurrenceFormData,
+    private i18n: I18nService
+  ) {
+    this.initOptions();
+  }
+
+  initOptions(): void {
+    this.typeRecurrenceOptions = [
+      { value: TypeRecurrence.HEBDOMADAIRE, label: this.i18n.t('recurrence.hebdomadaire') },
+      { value: TypeRecurrence.BIMENSUELLE, label: this.i18n.t('recurrence.bimensuelle') },
+      { value: TypeRecurrence.MENSUELLE, label: this.i18n.t('recurrence.mensuelle') }
+    ];
+
+    this.jourSemaineOptions = [
+      { value: 'LUNDI', label: this.i18n.t('recurrence.monday') },
+      { value: 'MARDI', label: this.i18n.t('recurrence.tuesday') },
+      { value: 'MERCREDI', label: this.i18n.t('recurrence.wednesday') },
+      { value: 'JEUDI', label: this.i18n.t('recurrence.thursday') },
+      { value: 'VENDREDI', label: this.i18n.t('recurrence.friday') },
+      { value: 'SAMEDI', label: this.i18n.t('recurrence.saturday') },
+      { value: 'DIMANCHE', label: this.i18n.t('recurrence.sunday') }
+    ];
+  }
 
   ngOnInit(): void {
     this.initForm();
@@ -165,7 +176,7 @@ export class RecurrenceFormComponent implements OnInit {
 
   submit(): void {
     if (this.recurrenceForm.invalid) {
-      this.snackBar.open('Veuillez corriger les erreurs', 'Fermer', { duration: 3000 });
+      this.snackBar.open(this.i18n.t('recurrence.fixErrors'), this.i18n.t('common.close'), { duration: 3000 });
       return;
     }
 
@@ -192,12 +203,12 @@ export class RecurrenceFormComponent implements OnInit {
 
     this.recurrenceService.createRecurrence(request).subscribe({
       next: () => {
-        this.snackBar.open('Récurrence créée avec succès', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('recurrence.createSuccess'), this.i18n.t('common.close'), { duration: 3000 });
         this.dialogRef.close(true);
       },
       error: (error) => {
         console.error('Erreur création récurrence:', error);
-        this.snackBar.open('Erreur lors de la création', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('recurrence.createError'), this.i18n.t('common.close'), { duration: 3000 });
         this.loading = false;
       }
     });

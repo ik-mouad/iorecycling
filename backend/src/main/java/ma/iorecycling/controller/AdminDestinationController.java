@@ -28,7 +28,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Admin Destinations", description = "API pour la gestion des destinations (centres de tri/traitement)")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMIN') or hasRole('BACKOFFICE')")
 public class AdminDestinationController {
     
     private final DestinationService destinationService;
@@ -134,8 +134,10 @@ public class AdminDestinationController {
     
     /**
      * Supprime une destination
+     * Accessible uniquement aux ADMIN
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Supprimer une destination", description = "Supprime une destination")
     public ResponseEntity<Void> deleteDestination(@PathVariable Long id) {
         log.info("DELETE /api/admin/destinations/{}", id);

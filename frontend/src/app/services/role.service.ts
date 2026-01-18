@@ -25,7 +25,15 @@ export class RoleService {
   }
   
   isAdmin(): boolean {
-    return this.hasRole('ADMIN');
+    return this.hasRole('ADMIN') || this.hasRole('BACKOFFICE');
+  }
+  
+  isBackoffice(): boolean {
+    return this.hasRole('BACKOFFICE');
+  }
+  
+  isAdminOnly(): boolean {
+    return this.hasRole('ADMIN') && !this.hasRole('BACKOFFICE');
   }
   
   isClient(): boolean {

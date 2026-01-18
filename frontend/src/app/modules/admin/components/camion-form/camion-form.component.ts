@@ -19,6 +19,7 @@ import { CreateCamionRequest, UpdateCamionRequest, TypeCamion } from '../../../.
 import { SocieteProprietaire } from '../../../../models/societe-proprietaire.model';
 import { CreateSocieteProprietaireDialogComponent } from '../create-societe-proprietaire-dialog/create-societe-proprietaire-dialog.component';
 import { TranslatePipe } from '../../../../pipes/translate.pipe';
+import { I18nService } from '../../../../services/i18n.service';
 
 /**
  * Composant : Formulaire de création/édition de camion
@@ -60,7 +61,8 @@ export class CamionFormComponent implements OnInit {
     public router: Router,
     private route: ActivatedRoute,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private i18n: I18nService
   ) {}
 
   ngOnInit(): void {
@@ -138,7 +140,7 @@ export class CamionFormComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erreur chargement camion:', error);
-        this.snackBar.open('Erreur lors du chargement du camion', 'Fermer', { duration: 3000 });
+        this.snackBar.open(this.i18n.t('camion.loadError'), this.i18n.t('common.close'), { duration: 3000 });
         this.loading = false;
       }
     });
@@ -146,7 +148,7 @@ export class CamionFormComponent implements OnInit {
 
   onSubmit(): void {
     if (this.camionForm.invalid) {
-      this.snackBar.open('Veuillez corriger les erreurs du formulaire', 'Fermer', { duration: 3000 });
+      this.snackBar.open(this.i18n.t('camion.formErrors'), this.i18n.t('common.close'), { duration: 3000 });
       return;
     }
 
@@ -165,12 +167,12 @@ export class CamionFormComponent implements OnInit {
 
       this.camionService.updateCamion(this.camionId, request).subscribe({
         next: () => {
-          this.snackBar.open('Camion modifié avec succès', 'Fermer', { duration: 3000 });
+          this.snackBar.open(this.i18n.t('camion.updatedSuccess'), this.i18n.t('common.close'), { duration: 3000 });
           this.router.navigate(['/admin/camions']);
         },
         error: (error) => {
           console.error('Erreur modification camion:', error);
-          this.snackBar.open('Erreur lors de la modification', 'Fermer', { duration: 3000 });
+          this.snackBar.open(this.i18n.t('camion.updateError'), this.i18n.t('common.close'), { duration: 3000 });
           this.loading = false;
         }
       });
@@ -180,13 +182,13 @@ export class CamionFormComponent implements OnInit {
 
       this.camionService.createCamion(request).subscribe({
         next: () => {
-          this.snackBar.open('Camion créé avec succès', 'Fermer', { duration: 3000 });
+          this.snackBar.open(this.i18n.t('camion.createdSuccess'), this.i18n.t('common.close'), { duration: 3000 });
           this.router.navigate(['/admin/camions']);
         },
         error: (error) => {
           console.error('Erreur création camion:', error);
-          const message = error.error?.message || 'Erreur lors de la création (matricule déjà utilisé ?)';
-          this.snackBar.open(message, 'Fermer', { duration: 5000 });
+          const message = error.error?.message || this.i18n.t('camion.createError');
+          this.snackBar.open(message, this.i18n.t('common.close'), { duration: 5000 });
           this.loading = false;
         }
       });
@@ -202,24 +204,24 @@ export class CamionFormComponent implements OnInit {
     if (!control) return '';
 
     if (control.hasError('required')) {
-      return 'Ce champ est obligatoire';
+      return this.i18n.t('validation.required');
     }
     if (control.hasError('min')) {
-      return 'Le tonnage doit être supérieur à 0';
+      return this.i18n.t('camion.tonnageMinError');
     }
     if (control.hasError('maxlength')) {
-      return `Maximum ${control.errors?.['maxlength'].requiredLength} caractères`;
+      return this.i18n.t('common.maxLength', { length: control.errors?.['maxlength'].requiredLength });
     }
     return '';
   }
 
   getTypeCamionLabel(type: TypeCamion): string {
     const labels: { [key in TypeCamion]: string } = {
-      [TypeCamion.PLATEAU]: 'Plateau',
-      [TypeCamion.CAISSON]: 'Caisson',
-      [TypeCamion.AMPLIROLL]: 'Ampliroll',
-      [TypeCamion.GRUE]: 'Grue',
-      [TypeCamion.HYDROCUREUR]: 'Hydrocureur'
+      [TypeCamion.PLATEAU]: this.i18n.t('camion.typePlateau'),
+      [TypeCamion.CAISSON]: this.i18n.t('camion.typeCaisson'),
+      [TypeCamion.AMPLIROLL]: this.i18n.t('camion.typeAmpliroll'),
+      [TypeCamion.GRUE]: this.i18n.t('camion.typeGrue'),
+      [TypeCamion.HYDROCUREUR]: this.i18n.t('camion.typeHydrocureur')
     };
     return labels[type] || type;
   }

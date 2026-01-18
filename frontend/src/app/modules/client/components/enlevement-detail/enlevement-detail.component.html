@@ -60,7 +60,7 @@
 
         <ng-container matColumnDef="quantiteKg">
           <th mat-header-cell *matHeaderCellDef class="table-header">Quantité</th>
-          <td mat-cell *matCellDef="let item" class="table-cell">{{ item.quantiteKg | number:'1.3-3' }} {{ item.uniteMesure || 'kg' }}</td>
+          <td mat-cell *matCellDef="let item" class="table-cell">{{ item.quantiteKg | number:'1.2-2' }} {{ item.uniteMesure || 'kg' }}</td>
         </ng-container>
 
         <ng-container matColumnDef="etat">
@@ -92,7 +92,7 @@
     <div class="totals-grid">
       <div class="total-item">
         <label class="total-label">Poids total</label>
-        <div class="total-value">{{ enlevement.poidsTotal | number:'1.1-1' }} kg</div>
+        <div class="total-value">{{ enlevement.poidsTotal | number:'1.2-2' }} kg</div>
       </div>
       <div class="total-item total-success">
         <label class="total-label">Budget recyclage</label>

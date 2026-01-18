@@ -16,5 +16,19 @@ const buildRoleGuard = (requiredRole: string): CanActivateFn => {
   };
 };
 
-export const adminGuard: CanActivateFn = buildRoleGuard('ADMIN');
+const buildMultiRoleGuard = (requiredRoles: string[]): CanActivateFn => {
+  return () => {
+    const authService = inject(AuthService);
+    const router = inject(Router);
+
+    if (authService.isLoggedIn() && requiredRoles.some(role => authService.hasRole(role))) {
+      return true;
+    }
+
+    router.navigate(['/']);
+    return false;
+  };
+};
+
+export const adminGuard: CanActivateFn = buildMultiRoleGuard(['ADMIN', 'BACKOFFICE']);
 export const clientGuard: CanActivateFn = buildRoleGuard('CLIENT');

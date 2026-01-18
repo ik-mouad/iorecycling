@@ -28,7 +28,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Admin Sociétés Propriétaires", description = "API pour la gestion des sociétés propriétaires de camions")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMIN') or hasRole('BACKOFFICE')")
 public class AdminSocieteProprietaireController {
     
     private final SocieteProprietaireService societeProprietaireService;

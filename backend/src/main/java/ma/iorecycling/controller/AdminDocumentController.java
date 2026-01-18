@@ -26,7 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Admin Documents", description = "API pour la gestion des documents")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMIN') or hasRole('BACKOFFICE')")
 public class AdminDocumentController {
     
     private final DocumentService documentService;

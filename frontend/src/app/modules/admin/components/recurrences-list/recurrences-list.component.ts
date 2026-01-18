@@ -16,6 +16,7 @@ import { RecurrenceFormComponent, RecurrenceFormData } from '../recurrence-form/
 import { DeleteRecurrenceDialogComponent } from '../delete-recurrence-dialog/delete-recurrence-dialog.component';
 import { I18nService } from '../../../../services/i18n.service';
 import { TranslatePipe } from '../../../../pipes/translate.pipe';
+import { RoleService } from '../../../../services/role.service';
 
 /**
  * Composant : Liste des récurrences
@@ -49,8 +50,13 @@ export class RecurrencesListComponent implements OnInit {
     private recurrenceService: RecurrenceService,
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
-    private i18n: I18nService
+    private i18n: I18nService,
+    private roleService: RoleService
   ) {}
+  
+  canDelete(): boolean {
+    return this.roleService.hasRole('ADMIN');
+  }
 
   ngOnInit(): void {
     this.loadRecurrences();

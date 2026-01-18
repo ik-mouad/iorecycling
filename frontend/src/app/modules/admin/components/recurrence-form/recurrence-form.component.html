@@ -1,114 +1,114 @@
 <h2 mat-dialog-title class="dialog-title">
   <mat-icon>schedule</mat-icon>
-  <span>Nouvelle Récurrence</span>
+  <span>{{ 'recurrence.new' | translate }}</span>
 </h2>
 
 <form [formGroup]="recurrenceForm" (ngSubmit)="submit()" class="recurrence-form">
   <mat-dialog-content class="dialog-content">
     <div class="form-fields">
       <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Société *</mat-label>
+        <mat-label>{{ 'recurrence.societe' | translate }}<span class="required-asterisk">*</span></mat-label>
+        <mat-icon matPrefix>business</mat-icon>
         <mat-select formControlName="societeId">
           <mat-option *ngFor="let societe of societes" [value]="societe.id">
             {{ societe.raisonSociale }}
           </mat-option>
         </mat-select>
-        <mat-icon matPrefix>business</mat-icon>
         <mat-error *ngIf="recurrenceForm.get('societeId')?.hasError('required')">
-          La société est obligatoire
+          {{ 'recurrence.societeRequired' | translate }}
         </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Site *</mat-label>
+        <mat-label>{{ 'recurrence.site' | translate }}<span class="required-asterisk">*</span></mat-label>
+        <mat-icon matPrefix>location_on</mat-icon>
         <mat-select formControlName="siteId" [disabled]="!recurrenceForm.value.societeId || loadingSites">
-          <mat-option *ngIf="loadingSites" disabled>Chargement des sites...</mat-option>
+          <mat-option *ngIf="loadingSites" disabled>{{ 'recurrence.loadingSites' | translate }}</mat-option>
           <mat-option *ngFor="let site of sites" [value]="site.id">
             {{ site.name }}
           </mat-option>
         </mat-select>
-        <mat-icon matPrefix>location_on</mat-icon>
-        <mat-hint *ngIf="loadingSites">Chargement des sites...</mat-hint>
+        <mat-hint *ngIf="loadingSites">{{ 'recurrence.loadingSites' | translate }}</mat-hint>
         <mat-error *ngIf="recurrenceForm.get('siteId')?.hasError('required')">
-          Le site est obligatoire
+          {{ 'recurrence.siteRequired' | translate }}
         </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Type de récurrence *</mat-label>
+        <mat-label>{{ 'recurrence.typeRecurrence' | translate }}<span class="required-asterisk">*</span></mat-label>
+        <mat-icon matPrefix>repeat</mat-icon>
         <mat-select formControlName="typeRecurrence">
           <mat-option *ngFor="let type of typeRecurrenceOptions" [value]="type.value">
             {{ type.label }}
           </mat-option>
         </mat-select>
-        <mat-icon matPrefix>repeat</mat-icon>
         <mat-error *ngIf="recurrenceForm.get('typeRecurrence')?.hasError('required')">
-          Le type de récurrence est obligatoire
+          {{ 'recurrence.typeRecurrenceRequired' | translate }}
         </mat-error>
       </mat-form-field>
 
       <!-- Options selon le type de récurrence -->
       <mat-form-field appearance="outline" class="form-field" *ngIf="getTypeRecurrence() === 'HEBDOMADAIRE'">
-        <mat-label>Jour de la semaine *</mat-label>
+        <mat-label>{{ 'recurrence.jourSemaine' | translate }}<span class="required-asterisk">*</span></mat-label>
+        <mat-icon matPrefix>calendar_today</mat-icon>
         <mat-select formControlName="jourSemaine">
           <mat-option *ngFor="let jour of jourSemaineOptions" [value]="jour.value">
             {{ jour.label }}
           </mat-option>
         </mat-select>
-        <mat-icon matPrefix>calendar_today</mat-icon>
         <mat-error *ngIf="recurrenceForm.get('jourSemaine')?.hasError('required')">
-          Le jour de la semaine est obligatoire
+          {{ 'recurrence.jourSemaineRequired' | translate }}
         </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="form-field" *ngIf="getTypeRecurrence() === 'BIMENSUELLE'">
-        <mat-label>Jours de la semaine *</mat-label>
-        <input matInput formControlName="joursSemaneBimensuel" placeholder="Ex: LUNDI,JEUDI">
+        <mat-label>{{ 'recurrence.joursSemaine' | translate }}<span class="required-asterisk">*</span></mat-label>
         <mat-icon matPrefix>event</mat-icon>
-        <mat-hint>Exemple: LUNDI,JEUDI pour les lundis et jeudis</mat-hint>
+        <input matInput formControlName="joursSemaneBimensuel" placeholder="Ex: LUNDI,JEUDI">
+        <mat-hint>{{ 'recurrence.joursSemaineHint' | translate }}</mat-hint>
         <mat-error *ngIf="recurrenceForm.get('joursSemaneBimensuel')?.hasError('required')">
-          Les jours sont obligatoires
+          {{ 'recurrence.joursSemaineRequired' | translate }}
         </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="form-field" *ngIf="getTypeRecurrence() === 'MENSUELLE'">
-        <mat-label>Jour du mois (1-31) *</mat-label>
-        <input matInput type="number" formControlName="jourMois" min="1" max="31">
+        <mat-label>{{ 'recurrence.jourMois' | translate }}<span class="required-asterisk">*</span></mat-label>
         <mat-icon matPrefix>calendar_view_day</mat-icon>
+        <input matInput type="number" formControlName="jourMois" min="1" max="31">
         <mat-error *ngIf="recurrenceForm.get('jourMois')?.hasError('required')">
-          Le jour du mois est obligatoire
+          {{ 'recurrence.jourMoisRequired' | translate }}
         </mat-error>
         <mat-error *ngIf="recurrenceForm.get('jourMois')?.hasError('min') || recurrenceForm.get('jourMois')?.hasError('max')">
-          Le jour doit être entre 1 et 31
+          {{ 'recurrence.jourMoisInvalid' | translate }}
         </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Heure prévue (optionnel)</mat-label>
-        <input matInput formControlName="heurePrevue" placeholder="Ex: 09:00">
+        <mat-label>{{ 'recurrence.heurePrevue' | translate }}</mat-label>
         <mat-icon matPrefix>schedule</mat-icon>
-        <mat-hint>Format: HH:mm</mat-hint>
+        <input matInput formControlName="heurePrevue" placeholder="Ex: 09:00">
+        <mat-hint>{{ 'recurrence.heurePrevueHint' | translate }}</mat-hint>
       </mat-form-field>
 
       <div class="dates-section">
         <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Date de début *</mat-label>
-          <input matInput [matDatepicker]="pickerDebut" formControlName="dateDebut">
+          <mat-label>{{ 'recurrence.dateDebut' | translate }}<span class="required-asterisk">*</span></mat-label>
           <mat-icon matPrefix>event</mat-icon>
+          <input matInput [matDatepicker]="pickerDebut" formControlName="dateDebut">
           <mat-datepicker-toggle matSuffix [for]="pickerDebut"></mat-datepicker-toggle>
           <mat-datepicker #pickerDebut></mat-datepicker>
           <mat-error *ngIf="recurrenceForm.get('dateDebut')?.hasError('required')">
-            La date de début est obligatoire
+            {{ 'recurrence.dateDebutRequired' | translate }}
           </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Date de fin (optionnel)</mat-label>
-          <input matInput [matDatepicker]="pickerFin" formControlName="dateFin">
+          <mat-label>{{ 'recurrence.dateFin' | translate }}</mat-label>
           <mat-icon matPrefix>event</mat-icon>
+          <input matInput [matDatepicker]="pickerFin" formControlName="dateFin">
           <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
           <mat-datepicker #pickerFin></mat-datepicker>
-          <mat-hint>Laisser vide pour une récurrence sans fin</mat-hint>
+          <mat-hint>{{ 'recurrence.dateFinHint' | translate }}</mat-hint>
         </mat-form-field>
       </div>
     </div>
@@ -116,12 +116,13 @@
 
   <mat-dialog-actions align="end" class="dialog-actions">
     <button mat-button type="button" (click)="cancel()" [disabled]="loading" class="cancel-button">
-      Annuler
+      {{ 'common.cancel' | translate }}
     </button>
-    <button mat-raised-button color="primary" type="submit" [disabled]="loading" class="submit-button">
+    <button mat-raised-button color="primary" type="submit" [disabled]="recurrenceForm.invalid || loading" class="submit-button">
       <mat-icon *ngIf="!loading">save</mat-icon>
       <mat-spinner *ngIf="loading" [diameter]="20" class="button-spinner"></mat-spinner>
-      <span>Créer</span>
+      <span *ngIf="!loading">{{ 'recurrence.create' | translate }}</span>
+      <span *ngIf="loading">{{ 'common.saving' | translate }}</span>
     </button>
   </mat-dialog-actions>
 </form>

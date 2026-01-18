@@ -21,7 +21,7 @@ describe('ClientDashboardComponent', () => {
       date: '2024-01-15',
       heure: '14:30',
       type: 'recyclables' as const,
-      tonnage: 2.5,
+      : 2.5,
       site: 'Site Principal - Casablanca',
       docs: [
         { name: 'Bordereau_001.pdf', url: '/docs/bordereau_001.pdf', type: 'bordereau' as const }

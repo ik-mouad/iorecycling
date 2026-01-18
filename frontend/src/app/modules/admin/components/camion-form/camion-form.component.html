@@ -10,22 +10,22 @@
       <form [formGroup]="camionForm" (ngSubmit)="onSubmit()">
         <div class="form-row">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Matricule *</mat-label>
+            <mat-label>{{ 'camion.matricule' | translate }} *</mat-label>
             <input matInput formControlName="matricule" placeholder="Ex: ABC-123-45">
             <mat-error>{{ getErrorMessage('matricule') }}</mat-error>
-            <mat-hint>Identifiant unique du camion</mat-hint>
+            <mat-hint>{{ 'camion.matriculeHint' | translate }}</mat-hint>
           </mat-form-field>
         </div>
 
         <div class="form-row">
           <mat-form-field appearance="outline">
-            <mat-label>Tonnage maximum (kg) *</mat-label>
+            <mat-label>{{ 'camion.tonnageMaxKg' | translate }} *</mat-label>
             <input matInput type="number" formControlName="tonnageMaxKg" step="0.01" min="0.01">
             <mat-error>{{ getErrorMessage('tonnageMaxKg') }}</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Type de camion *</mat-label>
+            <mat-label>{{ 'camion.typeCamion' | translate }} *</mat-label>
             <mat-select formControlName="typeCamion">
               <mat-option *ngFor="let type of typesCamion" [value]="type">
                 {{ getTypeCamionLabel(type) }}
@@ -37,42 +37,42 @@
 
         <div class="form-row">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Société propriétaire *</mat-label>
+            <mat-label>{{ 'camion.societeProprietaire' | translate }} *</mat-label>
             <mat-select formControlName="societeProprietaireId">
               <mat-option *ngFor="let societe of societesProprietaires" [value]="societe.id">
                 {{ societe.raisonSociale }}
               </mat-option>
             </mat-select>
             <mat-error>{{ getErrorMessage('societeProprietaireId') }}</mat-error>
-            <mat-hint>Société propriétaire du camion (partenaire, sous-traitant, etc.)</mat-hint>
+            <mat-hint>{{ 'camion.societeProprietaireHint' | translate }}</mat-hint>
           </mat-form-field>
-          <button mat-icon-button color="primary" (click)="openCreateSocieteProprietaireDialog()" matTooltip="Créer une nouvelle société propriétaire" type="button" class="add-societe-button">
+          <button mat-icon-button color="primary" (click)="openCreateSocieteProprietaireDialog()" [matTooltip]="'camion.createSocieteProprietaire' | translate" type="button" class="add-societe-button">
             <mat-icon>add_circle</mat-icon>
           </button>
         </div>
 
         <div class="form-row">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Observation</mat-label>
+            <mat-label>{{ 'camion.observation' | translate }}</mat-label>
             <textarea matInput formControlName="observation" rows="3" 
-                      placeholder="Notes ou remarques sur ce camion"></textarea>
+                      [placeholder]="'camion.observationHint' | translate"></textarea>
             <mat-error>{{ getErrorMessage('observation') }}</mat-error>
           </mat-form-field>
         </div>
 
         <div class="form-row">
           <mat-slide-toggle formControlName="actif">
-            Camion actif (peut être utilisé pour les enlèvements)
+            {{ 'camion.actif' | translate }} ({{ 'camion.actifHint' | translate }})
           </mat-slide-toggle>
         </div>
 
         <div class="form-actions">
           <button mat-button type="button" (click)="cancel()" [disabled]="loading">
-            Annuler
+            {{ 'common.cancel' | translate }}
           </button>
           <button mat-raised-button color="primary" type="submit" [disabled]="loading || camionForm.invalid">
             <mat-spinner *ngIf="loading" diameter="20" style="display: inline-block; margin-right: 8px;"></mat-spinner>
-            {{ isEditMode ? 'Modifier' : 'Créer' }}
+            {{ isEditMode ? ('common.edit' | translate) : ('common.create' | translate) }}
           </button>
         </div>
       </form>

@@ -86,7 +86,7 @@
                 <mat-icon>edit</mat-icon>
                 {{ 'common.edit' | translate }}
               </button>
-              <button mat-menu-item (click)="deleteDestination(destination)" class="delete-action">
+              <button *ngIf="canDelete()" mat-menu-item (click)="deleteDestination(destination)" class="delete-action">
                 <mat-icon>delete</mat-icon>
                 {{ 'common.delete' | translate }}
               </button>

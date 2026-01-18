@@ -29,7 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Ventes", description = "API pour la gestion des ventes de déchets")
-@PreAuthorize("hasRole('ADMIN') or hasRole('COMPTABLE')")
+@PreAuthorize("hasRole('ADMIN') or hasRole('BACKOFFICE') or hasRole('COMPTABLE')")
 public class AdminVenteController {
     
     private final VenteService venteService;

@@ -55,7 +55,7 @@ test.describe('Tableau de bord', () => {
     // Vérifier la présence des colonnes
     await expect(page.locator('th:has-text("Date & Heure")')).toBeVisible();
     await expect(page.locator('th:has-text("Type")')).toBeVisible();
-    await expect(page.locator('th:has-text("Tonnage")')).toBeVisible();
+    await expect(page.locator('th:has-text("")')).toBeVisible();
     await expect(page.locator('th:has-text("Site")')).toBeVisible();
     await expect(page.locator('th:has-text("Documents")')).toBeVisible();
     

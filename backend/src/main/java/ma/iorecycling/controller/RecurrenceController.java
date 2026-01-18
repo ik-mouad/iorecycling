@@ -23,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Admin Récurrences", description = "API pour la gestion des récurrences d'enlèvements")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMIN') or hasRole('BACKOFFICE')")
 public class RecurrenceController {
     
     private final RecurrenceService recurrenceService;
@@ -88,11 +88,13 @@ public class RecurrenceController {
     
     /**
      * Supprime une récurrence
+     * Accessible uniquement aux ADMIN
      * @param id ID de la récurrence à supprimer
      * @param supprimerToutesOccurrences Si true, supprime toutes les occurrences (passées et futures), 
      *                                   si false, supprime uniquement les occurrences futures (défaut: false)
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Supprimer récurrence", description = "Supprime une récurrence et optionnellement ses occurrences du planning")
     public ResponseEntity<Void> supprimerRecurrence(
             @PathVariable Long id,

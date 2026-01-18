@@ -32,7 +32,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Admin Enlèvements", description = "API pour la gestion des enlèvements")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMIN') or hasRole('BACKOFFICE')")
 public class AdminEnlevementController {
     
     private final EnlevementService enlevementService;
@@ -138,8 +138,10 @@ public class AdminEnlevementController {
     
     /**
      * Supprime un enlèvement
+     * Accessible uniquement aux ADMIN
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Supprimer un enlèvement", description = "Supprime un enlèvement et ses items")
     public ResponseEntity<Void> deleteEnlevement(@PathVariable Long id) {
         log.info("DELETE /api/admin/enlevements/{}", id);
